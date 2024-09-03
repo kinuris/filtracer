@@ -60,6 +60,14 @@ class DatabaseSeeder extends Seeder
             'role' => 'Admin',
         ]);
 
+        User::query()->create([
+            'name' => 'Alum N. Ai',
+            'username' => 'alumni',
+            'password' => bcrypt('password'),
+            'department_id' => Department::all()->random()->id,
+            'role' => 'Alumni',
+        ]);
+
         $admins = User::allAdmin();
         foreach ($admins as $admin) {
             Admin::query()->create([

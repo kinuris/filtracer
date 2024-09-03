@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
 {
@@ -12,7 +13,7 @@ class AuthController extends Controller
     }
 
     public function logout() {
-        auth()->logout();
+        Auth::logout();
 
         return redirect('/login')->with('success', 'You have been logged out.');
     }
@@ -24,14 +25,16 @@ class AuthController extends Controller
             'password' => ['required'],
         ]);
 
-        if (!auth()->attempt($validated)) {
+        if (!Auth::attempt($validated)) {
             return redirect('/login')->with('error', 'Invalid Credentials');
         }
 
-        $admin = auth()->user()->admin();
+        $admin = Auth::user()->admin();
         if ($admin) {
             return redirect('/admin');
         }
+
+        return redirect('/alumni');
     }
 
     public function registerAdminView()

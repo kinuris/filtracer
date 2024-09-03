@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\AlumniController;
 use App\Http\Controllers\AuthController;
 use App\Models\Department;
 use Illuminate\Support\Facades\Auth;
@@ -18,8 +19,8 @@ Route::get('/', function () {
     }
 })->middleware('auth');
 
-Route::get('/department/courses/{dept}', function(Department $dept) {
-    return response()->json(['courses' => $dept->getCourses()]); 
+Route::get('/department/courses/{dept}', function (Department $dept) {
+    return response()->json(['courses' => $dept->getCourses()]);
 });
 
 Route::get('/login', [AuthController::class, 'loginView'])
@@ -44,24 +45,30 @@ Route::get('/register/alumni', [AuthController::class, 'registerAlumniView'])
 Route::post('/register/alumni', [AuthController::class, 'registerAlumni'])
     ->middleware('guest');
 
+Route::controller(AlumniController::class)
+    ->middleware('role:Alumni')
+    ->group(function () {
+        Route::get('/alumni', 'dashboardView');
+    });
+
 Route::controller(AdminController::class)
-->middleware('role:Admin')
-->group(function () {
-    Route::get('/admin', 'dashboardView');
-    Route::get('/department', 'departmentView');
+    ->middleware('role:Admin')
+    ->group(function () {
+        Route::get('/admin', 'dashboardView');
+        Route::get('/department', 'departmentView');
 
-    Route::get('/department/{department}', 'alumniListView');
-    Route::get('/user/view/{user}', 'userView');
+        Route::get('/department/{department}', 'alumniListView');
+        Route::get('/user/view/{user}', 'userView');
 
-    Route::get('/report/graphical', 'reportsGraphicalView');
-    Route::get('/report/statistical', 'reportsStatisticalView');
+        Route::get('/report/graphical', 'reportsGraphicalView');
+        Route::get('/report/statistical', 'reportsStatisticalView');
 
-    Route::get('/account', 'accountsView');
-    Route::get('/admin/profile', 'myProfileView');
+        Route::get('/account', 'accountsView');
+        Route::get('/admin/profile', 'myProfileView');
 
-    Route::get('/audit', 'auditView');
+        Route::get('/audit', 'auditView');
 
-    Route::get('/admin/settings', 'settingsView');
-    Route::get('/settings/department', 'departmentSettingsView');
-    Route::get('/settings/account', 'accountsSettingsView');
-});
+        Route::get('/admin/settings', 'settingsView');
+        Route::get('/settings/department', 'departmentSettingsView');
+        Route::get('/settings/account', 'accountsSettingsView');
+    });
