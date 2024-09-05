@@ -41,5 +41,11 @@ class PersonalBio extends Model
         return date_diff(date_create($this->birthdate), date_create('now'))->y;
     }
 
+    public function casts() {
+        return [
+            'birthdate' => 'date',
+        ];
+    }
+
     use HasFactory;
 }

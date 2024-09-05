@@ -49,6 +49,9 @@ Route::controller(AlumniController::class)
     ->middleware('role:Alumni')
     ->group(function () {
         Route::get('/alumni', 'dashboardView');
+        Route::get('/alumni/profile', 'alumniProfileView');
+
+        Route::get('/alumni/profile/update', 'updateProfileView');
     });
 
 Route::controller(AdminController::class)

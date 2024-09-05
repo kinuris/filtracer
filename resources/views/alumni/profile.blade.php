@@ -1,0 +1,139 @@
+@extends('layouts.alumni')
+
+@section('content')
+<div class="bg-gray-100 w-full h-full p-8 flex flex-col max-h-[calc(100%-4rem)]">
+    <div class="flex justify-between">
+        <h1 class="font-medium tracking-widest text-lg">Profile Details</h1>
+        <a class="text-white bg-blue-600 text-sm flex place-items-center rounded-lg px-2" href="/alumni/profile/update">Update Profile</a>
+    </div>
+
+    <div class="flex max-h-full">
+        <div class="shadow rounded-lg h-fit mt-6 flex-1 min-w-80">
+            <div class="bg-white py-4 flex flex-col px-6 border-b rounded-lg">
+                <img class="w-32 h-32 rounded-full object-cover shadow-md mr-8" src="{{ $user->image() }}" alt="Profile">
+                <p class="text-lg font-bold my-6">{{ $user->name }}</p>
+
+                <div class="flex place-items-center">
+                    <img class="h-4 mr-3" src="{{ asset('assets/alumni_job.svg') }}" alt="Job">
+                    <p class="text-gray-400 text-sm">Example Job</p>
+                </div>
+                <div class="flex mt-1 ml-[1px] place-items-center">
+                    <img class="h-4 mr-3" src="{{ asset('assets/alumni_location.svg') }}" alt="Job">
+                    <p class="text-gray-400 text-sm">Roxas City, Capiz</p>
+                </div>
+
+                <p class="text-gray-400 mt-4">Email Address</p>
+                <p>{{ $user->getPersonalBio()->email_address }}</p>
+
+                <p class="text-gray-400 mt-4">Phone Number</p>
+                <p>{{ $user->getPersonalBio()->phone_number }}</p>
+
+                <p class="text-gray-400 mt-4">Degree</p>
+                <p>{{ $user->getEducationalBio()->degree_type }} in {{ $user->getEducationalBio()->getCourse()->name }}</p>
+
+                <p class="text-gray-400 mt-4">Alumni Batch</p>
+                @php($year = $user->getEducationalBio()->batch)
+                <p>S.Y. {{ $year }} - {{ $year + 1 }}</p>
+            </div>
+        </div>
+        
+        <div class="mx-2"></div>
+
+        <div class="flex-[3] flex flex-col mt-6 max-h-full overflow-scroll">
+            <div class="shadow rounded-lg">
+                <div class="bg-white py-4 flex flex-col px-6 border-b rounded-lg">
+                    <p class="text-lg font-bold pb-2">Personal Information</p>
+                    @php ($personal = $user->getPersonalBio())
+                    <div class="flex justify-between">
+                        <div class="flex-1 flex-col">
+                            <p class="text-gray-400">First Name</p>
+                            <p>{{ $personal->first_name }}</p>
+
+                            <p class="text-gray-400 mt-4">Date Joined</p>
+                            <p>{{ $personal->created_at->format('d/m/Y') }}</p>
+
+                            <p class="text-gray-400 mt-4">Gender</p>
+                            <p>{{ $personal->gender }}</p>
+
+                            <p class="text-gray-400 mt-4">Username</p>
+                            <p>{{ $user->username }}</p>
+
+                            <p class="text-gray-400 mt-4">Permanent Address</p>
+                            <p class="mr-3">{{ $personal->permanent_address }}</p>
+                        </div>
+
+                        <div class="flex-1 flex-col">
+                            <p class="text-gray-400">Middle Name</p>
+                            <p>{{ $personal->middle_name }}</p>
+
+                            <p class="text-gray-400 mt-4">Student ID</p>
+                            <p>{{ $personal->student_id }}</p>
+
+                            <p class="text-gray-400 mt-4">Date of Birth</p>
+                            <p>{{ $personal->birthdate->format('M. d, Y') }}</p>
+
+                            <p class="text-gray-400 mt-4">Phone Number</p>
+                            <p>{{ $personal->phone_number }}</p>
+
+                            <p class="text-gray-400 mt-4">Current Address</p>
+                            <p class="mr-3">{{ $personal->current_address }}</p>
+                        </div>
+
+                        <div class="flex-1 flex-col">
+                            <p class="text-gray-400">Last Name</p>
+                            <p>{{ $personal->last_name }}</p>
+
+                            <p class="text-gray-400 mt-4">Age</p>
+                            <p>{{ $personal->getAge() }}</p>
+
+                            <p class="text-gray-400 mt-4">Civil Status</p>
+                            <p>{{ $personal->civil_status }}</p>
+
+                            <p class="text-gray-400 mt-4">Email Address</p>
+                            <p>{{ $personal->email_address }}</p>
+
+                            <p class="text-gray-400 mt-4">Social Link/s</p>
+                            <a class="text-blue-500" href="{{ $personal->social_link }}">{{ $personal->social_link }}</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="shadow rounded-lg mt-3 mb-4">
+                <div class="bg-white py-4 flex flex-col px-6 border-b rounded-lg">
+                    <p class="text-lg font-bold pb-2">Educational Information</p>
+                    @php ($educational = $user->getEducationalBio())
+                    <div class="flex justify-between">
+                        <div class="flex-1 flex-col">
+                            <p class="text-gray-400">School</p>
+                            <p>{{ $educational->school_name }}</p>
+
+                            <p class="text-gray-400 mt-4">Location</p>
+                            <p>{{ $educational->school_location }}</p>
+                        </div>
+
+                        <div class="flex-1 flex-col">
+                            <p class="text-gray-400">Course</p>
+                            <p>{{ $educational->getCourse()->name }}</p>
+
+                            <p class="text-gray-400 mt-4">Year Started</p>
+                            <p>{{ $educational->batch - 4 }}</p>
+                        </div>
+
+                        <div class="flex-1 flex-col">
+                            <p class="text-gray-400">Degree Type</p>
+                            <p>{{ $educational->degree_type }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="shadow rounded-lg mt-3 mb-4">
+                <div class="bg-white py-4 flex flex-col px-6 border-b rounded-lg">
+                    <p class="text-lg font-bold pb-2">Professional Information</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@endsection

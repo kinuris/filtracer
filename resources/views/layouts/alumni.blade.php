@@ -20,17 +20,17 @@
                 </div>
             </a>
 
-            <a href="/profile">
+            <a href="/alumni/profile">
                 <div class="hover:bg-gray-100 font-medium tracking-wide hover:text-blue-500 rounded-lg p-3 flex place-items-center">
                     <img class="w-7 mr-4" src="{{ asset('assets/profile_outlined.svg') }}" alt="Profile">
                     Profile
                 </div>
             </a>
 
-            <a href="/job">
+            <a href="/post">
                 <div class="hover:bg-gray-100 font-medium tracking-wide hover:text-blue-500 rounded-lg p-3 flex place-items-center">
-                    <img class="w-7 mr-4" src="{{ asset('assets/jobs.svg') }}" alt="Jobs">
-                    Jobs
+                    <img class="w-7 mr-4" src="{{ asset('assets/posts.svg') }}" alt="Jobs">
+                    Posts
                 </div>
             </a>
 
