@@ -117,7 +117,7 @@ class User extends Authenticatable
 
     public function employment()
     {
-        return 'LMAO';
+        return $this->getProfessionalBio()->employment_status;
     }
 
     public function image()
