@@ -5,12 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Chatroom extends Model
+class ProfessionalRecordMethod extends Model
 {
-    protected $table = 'chatroom';
+    protected $table = 'professional_record_methods';
     protected $fillable = [
-        'chat_name',
-        'user_id',
+        'professional_record_id',
+        'method',
     ];
 
     use HasFactory;

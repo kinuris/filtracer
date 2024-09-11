@@ -19,6 +19,8 @@
                 <th class="font-thin">Action</th>
             </thead>
         </table>
+        <div class="bg-white rounded-b-lg p-3">
+        </div>
     </div>
 </div>
 @endsection

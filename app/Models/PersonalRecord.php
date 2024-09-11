@@ -5,16 +5,16 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class PersonalBio extends Model
+class PersonalRecord extends Model
 {
-    protected $table = 'personal_bio';
+    protected $table = 'personal_records';
     protected $fillable = [
+        'user_id',
         'student_id',
         'first_name',
         'middle_name',
         'last_name',
         'suffix',
-        'age',
         'gender',
         'birthdate',
         'civil_status',
@@ -24,10 +24,11 @@ class PersonalBio extends Model
         'phone_number',
         'social_link',
         'profile_picture',
-        'status'
+        'status',
     ];
-    
-    public function getFullname() {
+
+    public function getFullname()
+    {
         if ($this->middle_name) {
             return $this->first_name . ' ' . $this->middle_name[0] . '. ' . $this->last_name;
         } else {
@@ -35,13 +36,15 @@ class PersonalBio extends Model
         }
     }
 
-    public function getAge() {
+    public function getAge()
+    {
         // TODO: Change this garbage 
 
         return date_diff(date_create($this->birthdate), date_create('now'))->y;
     }
 
-    public function casts() {
+    public function casts()
+    {
         return [
             'birthdate' => 'date',
         ];

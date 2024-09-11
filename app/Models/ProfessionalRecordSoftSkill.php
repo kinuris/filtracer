@@ -5,12 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class EventCommit extends Model
+class ProfessionalRecordSoftSkill extends Model
 {
-    protected $table = 'event_commits';
+    protected $table = 'professional_record_soft_skills';
     protected $fillable = [
-        'event_id',
-        'user_id',
+        'professional_record_id',
+        'skill',
     ];
 
     use HasFactory;

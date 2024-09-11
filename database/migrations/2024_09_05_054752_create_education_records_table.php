@@ -11,9 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('educational_bio', function (Blueprint $table) {
+        Schema::create('education_records', function (Blueprint $table) {
             $table->id();
-            $table->enum('school_name', [
+            $table->foreignId('user_id')
+                ->references('id')
+                ->on('users');
+
+            $table->enum('school', [
                 'Filamer Christian University',
                 'University of the Philippines in the Visayas',
                 'Central Philippine University',
@@ -32,9 +36,8 @@ return new class extends Migration
                 'Western Institute of Technology',
                 'Guimaras State University',
                 'STI West Negros University'
-            ])->nullable();
+            ]);
 
-            $table->string('other_school')->nullable();
             $table->string('school_location');
 
             $table->enum('degree_type', [
@@ -43,20 +46,18 @@ return new class extends Migration
                 "Doctoral",
             ]);
 
-            $table->string('other_type')->nullable();
+            $table->foreignId('course_id')
+                ->references('id')
+                ->on('courses');
 
-            $table->unsignedBigInteger('course_id')->nullable();
-            $table->string('other_course')->nullable();
+            $table->foreignId('major_id')
+                ->references('id')
+                ->on('majors');
 
-            $table->unsignedBigInteger('major_id')->nullable();
-            $table->string('other_major')->nullable();
-
-            $table->year('batch');
+            $table->year('start');
+            $table->year('end');
 
             $table->timestamps();
-
-            $table->foreign('course_id')->references('id')->on('courses')->onUpdate('cascade')->onDelete('cascade');
-            $table->foreign('major_id')->references('id')->on('majors')->onUpdate('cascade')->onDelete('cascade');
         });
     }
 
@@ -65,6 +66,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('educational_bio');
+        Schema::dropIfExists('education_records');
     }
 };

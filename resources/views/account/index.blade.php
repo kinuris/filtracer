@@ -1,6 +1,7 @@
 @extends('layouts.admin')
 
 @section('content')
+@include('components.verify-modal')
 <div class="bg-gray-100 w-full h-full p-8">
     <h1 class="font-medium tracking-widest text-lg mb-6">User Accounts</h1>
 
@@ -39,7 +40,7 @@
                             @if ($personal !== null && $personal->status == 1)
                             <a href=""><img src="{{ asset('/assets/verified_user.svg') }}" alt="Verified"></a>
                             @elseif ($personal !== null && $personal->status == 0)
-                            <a href=""><img src="{{ asset('/assets/unverified_user.svg') }}" alt="Verified"></a>
+                            <button data-user-id="{{ $user->id }}" class="openVerifyModal"><img src="{{ asset('/assets/unverified_user.svg') }}" alt="Verified"></button>
                             @endif
                             <a class="mx-3" href="/user/view/{{ $user->id }}"><img src="{{ asset('assets/view.svg') }}" alt="View"></a>
                             <a href="/user/delete/{{ $user->id }}"><img src="{{ asset('assets/trash.svg') }}" alt="Trash"></a>
@@ -54,4 +55,40 @@
         </div>
     </div>
 </div>
+@endsection
+
+@section('script')
+<script>
+    const verifyModal = document.getElementById('verifyModal');
+    const closeVerifyModal = document.getElementById('closeVerifyModal');
+
+    const params = new URLSearchParams(window.location.search);
+    const user = params.get('verify_modal');
+
+    if (user) {
+        verifyModal.classList.remove('hidden');
+    }
+
+    closeVerifyModal.addEventListener('click', () => {
+        verifyModal.classList.add('hidden');
+    });
+
+    window.addEventListener('click', (e) => {
+        if (e.target === verifyModal) {
+            verifyModal.classList.add('hidden');
+        }
+    })
+</script>
+<script>
+    for (let button of document.querySelectorAll('.openVerifyModal')) {
+        button.addEventListener('click', () => {
+            const user = button.getAttribute('data-user-id');
+
+            const params = new URLSearchParams();
+            params.append('verify_modal', user);
+
+            window.location.replace('/account?' + params.toString());
+        });
+    }
+</script>
 @endsection

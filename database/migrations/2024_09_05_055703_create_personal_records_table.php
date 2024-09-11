@@ -11,8 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('personal_bio', function (Blueprint $table) {
+        Schema::create('personal_records', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('user_id')
+                ->references('id')
+                ->on('users');
+
             $table->string('student_id');
             $table->string('first_name');
             $table->string('middle_name')->nullable();
@@ -27,6 +31,7 @@ return new class extends Migration
                 'Widowed',
                 'Separated'
             ]);
+
             $table->string('permanent_address');
             $table->string('current_address');
             $table->string('email_address')->unique();
@@ -34,7 +39,7 @@ return new class extends Migration
             $table->string('social_link')->nullable();
             $table->string('profile_picture')->nullable();
             $table->tinyInteger('status')->default(0)->comment('0 = Unverified, 1 = Verified');
-            // $table->boolean('is_deleted')->default(0);
+
             $table->timestamps();
         });
     }
@@ -44,6 +49,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('personal_bio');
+        Schema::dropIfExists('personal_records');
     }
 };

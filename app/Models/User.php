@@ -25,9 +25,6 @@ class User extends Authenticatable
         'password',
         'role',
         'department_id',
-        'personal_bio_id',
-        'educational_bio_id',
-        'professional_bio_id',
         'is_deleted',
     ];
 
@@ -36,11 +33,23 @@ class User extends Authenticatable
         return User::query()->where('role', '=', 'Admin')->get();
     }
 
-    public function personalBio() {
-        return $this->belongsTo(PersonalBio::class, 'personal_bio_id');
+    public function partialPersonal()
+    {
+        return $this->hasOne(PartialPersonalRecord::class, 'user_id');
     }
 
-    public function department() {
+    public function personalBio()
+    {
+        return $this->hasOne(PersonalRecord::class, 'user_id');
+    }
+
+    public function course()
+    {
+        return $this->hasOneThrough(Course::class, EducationRecord::class, 'user_id', 'id', 'id', 'course_id');
+    }
+
+    public function department()
+    {
         return $this->belongsTo(Department::class, 'department_id');
     }
 
@@ -48,13 +57,19 @@ class User extends Authenticatable
     {
         switch ($type) {
             case 'personal':
-                return User::query()->where('personal_bio_id', '=', null);
+                $ids = PersonalRecord::query()->get('user_id');
+
+                return User::query()->whereNotIn('id', $ids);
                 break;
             case 'professional':
-                return User::query()->where('professional_bio_id', '=', null);
+                $ids = ProfessionalRecord::query()->get('user_id');
+
+                return User::query()->whereNotIn('id', $ids);
                 break;
             case 'educational':
-                return User::query()->where('educational_bio_id', '=', null);
+                $ids = EducationRecord::query()->get('user_id');
+
+                return User::query()->whereNotIn('id', $ids);
                 break;
             default:
                 throw new Exception('Invalid type: must be [personal, professional, educational]');
@@ -65,20 +80,26 @@ class User extends Authenticatable
     {
         switch ($type) {
             case 'personal':
-                return User::query()->where('personal_bio_id', '!=', null);
+                $ids = PersonalRecord::query()->get('user_id');
+
+                return User::query()->whereIn('id', $ids);
                 break;
             case 'professional':
-                return User::query()->where('professional_bio_id', '!=', null);
+                $ids = ProfessionalRecord::query()->get('user_id');
+
+                return User::query()->whereIn('id', $ids);
                 break;
             case 'educational':
-                return User::query()->where('educational_bio_id', '!=', null);
+                $ids = EducationRecord::query()->get('user_id');
+
+                return User::query()->whereIn('id', $ids);
                 break;
             default:
                 throw new Exception('Invalid type: must be [personal, professional, educational]');
         }
     }
 
-    public static function isCourse(int $course): Builder 
+    public static function isCourse(int $course): Builder
     {
         $users = self::hasBio('educational');
         $result = array();
@@ -101,11 +122,12 @@ class User extends Authenticatable
 
     public function image()
     {
-        if ($this->personal_bio_id === null) {
+        $bio = $this->getPersonalBio();
+
+        if (is_null($bio)) {
             return fake()->imageUrl();
         }
 
-        $bio = $this->getPersonalBio();
         if (str_contains($bio->profile_picture, 'https://')) {
             return $bio->profile_picture;
         } else {
@@ -113,19 +135,32 @@ class User extends Authenticatable
         }
     }
 
-    public function getPersonalBio(): null | PersonalBio
+    public function getPersonalBio(): null | PersonalRecord
     {
-        return PersonalBio::query()->find($this->personal_bio_id);
+        return PersonalRecord::query()->where('user_id', '=', $this->id)->first();
     }
 
-    public function getEducationalBio(): null | EducationalBio
+    public function getEducationalBio()
     {
-        return EducationalBio::query()->find($this->educational_bio_id);
+        return EducationRecord::query()
+            ->where('user_id', '=', $this->id)
+            ->orderBy('end', 'DESC')
+            ->first();
     }
 
-    public function getProfessionalBio(): null | ProfessionalBio
+    public function educationalBios()
     {
-        return ProfessionalBio::query()->find($this->professional_bio_id);
+        return $this->hasMany(EducationRecord::class, 'user_id');
+    }
+
+    public function getProfessionalBio(): null | ProfessionalRecord
+    {
+        return ProfessionalRecord::query()->where('user_id', '=', $this->id)->first();
+    }
+
+    public function professionalRecords()
+    {
+        return $this->hasOne(ProfessionalRecord::class, 'user_id');
     }
 
     public function admin(): null | Admin

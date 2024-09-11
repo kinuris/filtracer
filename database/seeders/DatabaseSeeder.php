@@ -5,8 +5,10 @@ namespace Database\Seeders;
 use App\Models\Admin;
 use App\Models\Course;
 use App\Models\Department;
-use App\Models\EducationalBio;
-use App\Models\PersonalBio;
+use App\Models\EducationRecord;
+use App\Models\Major;
+use App\Models\PersonalRecord;
+use App\Models\ProfessionalRecord;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 
@@ -17,6 +19,11 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        Department::query()->create([
+           'name' => 'Admins Assigned',
+           'logo' => 'ccs.png',  
+        ]);
+
         Department::query()->create([
             'name' => 'College of Computer Studies',
             'logo' => 'ccs.png',
@@ -42,7 +49,7 @@ class DatabaseSeeder extends Seeder
             'logo' => 'coe.png',
         ]);
 
-        foreach (Department::all() as $dept) {
+        foreach (Department::allValid() as $dept) {
             for ($i = 0; $i < fake()->numberBetween(3, 10); $i++) {
                 Course::query()->create([
                     'department_id' => $dept->id,
@@ -51,12 +58,22 @@ class DatabaseSeeder extends Seeder
             }
         }
 
-        User::factory(50)->create();
+        foreach (Course::all() as $course) {
+            for ($i = 0; $i < fake()->numberBetween(3, 10); $i++) {
+                Major::query()->create([
+                    'name' => fake()->firstName(),
+                    'course_id' => $course->id,
+                    'description' => fake()->sentence(),
+                ]);
+            }
+        }
+
+        User::factory(10)->create();
         User::query()->create([
             'name' => 'Chris D. Chan',
             'username' => 'admin',
             'password' => bcrypt('password'),
-            'department_id' => Department::all()->random()->id,
+            'department_id' => Department::allValid()->random()->id,
             'role' => 'Admin',
         ]);
 
@@ -64,7 +81,7 @@ class DatabaseSeeder extends Seeder
             'name' => 'Alum N. Ai',
             'username' => 'alumni',
             'password' => bcrypt('password'),
-            'department_id' => Department::all()->random()->id,
+            'department_id' => Department::allValid()->random()->id,
             'role' => 'Alumni',
         ]);
 
@@ -92,8 +109,11 @@ class DatabaseSeeder extends Seeder
         }
 
         foreach (User::noBio('educational')->get() as $user) {
-            $bio = EducationalBio::query()->create([
-                'school_name' => fake()->randomElement([
+            $major = Major::all()->random();
+
+            EducationRecord::query()->create([
+                'user_id' => $user->id,
+                'school' => fake()->randomElement([
                     'Filamer Christian University',
                     'University of the Philippines in the Visayas',
                     'Central Philippine University',
@@ -119,15 +139,16 @@ class DatabaseSeeder extends Seeder
                     'Masteral',
                     'Doctoral',
                 ]),
-                'course_id' => Course::all()->random()->id,
-                'batch' => fake()->year(),
+                'major_id' => $major->id,
+                'course_id' => $major->course->id,
+                'start' => fake()->year(),
+                'end' => fake()->year(),
             ]);
-
-            $user->update(['educational_bio_id' => $bio->id]);
         }
 
         foreach (User::noBio('personal')->get() as $user) {
-            $bio = PersonalBio::query()->create([
+            PersonalRecord::query()->create([
+                'user_id' => $user->id,
                 'student_id' => $user->id,
                 'first_name' => fake()->firstName(),
                 'middle_name' => fake()->optional()->lastName(),
@@ -150,8 +171,46 @@ class DatabaseSeeder extends Seeder
                 'status' => fake()->randomElement([0, 1]),
                 'profile_picture' => fake()->imageUrl(),
             ]);
+        }
 
-            $user->update(['personal_bio_id' => $bio->id]);
+        foreach (User::noBio('professional')->get() as $user) {
+            ProfessionalRecord::query()->create([
+                'user_id' => $user->id,
+                'employment_status' => fake()->randomElement([
+                    'Employed',
+                    'Unemployed',
+                    'Self-employed',
+                    'Student',
+                    'Working Student',
+                    'Retired'
+                ]),
+                'employment_type1' => fake()->randomElement([
+                    'Private',
+                    'Government',
+                    'NGO/INGO'
+                ]),
+                'employment_type2' => fake()->randomElement([
+                    'Full-Time',
+                    'Part-Time',
+                    'Traineeship',
+                    'Internship',
+                    'Contract'
+                ]),
+                'monthly_salary' => fake()->randomElement([
+                    'no income',
+                    'below 10,000',
+                    '10,000-20,000',
+                    '20,001-40,000',
+                    '40,001-60,000',
+                    '60,001-80,000',
+                    '80,001-100,000',
+                    'over 100,000'
+                ]),
+                'job_title' => fake()->word(),
+                'company_name' => fake()->country(),
+                'industry' => fake()->name(),
+                'work_location' => fake()->address(),
+            ]);
         }
     }
 }

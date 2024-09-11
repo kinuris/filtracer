@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->unsignedBigInteger('course_id');
-            $table->text('description')->nullable();
+            $table->text('description');
             $table->timestamps();
 
             $table->foreign('course_id')

@@ -5,13 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Chat extends Model
+class ProfessionalRecordHardSkill extends Model
 {
-    protected $table = 'chat';
+    protected $table = 'professional_record_hard_skills';
     protected $fillable = [
-        'user_id',
-        'chatroom_id',
-        'message',
+        'professional_record_id',
+        'skill',
     ];
 
     use HasFactory;

@@ -42,7 +42,7 @@
 
     use App\Models\Department;
 
-    $depts = Department::all();
+    $depts = Department::allValid();
     ?>
 
     new Chart(ctx, {

@@ -39,6 +39,9 @@ Route::get('/register/admin', [AuthController::class, 'registerAdminView'])
 Route::post('/register/admin', [AuthController::class, 'registerAdmin'])
     ->middleware('guest');
 
+Route::post('/register/admin', [AuthController::class, 'registerAdmin'])
+    ->middleware('guest');
+
 Route::get('/register/alumni', [AuthController::class, 'registerAlumniView'])
     ->middleware('guest');
 
@@ -48,10 +51,31 @@ Route::post('/register/alumni', [AuthController::class, 'registerAlumni'])
 Route::controller(AlumniController::class)
     ->middleware('role:Alumni')
     ->group(function () {
+        Route::get('/alumni/setup', 'setupView');
+        Route::get('/alumni/setup/personal', 'setupPersonalView');
+        Route::post('/alumni/setup/personal/{alumni}', 'setupPersonal');
+
+        Route::get('/alumni/setup/educational', 'setupEducationalView');
+        Route::post('/alumni/setup/educational/{alumni}', 'setupEducational');
+
+        Route::get('/alumni/setup/professional', 'setupProfessionalView');
+        Route::post('/alumni/setup/professional/{alumni}', 'setupProfessional');
+
+        Route::get('/alumni/setup/profilepic', 'setupProfilepicView');
+        Route::post('/alumni/setup/profilepic/{alumni}', 'setupProfilepic');
+
         Route::get('/alumni', 'dashboardView');
         Route::get('/alumni/profile', 'alumniProfileView');
 
         Route::get('/alumni/profile/update', 'updateProfileView');
+        Route::post('/alumni/profile/update/personal/{alumni}', 'updatePersonalProfile');
+        Route::post('/alumni/profile/upload/{alumni}', 'uploadProfilePicture');
+
+        Route::post('/alumni/profile/add/educational/{alumni}', 'addEducationRecord');
+        Route::post('/alumni/profile/update/educational/{educ}/{alumni}', 'updateEducationRecord');
+
+        Route::post('/profbio/create/{alumni}', 'createProfBio');
+        Route::post('/profbio/update/{alumni}', 'updateProfBio');
     });
 
 Route::controller(AdminController::class)
@@ -64,14 +88,30 @@ Route::controller(AdminController::class)
         Route::get('/user/view/{user}', 'userView');
 
         Route::get('/report/graphical', 'reportsGraphicalView');
+
         Route::get('/report/statistical', 'reportsStatisticalView');
+        Route::get('/report/statistical/generate', 'reportsStatisticalGenerateView');
 
         Route::get('/account', 'accountsView');
         Route::get('/admin/profile', 'myProfileView');
+        Route::get('/admin/useraccount/verify/{user}', 'verifyUser');
 
         Route::get('/audit', 'auditView');
 
         Route::get('/admin/settings', 'settingsView');
+
         Route::get('/settings/department', 'departmentSettingsView');
+        Route::get('/settings/department/edit/{department}', 'editDepartmentView');
+        Route::post('/settings/department/update/{department}', 'updateDepartment');
+
+        Route::post('/settings/department/create', 'createDepartment');
+
         Route::get('/settings/account', 'accountsSettingsView');
+
+        Route::get('/settings/course', 'coursesSettingsView');
+        Route::get('/settings/course/edit/{course}', 'editCourseView');
+        Route::post('/settings/course/create', 'createCourse');
+
+        Route::get('/settings/major', 'majorsSettingsView');
+        Route::get('/settings/major/edit/{major}', 'editMajorView');
     });

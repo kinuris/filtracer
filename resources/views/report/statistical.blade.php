@@ -6,30 +6,30 @@
     <p class="text-gray-400 text-xs mb-2">Report / <span class="text-blue-500">Statistical</span></p>
 
     <div class="shadow rounded-lg mt-4">
-        <form action="">
+        <form action="/report/statistical/generate">
             <div class="bg-white py-4 flex place-items-center px-6 border-b rounded-lg">
                 <p class="tracking-wider font-semibold mr-4">All</p>
                 <select class="g-gray-100 p-2 rounded border text-gray-400" name="category" id="category">
-                    <option value="all">All Users</option>
-                    <option value="registered">Registered Users</option>
-                    <option value="employed">Employed Alumni</option>
-                    <option value="unemployed">Unemployed Alumni</option>
-                    <option value="self-employed">Self-Employed Alumni</option>
-                    <option value="student">Student Alumni</option>
-                    <option value="retired">Retired Alumni</option>
+                    <option value="All Users">All Users</option>
+                    <option value="Registered Users">Registered Users</option>
+                    <option value="Employed Alumni">Employed Alumni</option>
+                    <option value="Unemployed Alumni">Unemployed Alumni</option>
+                    <option value="Self-Employed Alumni">Self-Employed Alumni</option>
+                    <option value="Student Alumni">Student Alumni</option>
+                    <option value="Retired Alumni">Retired Alumni</option>
                 </select>
 
-                <p class="tracking-wider font-semibold ml-10 mr-4">By</p>
+                <p class="tracking-wider font-semibold ml-10 mr-4">Of</p>
                 <select onchange="handleDepartmentChange()" class="g-gray-100 p-2 max-w-56 rounded border text-gray-400 mr-4" name="department" id="department">
                     <option value="-1">All Departments</option>
-                    @php($depts = App\Models\Department::all())
+                    @php($depts = App\Models\Department::allValid())
                     @foreach ($depts as $dept)
                     <option value="{{ $dept->id }}">{{ $dept->name }}</option>
                     @endforeach
                 </select>
 
                 <select class="g-gray-100 p-2 min-w-56 rounded border text-gray-400" name="courses" id="courses">
-                    <option value="all">All Courses</option>
+                    <option value="-1">All Courses</option>
                 </select>
 
                 <div class="flex-1"></div>

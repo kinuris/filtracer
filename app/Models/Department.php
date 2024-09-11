@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Override;
 
 class Department extends Model
 {
@@ -21,6 +22,10 @@ class Department extends Model
     public function students() {
         return $this->hasMany(User::class, 'department_id', 'id');
     }
+
+    public static function allValid() {
+        return Department::query()->where('name', '!=', 'Admins Assigned')->get();
+    } 
 
     use HasFactory;
 }

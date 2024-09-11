@@ -15,7 +15,7 @@
 
             <div class="flex-1"></div>
 
-            <a class="rounded-lg p-2 px-3 bg-blue-600 text-white mr-3" href="">Go to Settings</a>
+            <a class="rounded-lg p-2 px-3 bg-blue-600 text-white mr-3" href="/settings/account">Go to Settings</a>
             <a class="rounded-lg p-2 px-3 bg-blue-600 text-white" href="">Log History</a>
         </div>
     </div>
@@ -29,7 +29,7 @@
                 <div class="flex">
                     <div class="flex flex-1">
                         <p class="flex-[2] text-gray-500">Full Name</p>
-                        <p class="flex-[5] font-bold">{{ $personal->getFullname() }}</p>
+                        <p class="flex-[5] font-bold">{{ $personal ? $personal->getFullname() : $user->name }}</p>
                     </div>
                     <div class="flex flex-1">
                         <p class="flex-[2] text-gray-500">Username</p>
@@ -44,7 +44,7 @@
                     </div>
                     <div class="flex flex-1">
                         <p class="flex-[2] text-gray-500">Email</p>
-                        <p class="flex-[5] font-bold">{{ $personal->email_address }}</p>
+                        <p class="flex-[5] font-bold">{{ $personal ? $personal->email_address : "(No personal record)" }}</p>
                     </div>
                 </div>
 
@@ -55,7 +55,7 @@
                     </div>
                     <div class="flex flex-1">
                         <p class="flex-[2] text-gray-500">Phone Number</p>
-                        <p class="flex-[5] font-bold">{{ $personal->phone_number }}</p>
+                        <p class="flex-[5] font-bold">{{ $personal ? $personal->phone_number : "(No personal record)" }}</p>
                     </div>
                 </div>
             </div>

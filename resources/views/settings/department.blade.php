@@ -1,14 +1,16 @@
 @extends('layouts.admin')
 
 @section('content')
+@include('components.add-department-modal')
 <div class="bg-gray-100 w-full h-full p-8 flex flex-col">
     <h1 class="font-medium tracking-widest text-lg">Department List</h1>
     <p class="text-gray-400 text-xs mb-2">Settings / <span class="text-blue-500">Departments</span></p>
 
     <div class="shadow rounded-lg">
         <form action="">
-            <div class="bg-white py-4 flex place-items-center px-6 border-b rounded-t-lg justify-between">
-                <input value="{{ request('search') ?? '' }}" class="bg-gray-100 px-2 py-1 rounded border min-w-[max(33%,270px)]" placeholder="Search..." type="text" name="search" id="search">
+            <div class="bg-white py-4 flex place-items-center px-6 border-b rounded-t-lg">
+                <input value="{{ request('search') ?? '' }}" class="bg-gray-100 px-2 py-2 rounded border min-w-[max(33%,270px)]" placeholder="Search..." type="text" name="search" id="search">
+                <button type="button" class="bg-blue-600 text-white p-2 rounded ml-3" id="openAddDepartmentModal">Add Department</button>
             </div>
         </form>
         <table class="w-full">
@@ -28,8 +30,8 @@
                     <td>{{ $department->name }}</td>
                     <td>
                         <div class="flex justify-center place-items-center">
-                            <a class="mr-3" href="/deparment/edit/{{ $department->id }}"><img src="{{ asset('assets/settings_blue.svg') }}" alt="View"></a>
-                            <a href="/deparment/delete/{{ $department->id }}"><img src="{{ asset('assets/trash.svg') }}" alt="Trash"></a>
+                            <a class="mr-3" href="/settings/department/edit/{{ $department->id }}"><img src="{{ asset('assets/settings_blue.svg') }}" alt="View"></a>
+                            <a href="/settings/deparment/delete/{{ $department->id }}"><img src="{{ asset('assets/trash.svg') }}" alt="Trash"></a>
                         </div>
                     </td>
                 </tr>
@@ -41,4 +43,49 @@
         </div>
     </div>
 </div>
+@endsection
+
+@section('script')
+<script>
+    const upload = document.getElementById('logo');
+    const preview = document.getElementById('preview');
+    const nofile = document.getElementById('nofile');
+
+    upload.addEventListener('change', function() {
+        const file = this.files[0];  
+
+        if (!file) {
+            return;
+        }
+
+        const reader = new FileReader();
+
+        reader.readAsDataURL(file);
+        reader.addEventListener('load', function() {
+            preview.src = reader.result;
+
+            preview.classList.remove('hidden');
+            nofile.classList.add('hidden');
+        });
+    });
+</script>
+<script>
+    const openAddDeparmentModal = document.getElementById('openAddDepartmentModal');
+    const addDepartmentModal = document.getElementById('addDepartmentModal');
+    const closeAddDeparmentModal = document.getElementById('closeAddDeparmentModal');
+
+    openAddDeparmentModal.addEventListener('click', () => {
+        addDepartmentModal.classList.remove('hidden');
+    });
+
+    closeAddDeparmentModal.addEventListener('click', () => {
+        addDepartmentModal.classList.add('hidden');
+    });
+
+    window.addEventListener('click', function(event) {
+        if (event.target === addDepartmentModal) {
+            addDepartmentModal.classList.add('hidden');
+        }
+    });
+</script>
 @endsection

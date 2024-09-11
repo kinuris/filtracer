@@ -10,7 +10,7 @@
 
 <body>
     <div class="bg-gray-100 w-screen h-screen flex justify-center place-items-center">
-        <form action="/register/admin" method="POST" id="officer-registration">
+        <form action="/register/alumni" method="POST" id="officer-registration">
             @csrf
             <div class="flex h-full bg-white aspect-[8/5] shadow-lg rounded-2xl p-12 pt-8 pb-12 pr-0">
                 <img class="max-w-96 border-r pr-12" src="{{ asset('assets/filtracer.svg') }}" alt="Filtracer Logo">
@@ -19,13 +19,13 @@
                     <h1 class="text-center text-xl tracking-widest">Alumni Register Form</h1>
                     <p class="py-2 border rounded mt-6 text-center mx-8 text-gray-400 text-sm">By clicking Register and filling up your details, you agree to our <span class="text-blue-600">Website Policy</span> and our <span class="text-blue-600">Privacy Notice and Data Privacy Policy</span>.</p>
 
-                    <input class="rounded-lg border border-gray-200 p-2 mb-3 mt-8" type="text" placeholder="Full Name" name="username" id="username">
+                    <input class="rounded-lg border border-gray-200 p-2 mb-3 mt-8" type="text" placeholder="Full Name" name="name" id="name">
                     <input class="rounded-lg border border-gray-200 p-2 mb-3" type="text" placeholder="Username" name="username" id="username">
 
                     <div class="flex mb-3">
                         <input class="rounded-lg border border-gray-200 p-2 flex-1" type="password" placeholder="Password" name="password" id="password">
                         <div class="mx-1"></div>
-                        <input class="rounded-lg border border-gray-200 p-2 flex-1" type="password" placeholder="Repeat Password">
+                        <input class="rounded-lg border border-gray-200 p-2 flex-1" type="password" placeholder="Repeat Password" name="password_confirmation" id="password_confirmation">
                     </div>
 
                     <div class="flex mb-3">
@@ -34,13 +34,25 @@
                         <input class="rounded-lg border border-gray-200 p-2 flex-1" type="tel" placeholder="Contact Number" name="contact_number" id="contact_number">
                     </div>
 
-                    <input class="rounded-lg border border-gray-200 p-2 mb-3" type="text" placeholder="Student ID">
+                    <input class="rounded-lg border border-gray-200 p-2 mb-3" type="text" placeholder="Student ID" name="student_id" id="student_id">
 
-                    <div class="flex mb-3">
-                        <input class="rounded-lg border border-gray-200 p-2 flex-1" type="email" placeholder="Course" name="course" id="course">
+                    <!-- <div class="flex mb-3">
+                        <select class="rounded-lg border border-gray-200 p-2 flex-1" name="course" id="course">
+                            @php($courses = App\Models\Course::all())
+                            @foreach ($courses as $course)
+                            <option value="{{ $course->id }}">{{ $course->name }}</option>
+                            @endforeach
+                        </select>
                         <div class="mx-1"></div>
                         <input class="rounded-lg border border-gray-200 p-2 flex-1" type="tel" placeholder="Batch" name="batch" id="batch">
-                    </div>
+                    </div> -->
+
+                    <select class="rounded-lg border border-gray-200 p-2 mb-3" name="department" id="department">
+                        @php($departments = App\Models\Department::allValid())
+                        @foreach ($departments as $department)
+                        <option value="{{ $department->id }}">{{ $department->name }}</option>
+                        @endforeach
+                    </select>
 
                     <p class="text-gray-300 text-center text-sm my-3">Protected by reCaptcha v3</p>
 

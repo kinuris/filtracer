@@ -115,6 +115,43 @@
             @endif
 
             @if ($query === 'educational' && $user->getEducationalBio() !== null)
+            @php ($records = $user->educationalBios)
+            <div class="flex flex-col h-full">
+                @foreach($records as $educ)
+                <div class="flex">
+                    <div class="flex justify-between place-items-center flex-1 mx-4 h-fit">
+                        <p class="flex-1 tracking-wider text-slate-700">School</p>
+                        <p class="flex-[2] border p-2 rounded-lg text-gray-400 bg-gray-100 line-clamp-1 overflow-scroll">{{ $educ->school }}</p>
+                    </div>
+                    <div class="flex justify-between place-items-center flex-1 mx-4 h-fit">
+                        <p class="flex-1 tracking-wider text-slate-700">Civil Status</p>
+                        <p class="flex-[2] border p-2 rounded-lg text-gray-400 bg-gray-100">{{ $educ->getCourse()->name }}</p>
+                    </div>
+                </div>
+
+                <div class="flex mt-2">
+                    <div class="flex justify-between place-items-center flex-1 mx-4 h-fit">
+                        <p class="flex-1 tracking-wider text-slate-700">Location</p>
+                        <p class="flex-[2] border p-2 rounded-lg text-gray-400 bg-gray-100 line-clamp-1 overflow-scroll">{{ $educ->school_location }}</p>
+                    </div>
+                    <div class="flex justify-between place-items-center flex-1 mx-4 h-fit">
+                        <p class="flex-1 tracking-wider text-slate-700">Start Year</p>
+                        <p class="flex-[2] border p-2 rounded-lg text-gray-400 bg-gray-100">{{ $educ->start }}</p>
+                    </div>
+                </div>
+
+                <div class="flex mt-2 border-b pb-3">
+                    <div class="flex justify-between place-items-center flex-1 mx-4 h-fit">
+                        <p class="flex-1 tracking-wider text-slate-700">Degree Type</p>
+                        <p class="flex-[2] border p-2 rounded-lg text-gray-400 bg-gray-100 line-clamp-1 overflow-scroll">{{ $educ->degree_type }}</p>
+                    </div>
+                    <div class="flex justify-between place-items-center flex-1 mx-4 h-fit">
+                        <p class="flex-1 tracking-wider text-slate-700">End Year</p>
+                        <p class="flex-[2] border p-2 rounded-lg text-gray-400 bg-gray-100">{{ $educ->end }}</p>
+                    </div>
+                </div>
+                @endforeach
+            </div>
             @elseif ($query === 'educational' && $user->getEducationalBio() === null)
             <div class="flex flex-col justify-center flex-1">
                 <h1 class="text-center text-3xl text-gray-400">No Educational Info</h1>
@@ -122,6 +159,121 @@
             @endif
 
             @if ($query === 'professional' && $user->getProfessionalBio() !== null)
+            @php($prof = $user->getProfessionalBio())
+            <div class="flex flex-col h-full">
+                <div class="flex">
+                    <div class="flex justify-between place-items-center flex-1 mx-4 h-fit">
+                        <p class="flex-1 tracking-wider text-slate-700">Employment Status</p>
+                        <p class="flex-[2] border p-2 rounded-lg text-gray-400 bg-gray-100 line-clamp-1 overflow-scroll">{{ $prof->employment_status }}</p>
+                    </div>
+                    <div class="flex justify-between place-items-center flex-1 mx-4 h-fit">
+                        <p class="flex-1 tracking-wider text-slate-700">Current Job Title</p>
+                        <p class="flex-[2] border p-2 rounded-lg text-gray-400 bg-gray-100">{{ $prof->job_title }}</p>
+                    </div>
+                </div>
+
+                <div class="flex mt-2">
+                    <div class="flex justify-between place-items-center flex-1 mx-4 h-fit">
+                        <p class="flex-1 tracking-wider text-slate-700">Employment Type 1</p>
+                        <p class="flex-[2] border p-2 rounded-lg text-gray-400 bg-gray-100 line-clamp-1 overflow-scroll">{{ $prof->employment_type1 }}</p>
+                    </div>
+                    <div class="flex justify-between place-items-center flex-1 mx-4 h-fit">
+                        <p class="flex-1 tracking-wider text-slate-700">Company / Employer</p>
+                        <p class="flex-[2] border p-2 rounded-lg text-gray-400 bg-gray-100">{{ $prof->company_name }}</p>
+                    </div>
+                </div>
+
+                <div class="flex mt-2">
+                    <div class="flex justify-between place-items-center flex-1 mx-4 h-fit">
+                        <p class="flex-1 tracking-wider text-slate-700">Employment Type 2</p>
+                        <p class="flex-[2] border p-2 rounded-lg text-gray-400 bg-gray-100 line-clamp-1 overflow-scroll">{{ $prof->employment_type2 }}</p>
+                    </div>
+                    <div class="flex justify-between place-items-center flex-1 mx-4 h-fit">
+                        <p class="flex-1 tracking-wider text-slate-700">Monthly Salary Range</p>
+                        <p class="flex-[2] border p-2 rounded-lg text-gray-400 bg-gray-100">{{ $prof->monthly_salary }} PHP</p>
+                    </div>
+                </div>
+
+                <div class="flex mt-2 border-b pb-6 mb-4">
+                    <div class="flex justify-between place-items-center flex-1 mx-4 h-fit">
+                        <p class="flex-1 tracking-wider text-slate-700">Industry</p>
+                        <p class="flex-[2] border p-2 rounded-lg text-gray-400 bg-gray-100 line-clamp-1 overflow-scroll">{{ $prof->industry }}</p>
+                    </div>
+                    <div class="flex justify-between place-items-center flex-1 mx-4 h-fit">
+                        <p class="flex-1 tracking-wider text-slate-700">Location</p>
+                        <p class="flex-[2] border p-2 rounded-lg text-gray-400 bg-gray-100">{{ $prof->work_location }} PHP</p>
+                    </div>
+                </div>
+
+                <div class="flex mt-2">
+                    <div class="flex justify-between place-items-center flex-1 mx-4 h-fit">
+                        <p class="flex-1 tracking-wider text-slate-700">Waiting Time</p>
+                        <p class="flex-[2] border p-2 rounded-lg text-gray-400 bg-gray-100 line-clamp-1 overflow-scroll">{{ $prof->waiting_time }}</p>
+                    </div>
+                    <div class="flex justify-between place-items-center flex-1 mx-4 h-fit">
+                        <p class="flex-1 tracking-wider text-slate-700">Certification and Licenses</p>
+                        <p class="flex-[2]"></p>
+                    </div>
+                </div>
+
+                <div class="flex mt-6">
+                    <div class="flex justify-between place-items-center flex-1 mx-4 h-fit">
+                        <p class="flex-1 tracking-wider text-slate-700">Job Search Method(s)</p>
+                        <div class="flex-[2]">
+                            <ul class="list-disc pl-6">
+                                @php($hardSkills = $prof->methods)
+                                @foreach ($hardSkills as $skill)
+                                <li class="text-gray-400 text-lg">{{ $skill->method }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="flex justify-between place-items-center flex-1 mx-4 h-fit">
+                        <p class="flex-1 tracking-wider text-slate-700">Attached File(s)</p>
+                        <p class="flex flex-col flex-[2]">
+                            @foreach ($prof->attachments as $attachment)
+                            <a class="text-sm underline text-blue-400" href="{{ asset('storage/professional/attachments/' . $attachment->link) }}" target="_blank">{{ $attachment->name }}</a>
+                            @endforeach
+                        </p>
+                    </div>
+                </div>
+
+                <div class="flex mt-6">
+                    <div class="flex justify-between place-items-center flex-1 mx-4 h-fit">
+                        <p class="flex-1 tracking-wider text-slate-700">Hard Skill(s)</p>
+                        <div class="flex-[2]">
+                            <ul class="list-disc pl-6">
+                                @php($hardSkills = $prof->hardSkills)
+                                @foreach ($hardSkills as $skill)
+                                <li class="text-gray-400 text-lg">{{ $skill->skill }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="flex justify-between place-items-center flex-1 mx-4 h-fit">
+                        <p class="flex-1 tracking-wider text-slate-700">Link Posts</p>
+                        <p class="flex-[2]"></p>
+                    </div>
+                </div>
+
+                <div class="flex mt-6">
+                    <div class="flex justify-between place-items-center flex-1 mx-4 h-fit">
+                        <p class="flex-1 tracking-wider text-slate-700">Soft Skill(s)</p>
+                        <div class="flex-[2]">
+                            <ul class="list-disc pl-6">
+                                @php($softSkills = $prof->softSkills)
+                                @foreach ($softSkills as $skill)
+                                <li class="text-gray-400 text-lg">{{ $skill->skill }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="flex justify-between place-items-center flex-1 mx-4 h-fit">
+                        <p class="flex-1 tracking-wider text-slate-700"></p>
+                        <p class="flex-[2]"></p>
+                    </div>
+                </div>
+            </div>
             @elseif ($query === 'professional' && $user->getProfessionalBio() === null)
             <div class="flex flex-col justify-center flex-1">
                 <h1 class="text-center text-3xl text-gray-400">No Professional Info</h1>

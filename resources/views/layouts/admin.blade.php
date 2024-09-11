@@ -4,6 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+    <link rel="stylesheet" href=" https://printjs-4de6.kxcdn.com/print.min.css">
     @vite('resources/css/app.css')
     <title>@yield('title')</title>
 </head>
@@ -69,7 +71,6 @@
             </a>
         </div>
 
-
         <div class="flex flex-col w-full max-h-screen">
             <nav class="bg-white w-full max-h-16 min-h-16 h-16 border-b flex place-items-center px-6">
                 <img class="w-6 mr-4" src="{{ asset('assets/search.svg') }}" alt="Dashboard">
@@ -125,7 +126,7 @@
         </div>
     </div>
     @yield('script')
-
+    <script src="https://printjs-4de6.kxcdn.com/print.min.js"></script>
     <script>
         const menuBtn = document.querySelector('#menu-button');
         const options = document.querySelector('#options');

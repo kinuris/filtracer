@@ -14,5 +14,10 @@ class Major extends Model
         'description',
     ];
 
+    public function course()
+    {
+        return $this->belongsTo(Course::class);
+    }
+
     use HasFactory;
 }

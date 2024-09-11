@@ -13,8 +13,9 @@ return new class extends Migration
     {
         Schema::create('admins', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('user_id')->nullable();
+            $table->unsignedBigInteger('user_id');
             $table->string('fullname');
+
             $table->enum('office', [
                 'Alumni Office',
                 'CAS Faculty Office',
@@ -27,6 +28,7 @@ return new class extends Migration
                 'CTE Faculty Office',
                 'Graduate School Faculty Office'
             ]);
+
             $table->string('email_address')->unique();
             $table->string('phone_number');
             $table->string('profile_picture')->nullable();

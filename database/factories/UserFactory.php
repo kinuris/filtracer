@@ -28,7 +28,7 @@ class UserFactory extends Factory
             'name' => fake()->name(),
             'username' => fake()->unique()->userName(),
             'password' => bcrypt('password'),
-            'department_id' => Department::all()->random()->id,
+            'department_id' => Department::allValid()->random()->id,
             'role' => fake()->randomElement(['Admin', 'Alumni']),
         ];
     }

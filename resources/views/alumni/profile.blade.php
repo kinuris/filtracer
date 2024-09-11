@@ -15,11 +15,11 @@
 
                 <div class="flex place-items-center">
                     <img class="h-4 mr-3" src="{{ asset('assets/alumni_job.svg') }}" alt="Job">
-                    <p class="text-gray-400 text-sm">Example Job</p>
+                    <p class="text-gray-400 text-sm">{{ $user->getProfessionalBio()->job_title }}</p>
                 </div>
                 <div class="flex mt-1 ml-[1px] place-items-center">
                     <img class="h-4 mr-3" src="{{ asset('assets/alumni_location.svg') }}" alt="Job">
-                    <p class="text-gray-400 text-sm">Roxas City, Capiz</p>
+                    <p class="text-gray-400 text-sm">{{ $user->getProfessionalBio()->work_location }}</p>
                 </div>
 
                 <p class="text-gray-400 mt-4">Email Address</p>
@@ -32,11 +32,11 @@
                 <p>{{ $user->getEducationalBio()->degree_type }} in {{ $user->getEducationalBio()->getCourse()->name }}</p>
 
                 <p class="text-gray-400 mt-4">Alumni Batch</p>
-                @php($year = $user->getEducationalBio()->batch)
-                <p>S.Y. {{ $year }} - {{ $year + 1 }}</p>
+                @php($bio = $user->getEducationalBio())
+                <p>S.Y. {{ $bio->start }} - {{ $bio->end }}</p>
             </div>
         </div>
-        
+
         <div class="mx-2"></div>
 
         <div class="flex-[3] flex flex-col mt-6 max-h-full overflow-scroll">
@@ -99,14 +99,14 @@
                 </div>
             </div>
 
-            <div class="shadow rounded-lg mt-3 mb-4">
+            <div class="shadow rounded-lg mt-3">
                 <div class="bg-white py-4 flex flex-col px-6 border-b rounded-lg">
                     <p class="text-lg font-bold pb-2">Educational Information</p>
                     @php ($educational = $user->getEducationalBio())
                     <div class="flex justify-between">
                         <div class="flex-1 flex-col">
                             <p class="text-gray-400">School</p>
-                            <p>{{ $educational->school_name }}</p>
+                            <p>{{ $educational->school }}</p>
 
                             <p class="text-gray-400 mt-4">Location</p>
                             <p>{{ $educational->school_location }}</p>
@@ -117,20 +117,60 @@
                             <p>{{ $educational->getCourse()->name }}</p>
 
                             <p class="text-gray-400 mt-4">Year Started</p>
-                            <p>{{ $educational->batch - 4 }}</p>
+                            <p>{{ $educational->start }}</p>
                         </div>
 
                         <div class="flex-1 flex-col">
                             <p class="text-gray-400">Degree Type</p>
                             <p>{{ $educational->degree_type }}</p>
+
+                            <p class="text-gray-400 mt-4">Year Ended</p>
+                            <p>{{ $educational->end }}</p>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="shadow rounded-lg mt-3 mb-4">
+            <div class="shadow rounded-lg mt-3 mb-16">
                 <div class="bg-white py-4 flex flex-col px-6 border-b rounded-lg">
                     <p class="text-lg font-bold pb-2">Professional Information</p>
+                    @php ($prof = $user->getProfessionalBio())
+                    <div class="flex justify-between">
+                        <div class="flex-1 flex-col">
+                            <p class="text-gray-400">Employment Status</p>
+                            <p>{{ $prof->employment_status }}</p>
+
+                            <p class="text-gray-400 mt-4">Current Job Title</p>
+                            <p>{{ $prof->job_title }}</p>
+
+                            <p class="text-gray-400 mt-4">Monthly Salary Range</p>
+                            <p>{{ $prof->monthly_salary }} PHP</p>
+                        </div>
+
+                        <div class="flex-1 flex-col">
+                            <p class="text-gray-400">Employment Type</p>
+                            <p>{{ $prof->employment_type1 }}; {{ $prof->employment_type2 }}</p>
+
+                            <p class="text-gray-400 mt-4">Company / Employer</p>
+                            <p>{{ $prof->company_name }}</p>
+
+                            <p class="text-gray-400 mt-4">Waiting Time</p>
+                            <p>{{ $prof->waiting_time }}</p>
+                        </div>
+
+                        <div class="flex-1 flex-col">
+                            <p class="text-gray-400">Industry</p>
+                            <p>{{ $prof->industry }}</p>
+
+                            <p class="text-gray-400 mt-4">Location</p>
+                            <p>{{ $prof->work_location }}</p>
+                        </div>
+                    </div>
+                    @if ($prof)
+
+                    @else
+                    <p>(No professional bio)</p>
+                    @endif
                 </div>
             </div>
         </div>

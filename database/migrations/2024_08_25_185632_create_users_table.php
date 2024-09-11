@@ -18,37 +18,12 @@ return new class extends Migration
             $table->string('password');
             $table->enum('role', ['Admin', 'Alumni']);
 
-            // Nullable foreign keys
-            $table->unsignedBigInteger('personal_bio_id')->nullable();
-            $table->unsignedBigInteger('educational_bio_id')->nullable();
-            $table->unsignedBigInteger('professional_bio_id')->nullable();
-
             $table->boolean('is_deleted')->default(0);
             $table->foreignId('department_id')
                 ->references('id')
                 ->on('departments');
 
             $table->timestamps();
-
-            // Foreign key constraints
-            // $table->foreign('personal_bio_id')->references('id')->on('personal_bio')->onDelete('set null');
-            $table->foreign('personal_bio_id')
-                ->references('id')
-                ->on('personal_bio')
-                ->onUpdate('cascade')
-                ->onDelete('cascade');
-
-            $table->foreign('educational_bio_id')
-                ->references('id')
-                ->on('educational_bio')
-                ->onUpdate('cascade')
-                ->onDelete('cascade');
-
-            $table->foreign('professional_bio_id')
-                ->references('id')
-                ->on('professional_bio')
-                ->onUpdate('cascade')
-                ->onDelete('cascade');
         });
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {

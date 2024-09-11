@@ -4,12 +4,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+    <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
+
+    @yield('header')
     @vite('resources/css/app.css')
+
     <title>@yield('title')</title>
 </head>
 
 <body>
     <div class="flex w-screen">
+
+
         <div class="bg-white border-r h-screen max-h-screen min-w-[max(20%,300px)] px-6 pb-2 flex flex-col">
             <img class="h-fit w-44" src="{{ asset('assets/filtracer_nolabel.svg') }}" alt="Filtracer Logo">
 
@@ -61,10 +70,10 @@
                 <div class="border-r h-[calc(100%-1rem)] my-2 mr-3"></div>
 
                 <div class="border mr-4 rounded-full shadow">
-                    <img class="w-10 rounded-full aspect-square object-cover" src="{{ fake()->imageUrl() }}" alt="Profile">
+                    <img class="w-10 rounded-full aspect-square object-cover" src="{{ auth()->user()->image() }}" alt="Profile">
                 </div>
 
-                <p class="mx-3">{{ auth()->user()->name }}</p>
+                <p class="mx-3">{{ auth()->user()->getPersonalBio()->getFullname() }}</p>
 
                 <div class="relative inline-block text-left">
                     <div>
@@ -103,8 +112,7 @@
             @yield('content')
         </div>
     </div>
-    @yield('script')
-
+    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
     <script>
         const menuBtn = document.querySelector('#menu-button');
         const options = document.querySelector('#options');
@@ -119,6 +127,8 @@
             }
         })
     </script>
+
+    @yield('script')
 </body>
 
 </html>

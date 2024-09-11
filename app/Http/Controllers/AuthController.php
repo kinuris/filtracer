@@ -2,6 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Admin;
+use App\Models\Department;
+use App\Models\PartialPersonalRecord;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -12,7 +16,8 @@ class AuthController extends Controller
         return view('login');
     }
 
-    public function logout() {
+    public function logout()
+    {
         Auth::logout();
 
         return redirect('/login')->with('success', 'You have been logged out.');
@@ -34,6 +39,10 @@ class AuthController extends Controller
             return redirect('/admin');
         }
 
+        if (is_null(Auth::user()->personalBio)) {
+            return redirect('/alumni/setup');
+        }
+
         return redirect('/alumni');
     }
 
@@ -42,10 +51,62 @@ class AuthController extends Controller
         return view('admin-register');
     }
 
-    public function registerAdmin(Request $request) {}
+    public function registerAdmin(Request $request)
+    {
+        $validated = $request->validate([
+            'name' => ['required'],
+            'username' => ['required'],
+            'password' => ['required'],
+            'confirm_password' => ['required', 'same:password'],
+            'office' => ['required'],
+            'email_address' => ['required'],
+            'phone_number' => ['required'],
+        ]);
+
+        $validated['password'] = bcrypt($validated['password']);
+
+        $user = User::query()->create(array_merge([
+            'department_id' => Department::query()->where('name', 'Admins Assigned')->first()->id,
+        ], $validated));
+
+        Admin::query()->create(array_merge([
+            'user_id' => $user->id,
+            'fullname' => $validated['name'],
+        ], $validated));
+
+        return redirect('/login')->with('message', 'Registration Successful');
+    }
 
     public function registerAlumniView()
     {
         return view('alumni-register');
+    }
+
+    public function registerAlumni(Request $request)
+    {
+        $validated = $request->validate([
+            'name' => ['required'],
+            'username' => ['required', 'unique:users,username'],
+            'password' => ['required'],
+            'password_confirmation' => ['required', 'same:password'],
+            'department' => ['required'],
+            'email' => ['required'], // NOTE: Personal
+            'contact_number' => ['required'], // NOTE: Personal
+            'student_id' => ['required'], // NOTE: Personal
+        ]);
+
+        $validated['password'] = bcrypt($validated['password']);
+        $validated['department_id'] = $validated['department'];
+        $validated['role'] = 'Alumni';
+
+        $alumni = User::query()->create($validated);
+        PartialPersonalRecord::query()->create([
+            'user_id' => $alumni->id,
+            'email_address' => $validated['email'],
+            'phone_number' => $validated['contact_number'],
+            'student_id' => $validated['student_id'],
+        ]);
+
+        return redirect('/login')->with('message', 'Registration Successful');
     }
 }
