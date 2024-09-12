@@ -64,18 +64,20 @@ Route::controller(AlumniController::class)
         Route::get('/alumni/setup/profilepic', 'setupProfilepicView');
         Route::post('/alumni/setup/profilepic/{alumni}', 'setupProfilepic');
 
-        Route::get('/alumni', 'dashboardView');
-        Route::get('/alumni/profile', 'alumniProfileView');
+        Route::middleware('compset')->group(function () {
+            Route::get('/alumni', 'dashboardView');
+            Route::get('/alumni/profile', 'alumniProfileView');
 
-        Route::get('/alumni/profile/update', 'updateProfileView');
-        Route::post('/alumni/profile/update/personal/{alumni}', 'updatePersonalProfile');
-        Route::post('/alumni/profile/upload/{alumni}', 'uploadProfilePicture');
+            Route::get('/alumni/profile/update', 'updateProfileView');
+            Route::post('/alumni/profile/update/personal/{alumni}', 'updatePersonalProfile');
+            Route::post('/alumni/profile/upload/{alumni}', 'uploadProfilePicture');
 
-        Route::post('/alumni/profile/add/educational/{alumni}', 'addEducationRecord');
-        Route::post('/alumni/profile/update/educational/{educ}/{alumni}', 'updateEducationRecord');
+            Route::post('/alumni/profile/add/educational/{alumni}', 'addEducationRecord');
+            Route::post('/alumni/profile/update/educational/{educ}/{alumni}', 'updateEducationRecord');
 
-        Route::post('/profbio/create/{alumni}', 'createProfBio');
-        Route::post('/profbio/update/{alumni}', 'updateProfBio');
+            Route::post('/profbio/create/{alumni}', 'createProfBio');
+            Route::post('/profbio/update/{alumni}', 'updateProfBio');
+        });
     });
 
 Route::controller(AdminController::class)

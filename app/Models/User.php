@@ -43,6 +43,10 @@ class User extends Authenticatable
         return $this->hasOne(PersonalRecord::class, 'user_id');
     }
 
+    public function professionalBio() {
+        return $this->hasOne(ProfessionalRecord::class, 'user_id');
+    }
+
     public function course()
     {
         return $this->hasOneThrough(Course::class, EducationRecord::class, 'user_id', 'id', 'id', 'course_id');
