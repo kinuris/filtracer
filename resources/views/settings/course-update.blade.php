@@ -1,7 +1,7 @@
 @extends('layouts.admin')
 
 @section('content')
-<div class="bg-gray-100 w-full h-full p-8 flex flex-col max-h-[calc(100%-4rem)] overflow-scroll">
+<div class="bg-gray-100 w-full h-full p-8 flex flex-col max-h-[calc(100%-4rem)] overflow-auto">
     <h1 class="font-medium tracking-widest text-lg">Course Settings</h1>
     <div class="shadow rounded-lg mt-4">
         <div class="bg-white p-4 flex place-items-center rounded-lg">

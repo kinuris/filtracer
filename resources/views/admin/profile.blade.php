@@ -21,7 +21,7 @@
     </div>
 
     @php ($personal = $user->personalBio)
-    <div class="shadow rounded-lg mt-4 box-border h-full max-h-full overflow-scroll">
+    <div class="shadow rounded-lg mt-4 box-border h-full max-h-full overflow-auto">
         <div class="bg-white py-4 flex flex-col border-b rounded-lg min-h-full">
             <h1 class="px-6 pb-4 font-medium tracking-widest text-md">Personal Information</h1>
             <hr>

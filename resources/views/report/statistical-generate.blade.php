@@ -143,7 +143,7 @@ if ($department && $course) {
 ?>
 
 @section('content')
-<div class="bg-gray-100 w-full h-full p-8 flex flex-col max-h-[calc(100%-4rem)] overflow-scroll">
+<div class="bg-gray-100 w-full h-full p-8 flex flex-col max-h-[calc(100%-4rem)] overflow-auto">
     <div class="flex">
         <h1 class="font-medium tracking-widest text-lg">Statistical Report</h1>
         <div class="flex-1"></div>

@@ -11,7 +11,7 @@
 
 @section('content')
 
-<div class="flex place-items-start h-full justify-center max-h-[calc(100vh-5rem)] pb-10 overflow-scroll">
+<div class="flex place-items-start h-full justify-center max-h-[calc(100vh-5rem)] pb-10 overflow-auto">
     <div class="shadow-lg bg-white mt-12 w-[60%] p-2 rounded-lg flex flex-col">
         <div class="flex gap-2">
             <div class="flex-1 border p-1 rounded-full bg-gray-300"></div>

@@ -39,7 +39,7 @@
 
         <div class="mx-2"></div>
 
-        <div class="flex-[3] flex flex-col mt-6 max-h-full overflow-scroll">
+        <div class="flex-[3] flex flex-col mt-6 max-h-full overflow-auto">
             <div class="shadow rounded-lg">
                 <div class="bg-white py-4 flex flex-col px-6 border-b rounded-lg">
                     <p class="text-lg font-bold pb-2">Personal Information</p>

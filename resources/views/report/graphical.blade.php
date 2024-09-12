@@ -23,7 +23,7 @@
         </div>
     </div>
 
-    <div class="shadow rounded-lg mt-4 flex-1 h-full max-h-full overflow-scroll">
+    <div class="shadow rounded-lg mt-4 flex-1 h-full max-h-full overflow-auto">
         <div class="bg-white py-4 flex flex-col px-6 border-b rounded-lg min-h-full">
             <h1 class="font-medium text-lg h-12">All Registered Alumni by Department</h1>
             <canvas id="graphical"></canvas>

@@ -22,7 +22,7 @@
         </div>
     </div>
 
-    <div class="shadow rounded-lg mt-4 box-border h-full max-h-full overflow-scroll">
+    <div class="shadow rounded-lg mt-4 box-border h-full max-h-full overflow-auto">
         <div class="bg-white py-4 flex flex-col px-6 border-b rounded-lg min-h-full">
             <div class="flex mb-4">
                 <a class="text-gray-400 font-semibold @if($query === 'personal') pb-1 border-b-2 border-blue-500 !text-blue-500 @endif" href="?type=personal">Personal Info</a>
@@ -50,7 +50,7 @@
                     </div>
                     <div class="flex justify-between place-items-center flex-1 mx-4 h-fit">
                         <p class="flex-1 tracking-wider text-slate-700 line-clamp-1" title="Permanent Address">Permanent Addr.</p>
-                        <p class="flex-[2] border p-2 rounded-lg text-gray-400 bg-gray-100 line-clamp-1 overflow-scroll">{{ $personal->permanent_address }}</p>
+                        <p class="flex-[2] border p-2 rounded-lg text-gray-400 bg-gray-100 line-clamp-1 overflow-auto">{{ $personal->permanent_address }}</p>
                     </div>
                 </div>
 
@@ -61,7 +61,7 @@
                     </div>
                     <div class="flex justify-between place-items-center flex-1 mx-4 h-fit">
                         <p class="flex-1 tracking-wider text-slate-700 line-clamp-1" title="Current Address">Current Addr.</p>
-                        <p class="flex-[2] border p-2 rounded-lg text-gray-400 bg-gray-100 line-clamp-1 overflow-scroll">{{ $personal->current_address }}</p>
+                        <p class="flex-[2] border p-2 rounded-lg text-gray-400 bg-gray-100 line-clamp-1 overflow-auto">{{ $personal->current_address }}</p>
                     </div>
                 </div>
 
@@ -72,7 +72,7 @@
                     </div>
                     <div class="flex justify-between place-items-center flex-1 mx-4 h-fit">
                         <p class="flex-1 tracking-wider text-slate-700 line-clamp-1" title="Current Address">Email</p>
-                        <p class="flex-[2] border p-2 rounded-lg text-gray-400 bg-gray-100 line-clamp-1 overflow-scroll">{{ $personal->email_address }}</p>
+                        <p class="flex-[2] border p-2 rounded-lg text-gray-400 bg-gray-100 line-clamp-1 overflow-auto">{{ $personal->email_address }}</p>
                     </div>
                 </div>
 
@@ -83,7 +83,7 @@
                     </div>
                     <div class="flex justify-between place-items-center flex-1 mx-4 h-fit">
                         <p class="flex-1 tracking-wider text-slate-700 line-clamp-1" title="Current Address">Phone Number</p>
-                        <p class="flex-[2] border p-2 rounded-lg text-gray-400 bg-gray-100 line-clamp-1 overflow-scroll">{{ $personal->phone_number }}</p>
+                        <p class="flex-[2] border p-2 rounded-lg text-gray-400 bg-gray-100 line-clamp-1 overflow-auto">{{ $personal->phone_number }}</p>
                     </div>
                 </div>
 
@@ -94,7 +94,7 @@
                     </div>
                     <div class="flex justify-between place-items-center flex-1 mx-4 h-fit">
                         <p class="flex-1 tracking-wider text-slate-700 line-clamp-1" title="Current Address">Social Link</p>
-                        <p class="flex-[2] border p-2 rounded-lg text-gray-400 bg-gray-100 line-clamp-1 overflow-scroll"><a class="underline" href="{{ $personal->social_link }}">{{ $personal->social_link }}</a></p>
+                        <p class="flex-[2] border p-2 rounded-lg text-gray-400 bg-gray-100 line-clamp-1 overflow-auto"><a class="underline" href="{{ $personal->social_link }}">{{ $personal->social_link }}</a></p>
                     </div>
                 </div>
 
@@ -121,7 +121,7 @@
                 <div class="flex">
                     <div class="flex justify-between place-items-center flex-1 mx-4 h-fit">
                         <p class="flex-1 tracking-wider text-slate-700">School</p>
-                        <p class="flex-[2] border p-2 rounded-lg text-gray-400 bg-gray-100 line-clamp-1 overflow-scroll">{{ $educ->school }}</p>
+                        <p class="flex-[2] border p-2 rounded-lg text-gray-400 bg-gray-100 line-clamp-1 overflow-auto">{{ $educ->school }}</p>
                     </div>
                     <div class="flex justify-between place-items-center flex-1 mx-4 h-fit">
                         <p class="flex-1 tracking-wider text-slate-700">Civil Status</p>
@@ -132,7 +132,7 @@
                 <div class="flex mt-2">
                     <div class="flex justify-between place-items-center flex-1 mx-4 h-fit">
                         <p class="flex-1 tracking-wider text-slate-700">Location</p>
-                        <p class="flex-[2] border p-2 rounded-lg text-gray-400 bg-gray-100 line-clamp-1 overflow-scroll">{{ $educ->school_location }}</p>
+                        <p class="flex-[2] border p-2 rounded-lg text-gray-400 bg-gray-100 line-clamp-1 overflow-auto">{{ $educ->school_location }}</p>
                     </div>
                     <div class="flex justify-between place-items-center flex-1 mx-4 h-fit">
                         <p class="flex-1 tracking-wider text-slate-700">Start Year</p>
@@ -143,7 +143,7 @@
                 <div class="flex mt-2 border-b pb-3">
                     <div class="flex justify-between place-items-center flex-1 mx-4 h-fit">
                         <p class="flex-1 tracking-wider text-slate-700">Degree Type</p>
-                        <p class="flex-[2] border p-2 rounded-lg text-gray-400 bg-gray-100 line-clamp-1 overflow-scroll">{{ $educ->degree_type }}</p>
+                        <p class="flex-[2] border p-2 rounded-lg text-gray-400 bg-gray-100 line-clamp-1 overflow-auto">{{ $educ->degree_type }}</p>
                     </div>
                     <div class="flex justify-between place-items-center flex-1 mx-4 h-fit">
                         <p class="flex-1 tracking-wider text-slate-700">End Year</p>
@@ -164,7 +164,7 @@
                 <div class="flex">
                     <div class="flex justify-between place-items-center flex-1 mx-4 h-fit">
                         <p class="flex-1 tracking-wider text-slate-700">Employment Status</p>
-                        <p class="flex-[2] border p-2 rounded-lg text-gray-400 bg-gray-100 line-clamp-1 overflow-scroll">{{ $prof->employment_status }}</p>
+                        <p class="flex-[2] border p-2 rounded-lg text-gray-400 bg-gray-100 line-clamp-1 overflow-auto">{{ $prof->employment_status }}</p>
                     </div>
                     <div class="flex justify-between place-items-center flex-1 mx-4 h-fit">
                         <p class="flex-1 tracking-wider text-slate-700">Current Job Title</p>
@@ -175,7 +175,7 @@
                 <div class="flex mt-2">
                     <div class="flex justify-between place-items-center flex-1 mx-4 h-fit">
                         <p class="flex-1 tracking-wider text-slate-700">Employment Type 1</p>
-                        <p class="flex-[2] border p-2 rounded-lg text-gray-400 bg-gray-100 line-clamp-1 overflow-scroll">{{ $prof->employment_type1 }}</p>
+                        <p class="flex-[2] border p-2 rounded-lg text-gray-400 bg-gray-100 line-clamp-1 overflow-auto">{{ $prof->employment_type1 }}</p>
                     </div>
                     <div class="flex justify-between place-items-center flex-1 mx-4 h-fit">
                         <p class="flex-1 tracking-wider text-slate-700">Company / Employer</p>
@@ -186,7 +186,7 @@
                 <div class="flex mt-2">
                     <div class="flex justify-between place-items-center flex-1 mx-4 h-fit">
                         <p class="flex-1 tracking-wider text-slate-700">Employment Type 2</p>
-                        <p class="flex-[2] border p-2 rounded-lg text-gray-400 bg-gray-100 line-clamp-1 overflow-scroll">{{ $prof->employment_type2 }}</p>
+                        <p class="flex-[2] border p-2 rounded-lg text-gray-400 bg-gray-100 line-clamp-1 overflow-auto">{{ $prof->employment_type2 }}</p>
                     </div>
                     <div class="flex justify-between place-items-center flex-1 mx-4 h-fit">
                         <p class="flex-1 tracking-wider text-slate-700">Monthly Salary Range</p>
@@ -197,7 +197,7 @@
                 <div class="flex mt-2 border-b pb-6 mb-4">
                     <div class="flex justify-between place-items-center flex-1 mx-4 h-fit">
                         <p class="flex-1 tracking-wider text-slate-700">Industry</p>
-                        <p class="flex-[2] border p-2 rounded-lg text-gray-400 bg-gray-100 line-clamp-1 overflow-scroll">{{ $prof->industry }}</p>
+                        <p class="flex-[2] border p-2 rounded-lg text-gray-400 bg-gray-100 line-clamp-1 overflow-auto">{{ $prof->industry }}</p>
                     </div>
                     <div class="flex justify-between place-items-center flex-1 mx-4 h-fit">
                         <p class="flex-1 tracking-wider text-slate-700">Location</p>
@@ -208,7 +208,7 @@
                 <div class="flex mt-2">
                     <div class="flex justify-between place-items-center flex-1 mx-4 h-fit">
                         <p class="flex-1 tracking-wider text-slate-700">Waiting Time</p>
-                        <p class="flex-[2] border p-2 rounded-lg text-gray-400 bg-gray-100 line-clamp-1 overflow-scroll">{{ $prof->waiting_time }}</p>
+                        <p class="flex-[2] border p-2 rounded-lg text-gray-400 bg-gray-100 line-clamp-1 overflow-auto">{{ $prof->waiting_time }}</p>
                     </div>
                     <div class="flex justify-between place-items-center flex-1 mx-4 h-fit">
                         <p class="flex-1 tracking-wider text-slate-700">Certification and Licenses</p>

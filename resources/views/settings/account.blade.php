@@ -8,7 +8,7 @@
     <div class="flex h-full mt-4 max-h-[calc(100%-64px)]">
         <div class="shadow rounded-lg flex-[5] h-full">
             <form class="h-full" action="">
-                <div class="bg-white overflow-scroll py-4 h-full border-b rounded-lg">
+                <div class="bg-white overflow-auto py-4 h-full border-b rounded-lg">
                     <div class="flex mx-6 mb-3 place-items-center">
                         <h1 class="font-semibold mr-6 tracking-wider">Personal Information</h1>
                         <img class="max-h-3.5" src="{{ asset('assets/edit.svg') }}" alt="Edit">

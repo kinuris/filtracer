@@ -3,7 +3,7 @@
 @section('content')
 @php($partial = auth()->user()->partialPersonal)
 <div>
-    <form method="POST" class="flex place-items-start h-full justify-center max-h-[calc(100vh-5rem)] pb-10 overflow-scroll" action="/alumni/setup/personal/{{ auth()->user()->id }}">
+    <form method="POST" class="flex place-items-start h-full justify-center max-h-[calc(100vh-5rem)] pb-10 overflow-auto" action="/alumni/setup/personal/{{ auth()->user()->id }}">
         @csrf
         <div class="shadow-lg bg-white mt-12 w-[60%] p-2 rounded-lg flex flex-col">
             <div class="flex gap-2">
