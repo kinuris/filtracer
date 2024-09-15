@@ -5,15 +5,16 @@
     <h1 class="font-medium tracking-widest text-lg">Major Settings</h1>
     <div class="shadow rounded-lg mt-4">
         <div class="bg-white p-4 flex place-items-center rounded-lg">
-            <form action="" method="POST" class="w-full">
+            <form action="/settings/major/edit/{{ $major->id }}" method="POST" class="w-full">
+                @csrf
                 <div class="flex flex-col">
                     <label for="name">Major Name</label>
-                    <input value="{{ $major->name }}" class="mt-1 p-2 rounded border" placeholder="Course Name" type="text">
+                    <input value="{{ $major->name }}" class="mt-1 p-2 rounded border" name="name" placeholder="Course Name" type="text">
                 </div>
 
                 <div class="flex flex-col mt-3">
                     <label for="department">Course Name</label>
-                    <select class="mt-1 p-2 rounded border" name="department" id="department">
+                    <select class="mt-1 p-2 rounded border" name="course" id="department">
                         @foreach (App\Models\Course::all() as $course) 
                         <option value="{{ $course->id }}" {{ $major->course_id == $course->id ? 'selected' : '' }}>{{ $course->name }} ({{ $course->department->name }})</option>
                         @endforeach

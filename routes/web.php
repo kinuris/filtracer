@@ -109,11 +109,15 @@ Route::controller(AdminController::class)
         Route::post('/settings/department/create', 'createDepartment');
 
         Route::get('/settings/account', 'accountsSettingsView');
+        Route::post('/settings/account/edit/{user}', 'accountEdit');
+        Route::post('/settings/account/profilepic/{admin}', 'uploadProfilePicture');
 
         Route::get('/settings/course', 'coursesSettingsView');
         Route::get('/settings/course/edit/{course}', 'editCourseView');
+        Route::post('/settings/course/edit/{course}', 'editCourse');
         Route::post('/settings/course/create', 'createCourse');
 
         Route::get('/settings/major', 'majorsSettingsView');
         Route::get('/settings/major/edit/{major}', 'editMajorView');
+        Route::post('/settings/major/edit/{major}', 'editMajor');
     });

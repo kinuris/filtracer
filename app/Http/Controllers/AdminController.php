@@ -42,7 +42,7 @@ class AdminController extends Controller
 
     public function reportsStatisticalView()
     {
-        $users = User::query()->where('role', '=', 'Alumni');
+        $users = User::query()->where('role', '=', 'Alumni')->orderBy('created_at', 'DESC');
 
         $users = $users->paginate(5);
 
@@ -52,6 +52,25 @@ class AdminController extends Controller
     public function reportsStatisticalGenerateView()
     {
         return view('report.statistical-generate');
+    }
+
+    public function uploadProfilePicture(Request $request, User $admin)
+    {
+        $request->validate([
+            'profile' => ['required', 'mimes:jpg,jpeg,png', 'max:10000']
+        ]);
+
+        $profile = $request->file('profile');
+        Storage::delete('public/user/images/' . $admin->personalBio->profile_picture);
+
+        $filename = sha1(time() . $admin->name) . '.' . $profile->getClientOriginalExtension();
+        $profile->storePubliclyAs('public/user/images', $filename);
+
+        $admin->getPersonalBio()->update([
+            'profile_picture' => $filename,
+        ]);
+
+        return redirect('/settings/account')->with('message', 'Profile picture uploaded successfully!');
     }
 
     public function myProfileView()
@@ -66,7 +85,7 @@ class AdminController extends Controller
 
     public function departmentSettingsView()
     {
-        $depts = Department::query();
+        $depts = Department::query()->where('name', '!=', 'Admins Assigned');
 
         $depts = $depts->paginate(5);
 
@@ -167,7 +186,8 @@ class AdminController extends Controller
         return view('department.update')->with('department', $department);
     }
 
-    public function createDepartment(Request $request) {
+    public function createDepartment(Request $request)
+    {
         $validated = $request->validate([
             'name' => ['required', 'unique:departments'],
             'logo' => [
@@ -187,6 +207,58 @@ class AdminController extends Controller
         Department::query()->create($validated);
 
         return redirect('/settings/department')->with('message', 'Department created successfully');
+    }
+
+    public function editMajor(Request $request, Major $major)
+    {
+        $validated = $request->validate([
+            'name' => [
+                'required',
+            ],
+            'course' => [
+                'required',
+            ]
+        ]);
+
+        $validated['course_id'] = $validated['course'];
+
+        $major->update($validated);
+
+        return redirect('/settings/major')->with('message', 'Major updated successfully');
+    }
+
+    public function editCourse(Request $request, Course $course)
+    {
+        $validated = $request->validate([
+            'name' => ['required'],
+            'department' => ['required'],
+        ]);
+
+        $validated['department_id'] = $validated['department'];
+
+        $course->update($validated);
+
+        return redirect('/settings/course')->with('message', 'Course updated successfully');
+    }
+
+    public function accountEdit(Request $request, User $user)
+    {
+        $validated = $request->validate([
+            'name' => ['required'],
+            'position' => ['required'],
+            'department' => ['required'],
+            'email' => ['required'],
+            'phone' => ['required'],
+        ]);
+
+        $validated['department_id'] = $validated['department'];
+        $validated['email_address'] = $validated['email'];
+        $validated['phone_number'] = $validated['phone'];
+
+        $user->update($validated);
+        $user->personalBio->update($validated);
+
+        return redirect('/settings/account')->with('message', 'Account updated successfully');
     }
 
     public function updateDepartment(Request $request, Department $department)
@@ -221,22 +293,25 @@ class AdminController extends Controller
         return redirect('/settings/department')->with('message', 'Department updated successfully');
     }
 
-    public function delelteDepartment(Department $department) {
+    public function delelteDepartment(Department $department)
+    {
         Storage::delete('/public/departments/' . $department->logo);
         $department->delete();
 
         return redirect('/settings/department')->with('message', 'Department deleted successfully');
     }
 
-    public function verifyUser(User $user) {
+    public function verifyUser(User $user)
+    {
         $user->getPersonalBio()->update(['status' => 1]);
 
         return redirect('/account')->with('message', 'User verified successfully');
     }
 
-    public function createCourse(Request $request) {
+    public function createCourse(Request $request)
+    {
         $validated = $request->validate([
-            'name' => ['required', 'unique:courses'],  
+            'name' => ['required', 'unique:courses'],
             'department' => ['required'],
         ]);
 

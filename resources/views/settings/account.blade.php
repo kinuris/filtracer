@@ -7,7 +7,8 @@
     <h1 class="font-medium tracking-widest text-lg">Account Settings</h1>
     <div class="flex h-full mt-4 max-h-[calc(100%-64px)]">
         <div class="shadow rounded-lg flex-[5] h-full">
-            <form class="h-full" action="">
+            <form class="h-full" action="/settings/account/edit/{{ $user->id }}" method="POST">
+                @csrf
                 <div class="bg-white overflow-auto py-4 h-full border-b rounded-lg">
                     <div class="flex mx-6 mb-3 place-items-center">
                         <h1 class="font-semibold mr-6 tracking-wider">Personal Information</h1>
@@ -64,7 +65,8 @@
         <div class="mx-2"></div>
         <div class="flex-[3] h-full max-w-[400px] flex items-start justify-center max-h-[calc(100%-64px)]">
             <div class="shadow rounded-lg w-full">
-                <form class="w-full h-full" action="/profile/pic/edit" enctype="multipart/form-data" method="POST">
+                <form class="w-full h-full" action="/settings/account/profilepic/{{ $user->id }}" enctype="multipart/form-data" method="POST">
+                    @csrf
                     <div class="bg-white py-4 flex flex-col h-full border-b rounded-lg">
                         <h1 class="ml-6 mb-3 font-bold tracking-wide">Your Photo</h1>
                         <hr>

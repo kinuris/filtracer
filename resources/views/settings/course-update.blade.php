@@ -5,10 +5,11 @@
     <h1 class="font-medium tracking-widest text-lg">Course Settings</h1>
     <div class="shadow rounded-lg mt-4">
         <div class="bg-white p-4 flex place-items-center rounded-lg">
-            <form action="" method="POST" class="w-full">
+            <form action="/settings/course/edit/{{ $course->id }}" method="POST" class="w-full">
+                @csrf
                 <div class="flex flex-col">
                     <label for="name">Course Name</label>
-                    <input value="{{ $course->name }}" class="mt-1 p-2 rounded border" placeholder="Course Name" type="text">
+                    <input name="name" value="{{ $course->name }}" class="mt-1 p-2 rounded border" placeholder="Course Name" type="text">
                 </div>
 
                 <div class="flex flex-col mt-3">
