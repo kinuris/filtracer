@@ -23,6 +23,10 @@ class EducationRecord extends Model
         return $this->belongsTo(User::class, 'user_id');
     }
 
+    public function course() {
+        return $this->belongsTo(Course::class, 'course_id');
+    }
+
     public function getCourse() {
         return Course::find($this->course_id);
     }

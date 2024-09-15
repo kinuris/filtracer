@@ -83,6 +83,11 @@ class AdminController extends Controller
         return view('settings.index');
     }
 
+    public function profileReportView(User $alumni)
+    {
+        return view('alumni.profile-report')->with('alumni', $alumni);
+    }
+
     public function departmentSettingsView()
     {
         $depts = Department::query()->where('name', '!=', 'Admins Assigned');

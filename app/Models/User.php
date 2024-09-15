@@ -154,7 +154,7 @@ class User extends Authenticatable
 
     public function educationalBios()
     {
-        return $this->hasMany(EducationRecord::class, 'user_id');
+        return $this->hasMany(EducationRecord::class, 'user_id')->orderBy('end', 'DESC');
     }
 
     public function getProfessionalBio(): null | ProfessionalRecord

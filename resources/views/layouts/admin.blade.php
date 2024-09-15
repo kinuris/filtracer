@@ -83,7 +83,7 @@
                 <div class="border-r h-[calc(100%-1rem)] my-2 mr-3"></div>
 
                 <div class="border mr-4 rounded-full shadow">
-                    <img class="w-10 rounded-full aspect-square object-cover" src="{{ asset('storage/user/images/' . auth()->user()->getPersonalBio()->profile_picture) }}" alt="Profile">
+                    <img class="w-10 rounded-full aspect-square object-cover" src="{{ auth()->user()->image() }}" alt="Profile">
                 </div>
 
                 <p class="mx-3">{{ auth()->user()->name }}</p>

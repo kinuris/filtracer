@@ -16,7 +16,7 @@
 
             <div class="flex-1"></div>
 
-            <a class="rounded-lg p-2 px-3 bg-blue-600 text-white" href="">Generate Report</a>
+            <a class="rounded-lg p-2 px-3 bg-blue-600 text-white" href="/profile/report/{{ $user->id }}">Generate Report</a>
             <a class="rounded-lg p-2 px-3 bg-blue-600 text-white mx-3" href="">Manage Account</a>
             <a class="rounded-lg p-2 px-3 bg-blue-600 text-white" href="">Log History</a>
         </div>

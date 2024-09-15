@@ -100,6 +100,8 @@ class AlumniController extends Controller
 
         return redirect('/alumni/profile/update')->with('message', 'Profile picture uploaded successfully!');
     }
+    
+    
 
     public function createProfBio(Request $request, User $alumni)
     {

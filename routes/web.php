@@ -75,6 +75,7 @@ Route::controller(AlumniController::class)
             Route::post('/alumni/profile/add/educational/{alumni}', 'addEducationRecord');
             Route::post('/alumni/profile/update/educational/{educ}/{alumni}', 'updateEducationRecord');
 
+
             Route::post('/profbio/create/{alumni}', 'createProfBio');
             Route::post('/profbio/update/{alumni}', 'updateProfBio');
         });
@@ -85,6 +86,8 @@ Route::controller(AdminController::class)
     ->group(function () {
         Route::get('/admin', 'dashboardView');
         Route::get('/department', 'departmentView');
+
+        Route::get('/profile/report/{alumni}', 'profileReportView');
 
         Route::get('/department/{department}', 'alumniListView');
         Route::get('/user/view/{user}', 'userView');
