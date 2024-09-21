@@ -11,7 +11,7 @@
                 <p class="tracking-wider font-semibold mr-4">All</p>
                 <select class="g-gray-100 p-2 rounded border text-gray-400" name="category" id="category">
                     <option value="All Users">All Users</option>
-                    <option value="Registered Users">Registered Users</option>
+                    <!-- <option value="Registered Users">Registered Users</option> -->
                     <option value="Employed Alumni">Employed Alumni</option>
                     <option value="Unemployed Alumni">Unemployed Alumni</option>
                     <option value="Self-Employed Alumni">Self-Employed Alumni</option>
