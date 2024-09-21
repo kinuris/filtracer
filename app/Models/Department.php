@@ -15,6 +15,18 @@ class Department extends Model
         'logo',
     ];
 
+    public function shortened() {
+        $result = '';
+
+        foreach (str_split($this->name) as $char) {
+            if (ctype_upper($char)) {
+                $result .= $char;
+            }
+        }
+
+        return $result;
+    }
+
     public function getCourses() {
         return Course::query()->where('department_id', '=', $this->id)->get();
     }
