@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ChatGroup;
 use App\Models\Course;
 use App\Models\Department;
 use App\Models\Major;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
@@ -146,7 +148,9 @@ class AdminController extends Controller
 
         $search = request()->query('search');
         if ($search) {
-            $users = $users->where('name', 'LIKE', '%' . $search . '%');
+            $users = $users->whereRelation('personalBio', 'first_name', 'LIKE', '%' . $search . '%')
+                ->orWhereRelation('personalBio', 'middle_name', 'LIKE', '%' . $search . '%')
+                ->orWhereRelation('personalBio', 'last_name', 'LIKE', '%' . $search . '%');
         }
 
         $status = (int) request()->query('user_status', -1);
@@ -325,5 +329,23 @@ class AdminController extends Controller
         Course::query()->create($validated);
 
         return redirect('/settings/course')->with('message', 'Course created successfully');
+    }
+
+    public function chatView()
+    {
+        $user = User::query()->find(Auth::user()->id);
+        $view = view('chat.admin');
+
+        $selected = request('initiate');
+
+        if ($selected && is_numeric($selected)) {
+            $selected = User::query()->find($selected);
+        } else {
+            $selected = ChatGroup::query()->where('internal_id', '=', urldecode(request('initiate')))->first();
+        }
+
+        return $view
+            ->with('selected', $selected)
+            ->with('chatGroups', $user->chatGroups());
     }
 }

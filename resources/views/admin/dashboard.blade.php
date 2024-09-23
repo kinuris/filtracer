@@ -15,7 +15,7 @@
 
             <div class="flex">
                 <div class="flex flex-col mr-10">
-                    <p class="text-3xl font-bold">{{ $users->whereRelation('professionalRecords', 'employment_status', '=', 'Employed')->count() }}</p>
+                    <p class="text-3xl font-bold">{{ $users->where('role', '=', 'Alumni')->whereRelation('professionalRecords', 'employment_status', '=', 'Employed')->count() }}</p>
                     <p class="text-sm text-gray-400">Employed Users</p>
                 </div>
                 <img src="{{ asset('assets/employed.svg') }}" alt="Employed">
@@ -24,7 +24,7 @@
             <div class="flex">
                 <div class="flex flex-col mr-10">
                     @php($users = App\Models\User::query())
-                    <p class="text-3xl font-bold">{{ $users->whereRelation('professionalRecords', 'employment_status', '=', 'Unemployed')->count() }}</p>
+                    <p class="text-3xl font-bold">{{ $users->where('role', '=', 'Alumni')->whereRelation('professionalRecords', 'employment_status', '=', 'Unemployed')->count() }}</p>
                     <p class="text-sm text-gray-400">Unemployed Users</p>
                 </div>
                 <img src="{{ asset('assets/unemployed.svg') }}" alt="Unemployed">

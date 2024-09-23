@@ -33,6 +33,39 @@ class User extends Authenticatable
         return User::query()->where('role', '=', 'Admin')->get();
     }
 
+    public function chatsWith(User $user)
+    {
+        $groups = array();
+        foreach ($this->chatGroups()->get() as $group) {
+            if ($group->users()->count() === 2 && $group->users()->get()->contains($user)) {
+                array_push($groups, $group);
+            }
+        }
+
+        return !empty($groups);
+    }
+
+    public function chatGroupWith(User $user)
+    {
+        $groups = array();
+        foreach ($this->chatGroups()->get() as $group) {
+            if ($group->users()->count() === 2 && $group->users()->get()->contains($user)) {
+                array_push($groups, $group);
+            }
+        }
+
+        return isset($groups[0]) ? $groups[0] : null;
+    }
+
+    public function getNameAttribute()
+    {
+        if ($this->role === 'Alumni') {
+            return $this->getPersonalBio()->getFullname();
+        } else {
+            return $this->attributes['name'];
+        }
+    }
+
     public function partialPersonal()
     {
         return $this->hasOne(PartialPersonalRecord::class, 'user_id');
@@ -43,7 +76,13 @@ class User extends Authenticatable
         return $this->hasOne(PersonalRecord::class, 'user_id');
     }
 
-    public function professionalBio() {
+    public function chatGroups()
+    {
+        return $this->hasManyThrough(ChatGroup::class, ChatAssociation::class, 'user_id', 'id', 'id', 'chat_group_id');
+    }
+
+    public function professionalBio()
+    {
         return $this->hasOne(ProfessionalRecord::class, 'user_id');
     }
 

@@ -17,8 +17,11 @@
 
 <body>
     <div class="flex w-screen">
-
-
+        @if (request()->path() !== 'alumni/chat')
+        <a href="/alumni/chat" class="fixed rounded-full bottom-0 right-0 mb-6 mr-6 shadow-lg bg-blue-600 transition-transform hover:scale-110">
+            <img class="w-8 m-3" src="{{ asset('assets/chat.svg') }}" alt="Chat">
+        </a>
+        @endif
         <div class="bg-white border-r h-screen max-h-screen min-w-[max(20%,300px)] px-6 pb-2 flex flex-col">
             <img class="h-fit w-44" src="{{ asset('assets/filtracer_nolabel.svg') }}" alt="Filtracer Logo">
 
@@ -33,6 +36,13 @@
                 <div class="hover:bg-gray-100 font-medium tracking-wide hover:text-blue-500 rounded-lg p-3 flex place-items-center">
                     <img class="w-7 mr-4" src="{{ asset('assets/profile_outlined.svg') }}" alt="Profile">
                     Profile
+                </div>
+            </a>
+
+            <a href="/alumni/chat">
+                <div class="hover:bg-gray-100 font-medium tracking-wide hover:text-blue-500 rounded-lg p-3 flex place-items-center">
+                    <img class="w-7 mr-4" src="{{ asset('assets/chat_gray.svg') }}" alt="Chat">
+                    Chats
                 </div>
             </a>
 
@@ -73,7 +83,7 @@
                     <img class="w-10 rounded-full aspect-square object-cover" src="{{ auth()->user()->image() }}" alt="Profile">
                 </div>
 
-                <p class="mx-3">{{ auth()->user()->getPersonalBio()->getFullname() }}</p>
+                <p class="mx-3">{{ auth()->user()->name }}</p>
 
                 <div class="relative inline-block text-left">
                     <div>
@@ -91,6 +101,8 @@
                                 My Profile
                             </div>
                         </a>
+
+
 
                         <a href="#" class="block py-2 text-sm text-gray-700" role="menuitem" tabindex="-1" id="menu-item-3">
                             <div class="py-1 flex place-items-center" role="none">

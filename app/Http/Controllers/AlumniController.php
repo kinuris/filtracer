@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ChatGroup;
 use App\Models\EducationRecord;
 use App\Models\PersonalRecord;
 use App\Models\ProfessionalRecord;
@@ -100,8 +101,6 @@ class AlumniController extends Controller
 
         return redirect('/alumni/profile/update')->with('message', 'Profile picture uploaded successfully!');
     }
-    
-    
 
     public function createProfBio(Request $request, User $alumni)
     {
@@ -419,5 +418,23 @@ class AlumniController extends Controller
         }
 
         return view('setup.personal-info');
+    }
+
+    public function chatView()
+    {
+        $user = User::query()->find(Auth::user()->id);
+        $view = view('chat.alumni');
+
+        $selected = request('initiate');
+
+        if ($selected && is_numeric($selected)) {
+            $selected = User::query()->find($selected);
+        } else {
+            $selected = ChatGroup::query()->where('internal_id', '=', urldecode(request('initiate')))->first();
+        }
+
+        return $view
+            ->with('selected', $selected)
+            ->with('chatGroups', $user->chatGroups());
     }
 }

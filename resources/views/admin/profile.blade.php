@@ -29,7 +29,7 @@
                 <div class="flex">
                     <div class="flex flex-1">
                         <p class="flex-[2] text-gray-500">Full Name</p>
-                        <p class="flex-[5] font-bold">{{ $personal ? $personal->getFullname() : $user->name }}</p>
+                        <p class="flex-[5] font-bold">{{ $user->name }}</p>
                     </div>
                     <div class="flex flex-1">
                         <p class="flex-[2] text-gray-500">Username</p>

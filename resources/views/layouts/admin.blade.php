@@ -6,12 +6,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
     <link rel="stylesheet" href=" https://printjs-4de6.kxcdn.com/print.min.css">
+    <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
+
     @vite('resources/css/app.css')
     <title>@yield('title')</title>
 </head>
 
 <body>
     <div class="flex w-screen">
+        @if (request()->path() !== 'admin/chat')
+        <a href="/admin/chat" class="fixed rounded-full bottom-0 right-0 mb-6 mr-6 shadow-lg bg-blue-600 transition-transform hover:scale-110">
+            <img class="w-8 m-3" src="{{ asset('assets/chat.svg') }}" alt="Chat">
+        </a>
+        @endif
         <div class="bg-white border-r h-screen max-h-screen min-w-[max(20%,300px)] px-6 pb-2 flex flex-col">
             <img class="h-fit w-44" src="{{ asset('assets/filtracer_nolabel.svg') }}" alt="Filtracer Logo">
 
@@ -33,6 +42,13 @@
                 <div class="hover:bg-gray-100 font-medium tracking-wide hover:text-blue-500 rounded-lg p-3 flex place-items-center">
                     <img class="w-7 mr-4" src="{{ asset('assets/accounts.svg') }}" alt="Dashboard">
                     Accounts
+                </div>
+            </a>
+
+            <a href="/admin/chat">
+                <div class="hover:bg-gray-100 font-medium tracking-wide hover:text-blue-500 rounded-lg p-3 flex place-items-center">
+                    <img class="w-7 mr-4" src="{{ asset('assets/chat_gray.svg') }}" alt="Chat">
+                    Chats
                 </div>
             </a>
 
@@ -125,8 +141,9 @@
             @yield('content')
         </div>
     </div>
-    @yield('script')
     <script src="https://printjs-4de6.kxcdn.com/print.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+    @yield('script')
     <script>
         const menuBtn = document.querySelector('#menu-button');
         const options = document.querySelector('#options');

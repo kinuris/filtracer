@@ -1,0 +1,201 @@
+@extends('layouts.alumni')
+
+@section('content')
+<div class="max-h-[calc(100%-4rem)]">
+    <div class="bg-gray-100 w-full h-full p-8 flex flex-col overflow-auto max-h-[calc(100%-0.01px)]">
+        <h1 class="font-medium tracking-widest text-lg">Chats</h1>
+
+        <div class="shadow rounded-lg mt-4 max-h-[calc(100vh-4rem)] overflow-auto">
+            <div class="bg-white justify-between rounded-lg">
+                <div class="text-lg font-semibold relative tracking-wide grid grid-rows-[auto,1fr] grid-cols-[auto,1fr] h-full w-full">
+                    <div class="border-b px-6 py-3">
+                        <div class="flex justify-between place-items-center h-full">
+                            <p class="text-lg tracking-wide font-semibold">Messages</p>
+                            <a href="/alumni/chat">
+                                <img class="w-5" src="{{ asset('assets/compose_message.svg') }}" alt="Compose Message">
+                            </a>
+                        </div>
+                    </div>
+                    <div class="border-b px-6 py-2 pl-4 border-l">
+                        @if ($selected)
+                        <div class="flex place-items-center h-full">
+                            <img class="w-9 h-9 rounded-full object-cover shadow" src="{{ $selected->image() }}" alt="">
+                            <p class="font-normal text-base tracking-normal ml-3">{{ $selected->name }}</p>
+                        </div>
+                        @else
+                        <div class="flex place-items-center h-full">
+                            <p class="font-normal text-sm mr-3">To:</p>
+                            <select multiple name="receivers[]" id="receivers"></select>
+                            <button class="hidden h-5 w-5 transition-transform hover:scale-110 bg-slate-700 text-white text-xs font-light rounded" id="addBtn">+</button>
+                        </div>
+                        @endif
+                    </div>
+                    <div class="px-6 py-3 flex flex-col h-full">
+                        <form class="self-center mb-2" action="">
+                            <input class="border rounded-lg bg-gray-50 font-light text-sm p-2 min-w-72" placeholder="Search..." type="text" name="search">
+                        </form>
+
+                        @foreach (auth()->user()->chatGroups()->get() as $group)
+                        <a href="/alumni/chat?initiate={{ $group->initiateLink() }}" class="flex place-items-center p-2 hover:bg-gray-100">
+                            <img class="w-12 h-12 object-cover rounded-full shadow mr-3.5" src="{{ $group->image() }}" alt="Group">
+                            <div class="flex flex-col">
+                                <p class="text-sm font-normal">{{ $group->name }}</p>
+                                @php($first = $group->messages()->latest()->first())
+                                <p class="text-xs font-light text-gray-400 line-clamp-1 max-w-48">{{ $first && $first->sender->id == auth()->user()->id ? 'You: ' : ''}}{{ $first ? $first->content : 'No Messages Yet' }}</p>
+                            </div>
+                        </a>
+                        @endforeach
+                    </div>
+                    <div class="border-l px-6 py-3 h-full min-h-[calc(100vh-14.1rem)] max-h-[calc(100vh-14.1rem)] overflow-scroll">
+                        @if (!$selected)
+                        <div class="div w-full h-full flex flex-col justify-center place-items-center">
+                            <img class="w-16" src="{{ asset('assets/chat_gray.svg') }}" alt="Messages">
+                            <h1 class="text-gray-400 font-light">(No Chat Selected)</h1>
+                        </div>
+                        @else
+                        <div class="flex flex-col mb-12 overflow-auto" id="messages">
+                            <!-- NOTE: Messages go here -->
+                        </div>
+                        <div class="div w-full bg-white/80 backdrop-blur-sm py-3 flex flex-col justify-end absolute px-4 right-0 bottom-0">
+                            <div class="flex">
+                                <input class="border rounded-lg bg-gray-50 font-light text-sm p-2 min-w-72 flex-1" placeholder="Type something here..." type="text" name="message" id="message">
+                                <button id="send" class="shadow bg-blue-600 w-10 h-10 flex justify-center place-items-center rounded-lg ml-3 transition-transform hover:scale-110">
+                                    <img class="w-5 h-5" src="{{ asset('assets/send.svg') }}" alt="Send">
+                                </button>
+                            </div>
+                        </div>
+                        @endif
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@endsection
+
+@section('script')
+<script>
+    const messages = document.getElementById('messages');
+    const message = document.getElementById('message');
+    const send = document.getElementById('send');
+
+    if (send) {
+        send.addEventListener('click', async () => {
+            if (message.value.length < 1) return;
+
+            <?php
+
+            use App\Models\User;
+            use Illuminate\Support\Facades\Auth;
+            ?>
+
+            const formData = new FormData();
+            formData.append('message', message.value);
+            formData.append('sender', <?php echo Auth::user()->id ?>);
+            formData.append('room_id', '<?php echo isset($selected->internal_id) ? $selected->internal_id : ($selected ? $selected->id : 'null') ?>');
+
+            message.value = '';
+
+            const response = await fetch('/chat/send', {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': <?php echo '"' . csrf_token() . '"' ?>,
+                },
+                body: formData
+            });
+
+            const {
+                group
+            } = await response.json();
+
+            const htmlRes = await fetch(`/chat/messages/${group}`);
+            messages.innerHTML = await htmlRes.text();
+        });
+    }
+</script>
+
+@if ($selected)
+<script>
+    (async function repeat() {
+        const response = await fetch(`/chat/getgroup/<?php echo urlencode(isset($selected->internal_id) ? $selected->internal_id : ($selected ? $selected->id : 'null')) ?>`);
+        const group = Number(await response.text());
+
+        async function sync() {
+            const htmlRes = await fetch(`/chat/messages/${group}`);
+            if (htmlRes.status !== 200) return;
+
+            messages.innerHTML = await htmlRes.text();
+        }
+
+        sync();
+
+        if (group !== -1) {
+            setInterval(sync, 1000);
+        }
+    })()
+</script>
+@else
+<script>
+    let selectedCount = 0;
+    const receivers = document.getElementById('receivers');
+    const addBtn = document.getElementById('addBtn');
+
+    addBtn.addEventListener('click', async () => {
+        if (selectedCount < 0) {
+            return;
+        }
+
+        const formData = new FormData();
+        for (const opt of receivers.selectedOptions) {
+            formData.append('receivers[]', opt.value);
+        }
+        formData.append('creator', <?php echo Auth::user()->id ?>);
+
+        const response = await fetch('/chat/makegroup', {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': <?php echo '"' . csrf_token() . '"' ?>,
+            },
+            body: formData
+        });
+    });
+
+    function updateAddBtnVis() {
+        if (selectedCount > 0) {
+            addBtn.classList.remove('hidden');
+        } else {
+            addBtn.classList.add('hidden');
+        }
+    }
+
+    receivers.addEventListener('addItem', () => {
+        selectedCount++;
+        updateAddBtnVis();
+    });
+
+    receivers.addEventListener('removeItem', () => {
+        selectedCount--;
+        updateAddBtnVis();
+    });
+
+    new Choices(receivers, {
+        choices: [
+            <?php
+            foreach (User::all() as $user) {
+                if ($user->id !== Auth::user()->id) {
+                    echo '{ value: ' . $user->id . ', ' . 'label: "' .  $user->name . '"'  . '},';
+                }
+            }
+            ?>
+        ],
+        removeItemButton: true,
+        classNames: {
+            containerOuter: ['m-0', 'choices'],
+            containerInner: ['p-0'],
+            listDropdown: ['min-w-96', 'bg-gray-100'],
+            item: ['choices__item']
+        }
+    })
+</script>
+@endif
+@endsection

@@ -10,7 +10,12 @@
         <div class="bg-white py-4 flex place-items-center px-6 border-b rounded-lg">
             <img class="w-32 h-32 rounded-full object-cover shadow-md mr-8" src="{{ $user->image() }}" alt="Profile">
             <div class="flex flex-col">
-                <p class="text-lg">{{ $user->name }}</p>
+                <div class="flex place-items-center">
+                    <p class="text-lg">{{ $user->name }}</p>
+                    <a href="/admin/chat?initiate={{ $user->id }}">
+                        <img class="w-5 ml-3" src="{{ asset('assets/chat_gray.svg') }}" alt="Chat">
+                    </a>
+                </div>
                 <p class="text-gray-400 text-sm">{{ $user->getEducationalBio()->getCourse()->name }}</p>
             </div>
 

@@ -70,7 +70,7 @@
         <div class="shadow rounded-lg h-fit mt-6 flex-1 min-w-80">
             <div class="bg-white py-4 flex flex-col px-6 border-b rounded-lg">
                 <img class="w-32 h-32 rounded-full object-cover shadow-md mr-8" src="{{ $user->image() }}" id="user-profile" alt="Profile">
-                <p class="text-lg font-bold my-6">{{ $user->getPersonalBio()->getFullname() }}</p>
+                <p class="text-lg font-bold my-6">{{ $user->name }}</p>
 
                 <div class="flex place-items-center">
                     <img class="h-4 mr-3" src="{{ asset('assets/alumni_job.svg') }}" alt="Job">

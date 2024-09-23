@@ -42,7 +42,11 @@
                             @elseif ($personal !== null && $personal->status == 0)
                             <button data-user-id="{{ $user->id }}" class="openVerifyModal"><img src="{{ asset('/assets/unverified_user.svg') }}" alt="Verified"></button>
                             @endif
+                            @if ($user->role !== 'Admin')
                             <a class="mx-3" href="/user/view/{{ $user->id }}"><img src="{{ asset('assets/view.svg') }}" alt="View"></a>
+                            @else
+                            <div class="mr-3"></div>
+                            @endif
                             <a href="/user/delete/{{ $user->id }}"><img src="{{ asset('assets/trash.svg') }}" alt="Trash"></a>
                         </div>
                     </td>
@@ -51,7 +55,7 @@
             </tbody>
         </table>
         <div class="bg-white rounded-b-lg p-3">
-            {{ $users->withQueryString()->links('vendor.pagination.tailwind') }}
+            {{ $users->appends(request()->except(['verify_modal']))->links('vendor.pagination.tailwind') }}
         </div>
     </div>
 </div>
@@ -84,7 +88,7 @@
         button.addEventListener('click', () => {
             const user = button.getAttribute('data-user-id');
 
-            const params = new URLSearchParams();
+            const params = new URLSearchParams(window.location.search);
             params.append('verify_modal', user);
 
             window.location.replace('/account?' + params.toString());
