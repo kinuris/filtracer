@@ -109,6 +109,8 @@ Route::controller(AdminController::class)
 
         Route::get('/admin/chat', 'chatView');
 
+        Route::get('/admin/post', 'postView');
+
         Route::get('/settings/department', 'departmentSettingsView');
         Route::get('/settings/department/edit/{department}', 'editDepartmentView');
         Route::post('/settings/department/update/{department}', 'updateDepartment');
@@ -127,6 +129,7 @@ Route::controller(AdminController::class)
         Route::get('/settings/major', 'majorsSettingsView');
         Route::get('/settings/major/edit/{major}', 'editMajorView');
         Route::post('/settings/major/edit/{major}', 'editMajor');
+        Route::post('/settings/major/create', 'createMajor');
     });
 
 Route::controller(ChatController::class)

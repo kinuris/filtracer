@@ -1,6 +1,9 @@
 @extends('layouts.admin')
 
 @section('content')
+@if (request('initiate'))
+@include('components.chat-members-modal')
+@endif
 <div class="max-h-[calc(100%-4rem)]">
     <div class="bg-gray-100 w-full h-full p-8 flex flex-col overflow-auto max-h-[calc(100%-0.01px)]">
         <h1 class="font-medium tracking-widest text-lg">Chats</h1>
@@ -21,6 +24,41 @@
                         <div class="flex place-items-center h-full">
                             <img class="w-9 h-9 rounded-full object-cover shadow" src="{{ $selected->image() }}" alt="">
                             <p class="font-normal text-base tracking-normal ml-3">{{ $selected->name }}</p>
+
+                            <div class="flex-1"></div>
+
+                            <div class="group relative">
+                                <img class="w-5 h-5 transition-transform hover:scale-110" src="{{ asset('assets/option.svg') }}" alt="Close">
+
+                                <div class="w-48 right-0 absolute hidden group-hover:block font-light text-sm bg-white shadow-lg rounded-lg overflow-hidden">
+                                    <div class="flex p-2 group hover:bg-gray-100 cursor-pointer">
+                                        <img class="w-5" src="{{ asset('assets/file.svg') }}" alt="Chat Members">
+                                        <button class="text-left w-full block px-4 py-2 hover:bg-gray-100">See Files</button>
+                                    </div>
+
+                                    <div class="flex p-2 group hover:bg-gray-100 cursor-pointer">
+                                        <img class="w-5" src="{{ asset('assets/image.svg') }}" alt="Chat Members">
+                                        <button class="text-left w-full block px-4 py-2 hover:bg-gray-100">See Images</button>
+                                    </div>
+
+                                    @if (!is_numeric(request('initiate')))
+                                    <div id="openChatMembersModal" class="flex p-2 group hover:bg-gray-100 rounded-t-lg cursor-pointer">
+                                        <img class="w-5" src="{{ asset('assets/accounts.svg') }}" alt="Chat Members">
+                                        <button class="text-left w-full block px-4 py-2">See Members</button>
+                                    </div>
+
+                                    <div class="flex p-2 group hover:bg-gray-100 cursor-pointer">
+                                        <img class="w-5" src="{{ asset('assets/rename.svg') }}" alt="Chat Members">
+                                        <button class="text-left w-full block px-4 py-2 hover:bg-gray-100">Rename Group</button>
+                                    </div>
+
+                                    <div class="flex p-2 group hover:bg-gray-100 cursor-pointer">
+                                        <img class="w-5" src="{{ asset('assets/leave.svg') }}" alt="Chat Members">
+                                        <button class="text-left w-full block px-4 py-2 hover:bg-gray-100">Leave Group</button>
+                                    </div>
+                                    @endif
+                                </div>
+                            </div>
                         </div>
                         @else
                         <div class="flex place-items-center h-full">
@@ -74,6 +112,25 @@
 @endsection
 
 @section('script')
+<script>
+    const openChatMembersModal = document.getElementById('openChatMembersModal');
+    const chatMembersModal = document.getElementById('chatMembersModal');
+    const closeChatMembersModal = document.getElementById('closeChatMembersModal');
+
+    openChatMembersModal.addEventListener('click', () => {
+        chatMembersModal.classList.remove('hidden');
+    });
+
+    closeChatMembersModal.addEventListener('click', () => {
+        chatMembersModal.classList.add('hidden');
+    });
+
+    chatMembersModal.addEventListener('click', (e) => {
+        if (e.target === chatMembersModal) {
+            chatMembersModal.classList.add('hidden');
+        }
+    })
+</script>
 <script>
     const messages = document.getElementById('messages');
     const message = document.getElementById('message');
@@ -158,6 +215,10 @@
             },
             body: formData
         });
+
+        if (response.status === 200) {
+            window.location.href = '/admin/chat';
+        }
     });
 
     function updateAddBtnVis() {

@@ -348,4 +348,21 @@ class AdminController extends Controller
             ->with('selected', $selected)
             ->with('chatGroups', $user->chatGroups());
     }
+
+    public function createMajor(Request $request) {
+        $validated = $request->validate([
+            'name' => ['required', 'unique:majors'],
+            'course_id' => ['required'],
+        ]);
+
+        $validated['description'] = '';
+
+        Major::query()->create($validated);
+
+        return redirect('/settings/major')->with('message', 'Major created successfully');
+    }
+
+    public function postView() {
+        return view('post.admin');
+    }
 }
