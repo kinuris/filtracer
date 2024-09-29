@@ -94,7 +94,16 @@
 
                 <div class="flex-1"></div>
 
-                <img class="w-5 mr-4" src="{{ asset('assets/notification.svg') }}" alt="Dashboard">
+                <div class="group relative">
+                    <img class="w-5 mr-4" src="{{ asset('assets/notification.svg') }}" alt="Dashboard">
+
+                    <div class="absolute right-3 top-3 z-40 hidden border group-hover:block bg-white shadow-lg rounded-lg overflow-hidden min-w-80">
+                        <p class="border-b p-3 font-bold">Notifications</p>
+                        <span class="block max-h-96 overflow-auto" id="alertContainer">
+
+                        </span>
+                    </div>
+                </div>
 
                 <div class="border-r h-[calc(100%-1rem)] my-2 mr-3"></div>
 
@@ -121,7 +130,7 @@
                             </div>
                         </a>
 
-                        <a href="#" class="block py-2 text-sm text-gray-700" role="menuitem" tabindex="-1" id="menu-item-3">
+                        <a href="/settings/account" class="block py-2 text-sm text-gray-700" role="menuitem" tabindex="-1" id="menu-item-3">
                             <div class="py-1 flex place-items-center" role="none">
                                 <img class="block h-4 mx-4" src="{{ asset('assets/settings.svg') }}" alt="Profile">
                                 Account Settings
@@ -136,13 +145,27 @@
                         </a>
                     </div>
                 </div>
-
             </nav>
             @yield('content')
         </div>
     </div>
     <script src="https://printjs-4de6.kxcdn.com/print.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+    <script>
+        const alertContainer = document.querySelector('#alertContainer');
+
+        (function() {
+            async function repeat() {
+                const alerts = await fetch('/alert/gen');
+
+                alertContainer.innerHTML = await alerts.text();
+            }
+
+            repeat();
+
+            setInterval(repeat, 1000);
+        })()
+    </script>
     @yield('script')
     <script>
         const menuBtn = document.querySelector('#menu-button');

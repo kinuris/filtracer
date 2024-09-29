@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('user_id');
             $table->string('fullname');
+            $table->string('position_id');
 
             $table->enum('office', [
                 'Alumni Office',

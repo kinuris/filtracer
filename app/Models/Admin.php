@@ -13,6 +13,7 @@ class Admin extends Model
         'fullname',
         'office',
         'email_address',
+        'position_id',
         'phone_number',
         'profile_picture',
         'is_deleted',

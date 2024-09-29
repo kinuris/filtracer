@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\ChatGroup;
 use App\Models\EducationRecord;
 use App\Models\PersonalRecord;
+use App\Models\Post;
 use App\Models\ProfessionalRecord;
 use App\Models\ProfessionalRecordAttachments;
 use App\Models\ProfessionalRecordHardSkill;
@@ -436,5 +437,26 @@ class AlumniController extends Controller
         return $view
             ->with('selected', $selected)
             ->with('chatGroups', $user->chatGroups());
+    }
+
+    public function postView()
+    {
+        $category = request('category', 'All Posts');
+
+        $posts = Post::query();
+
+        if ($category === 'Events') {
+            $posts = $posts->where('post_category', 'Event');
+        } else if ($category === 'Job Openings') {
+            $posts = $posts->where('post_category', 'Job Opening');
+        } else if ($category === 'Announcements') {
+            $posts = $posts->where('post_category', 'Announcement');
+        } else if ($category === 'Your Posts') {
+            $posts = $posts->where('user_id', Auth::user()->id); 
+        }
+
+        $posts = $posts->latest()->get();
+
+        return view('post.alumni')->with('posts', $posts);
     }
 }

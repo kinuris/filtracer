@@ -46,7 +46,7 @@
                 </div>
             </a>
 
-            <a href="/post">
+            <a href="/alumni/post">
                 <div class="hover:bg-gray-100 font-medium tracking-wide hover:text-blue-500 rounded-lg p-3 flex place-items-center">
                     <img class="w-7 mr-4" src="{{ asset('assets/posts.svg') }}" alt="Jobs">
                     Posts
@@ -75,7 +75,16 @@
 
                 <div class="flex-1"></div>
 
-                <img class="w-5 mr-4" src="{{ asset('assets/notification.svg') }}" alt="Dashboard">
+                <div class="group relative">
+                    <img class="w-5 mr-4" src="{{ asset('assets/notification.svg') }}" alt="Dashboard">
+
+                    <div class="absolute right-3 top-3 z-40 hidden border group-hover:block bg-white shadow-lg rounded-lg overflow-hidden min-w-80 ">
+                        <p class="border-b p-3 font-bold">Notifications</p>
+                        <span class="block max-h-96 overflow-auto" id="alertContainer">
+
+                        </span>
+                    </div>
+                </div>
 
                 <div class="border-r h-[calc(100%-1rem)] my-2 mr-3"></div>
 
@@ -125,6 +134,21 @@
         </div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+    <script>
+        const alertContainer = document.querySelector('#alertContainer');
+
+        (function() {
+            async function repeat() {
+                const alerts = await fetch('/alert/gen');
+
+                alertContainer.innerHTML = await alerts.text();
+            }
+
+            repeat();
+
+            setInterval(repeat, 1000);
+        })()
+    </script>
     <script>
         const menuBtn = document.querySelector('#menu-button');
         const options = document.querySelector('#options');

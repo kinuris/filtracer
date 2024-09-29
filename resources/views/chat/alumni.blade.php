@@ -3,6 +3,8 @@
 @section('content')
 @if (request('initiate'))
 @include('components.chat-members-modal')
+@include('components.leave-group-modal')
+@include('components.rename-group-modal')
 @endif
 <div class="max-h-[calc(100%-4rem)]">
     <div class="bg-gray-100 w-full h-full p-8 flex flex-col overflow-auto max-h-[calc(100%-0.01px)]">
@@ -49,12 +51,12 @@
 
                                     <div class="flex p-2 group hover:bg-gray-100 cursor-pointer">
                                         <img class="w-5" src="{{ asset('assets/rename.svg') }}" alt="Chat Members">
-                                        <button class="text-left w-full block px-4 py-2 hover:bg-gray-100">Rename Group</button>
+                                        <button class="text-left w-full block px-4 py-2 hover:bg-gray-100" id="openRenameGroupModal">Rename Group</button>
                                     </div>
 
                                     <div class="flex p-2 group hover:bg-gray-100 cursor-pointer">
                                         <img class="w-5" src="{{ asset('assets/leave.svg') }}" alt="Chat Members">
-                                        <button class="text-left w-full block px-4 py-2 hover:bg-gray-100">Leave Group</button>
+                                        <button class="text-left w-full block px-4 py-2 hover:bg-gray-100" id="openLeaveGroupModal">Leave Group</button>
                                     </div>
                                     @endif
                                 </div>
@@ -112,6 +114,25 @@
 @endsection
 
 @section('script')
+<script>
+    const openRenameGroupModal = document.getElementById('openRenameGroupModal');
+    const renameGroupModal = document.getElementById('renameGroupModal');
+    const closeRenameGroupModal = document.getElementById('closeRenameGroupModal');
+
+    openRenameGroupModal.addEventListener('click', () => {
+        renameGroupModal.classList.remove('hidden');
+    });
+
+    closeRenameGroupModal.addEventListener('click', () => {
+        renameGroupModal.classList.add('hidden');
+    });
+
+    renameGroupModal.addEventListener('click', (e) => {
+        if (e.target === renameGroupModal) {
+            renameGroupModal.classList.add('hidden');
+        }
+    })
+</script>
 <script>
     const openChatMembersModal = document.getElementById('openChatMembersModal');
     const chatMembersModal = document.getElementById('chatMembersModal');
@@ -171,7 +192,46 @@
     }
 </script>
 
+@if ($selected && $selected instanceof App\Models\ChatGroup)
+<script>
+    const addtiions = document.getElementById('additions');
+    new Choices(addtiions, {
+        choices: [
+            <?php
+            $raw = $selected->users->pluck('id');
+
+            foreach (User::query()->whereNotIn('id', $raw->toArray())->get() as $user) {
+                if ($user->id !== Auth::user()->id) {
+                    echo '{ value: ' . $user->id . ', ' . 'label: "' .  $user->name . '"'  . '},';
+                }
+            }
+            ?>
+        ],
+        removeItemButton: true,
+    })
+</script>
+@endif
+
 @if ($selected)
+<script>
+    const openLeaveGroupModal = document.getElementById('openLeaveGroupModal');
+    const leaveGroupModal = document.getElementById('leaveGroupModal');
+    const closeLeaveGroupModal = document.getElementById('closeLeaveGroupModal');
+
+    openLeaveGroupModal.addEventListener('click', () => {
+        leaveGroupModal.classList.remove('hidden');
+    });
+
+    closeLeaveGroupModal.addEventListener('click', () => {
+        leaveGroupModal.classList.add('hidden');
+    });
+
+    leaveGroupModal.addEventListener('click', (e) => {
+        if (e.target === leaveGroupModal) {
+            leaveGroupModal.classList.add('hidden');
+        }
+    })
+</script>
 <script>
     (async function repeat() {
         const response = await fetch(`/chat/getgroup/<?php echo urlencode(isset($selected->internal_id) ? $selected->internal_id : ($selected ? $selected->id : 'null')) ?>`);

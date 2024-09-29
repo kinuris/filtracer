@@ -1,6 +1,18 @@
 <div id="chatMembersModal" class="fixed z-50 inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center hidden">
-    <div class="bg-white rounded-lg shadow-lg w-1/3">
-        <h2 class="text-lg font-bold p-4 pb-6 border-b">Chat Members</h2>
+    <div class="bg-white rounded-lg shadow-lg w-1/3 max-h-[60%] overflow-auto">
+        <h2 class="text-lg font-bold p-4 border-b">Chat Members</h2>
+        <div class="m-6">
+            <form action="/chat/add/{{ urlencode(request('initiate')) }}" method="POST">
+                @csrf
+                <p>Add Members</p>
+                <div class="flex">
+                    <div class="flex-1">
+                        <select multiple name="additions[]" id="additions"></select>
+                    </div>
+                    <button class="p-2 px-4 rounded bg-blue-600 text-white ml-2">Add</button>
+                </div>
+            </form>
+        </div>
 
         @php($initiate = request('initiate'))
         @if (is_numeric($initiate))

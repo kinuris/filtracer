@@ -122,7 +122,6 @@
                 legend: {
                     display: false,
                 },
-
             }
         },
     });

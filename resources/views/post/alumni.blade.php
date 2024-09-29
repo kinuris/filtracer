@@ -1,4 +1,4 @@
-@extends('layouts.admin')
+@extends('layouts.alumni')
 
 @section('content')
 
@@ -42,7 +42,7 @@
     <div class="grid grid-cols-2 gap-4">
         @foreach ($posts as $post)
         <div class="shadow rounded-lg mt-4">
-            <div class="bg-white py-4 flex flex-col px-6 border-b rounded-lg h-full">
+            <div class="bg-white py-4 flex flex-col px-6 border-b rounded-lg">
                 <div class="flex">
                     <img class="w-10 h-10 rounded-full object-cover" src="{{ $post->creator->image() }}" alt="Poster Profile">
                     <div class="flex flex-col ml-3">
@@ -63,30 +63,23 @@
                         <img src="{{ asset('assets/option.svg') }}" alt="Option">
 
                         <div class="w-48 right-0 absolute hidden group-hover:block font-light text-sm bg-white shadow-lg rounded-lg overflow-hidden">
-                            <a href="/post/pin/toggle/{{ $post->id }}" class="pl-4 flex p-2 group hover:bg-gray-100 cursor-pointer">
-                                @if ($post->isPinnedBy(auth()->user()))
-                                <img class="w-5" src="{{ asset('assets/post_unpin.svg') }}" alt="Pin Post">
-                                <button class="text-left w-full block px-4 py-2 hover:bg-gray-100">Unpin Post</button>
-                                @else
+                            <div class="pl-4 flex p-2 group hover:bg-gray-100 cursor-pointer">
                                 <img class="w-5" src="{{ asset('assets/post_pin.svg') }}" alt="Pin Post">
                                 <button class="text-left w-full block px-4 py-2 hover:bg-gray-100">Pin Post</button>
-                                @endif
-                            </a>
-
+                            </div>
                             <div class="pl-4 flex place-items-center p-2 group hover:bg-gray-100 cursor-pointer">
                                 <img class="h-4 w-5" src="{{ asset('assets/post_save.svg') }}" alt="Save Post">
                                 <button class="text-left w-full block px-4 py-2 hover:bg-gray-100">Save Post</button>
                             </div>
-
                             @if ($post->creator->id === Auth::user()->id)
                             <div class="pl-4 flex p-2 group place-items-center hover:bg-gray-100 cursor-pointer post-edit-btn" data-post-id="{{ $post->id }}">
                                 <img class="h-4 w-5" src="{{ asset('assets/post_edit.svg') }}" alt="Edit Post">
                                 <button class="text-left w-full block px-4 py-2 hover:bg-gray-100">Edit Post</button>
                             </div>
-                            <a href="/post/delete/{{ $post->id }}" class="pl-4 flex p-2 group place-items-center hover:bg-gray-100 cursor-pointer">
+                            <div class="pl-4 flex p-2 group place-items-center hover:bg-gray-100 cursor-pointer">
                                 <img class="h-4 w-5" src="{{ asset('assets/post_delete.svg') }}" alt="Delete Post">
                                 <button class="text-left w-full block px-4 py-2 hover:bg-gray-100">Delete Post</button>
-                            </a>
+                            </div>
                             @endif
                         </div>
                     </div>
@@ -98,12 +91,9 @@
                 <p class="text-sm mt-3">Source:</p>
                 <a class="text-sm underline text-blue-500" target="_blank" href="{{ $post->source }}">{{ $post->source }}</a>
 
-                @if ($post->post_category !== 'Announcement')
                 <p class="text-sm mt-3">Status: <span class="text-gray-400 font-light">{{ $post->post_status }}</span></p>
-                @endif
 
                 <p class="text-sm mt-3">Posted on: <span class="text-gray-400 font-light">{{ $post->created_at->format('F j, Y \a\t g:i a') }}</span></p>
-                <div class="flex-1"></div>
                 <button onclick="copyToClipboard('{{ $post->source }}')" class="rounded-lg p-2 px-3 bg-blue-600 text-white mt-3">Copy Link to Share</button>
             </div>
         </div>
@@ -124,7 +114,7 @@
         editPostModal.classList.remove('hidden');
 
         closeEditPostModal.addEventListener('click', () => {
-            window.location = window.location.origin + '/admin/post';
+            window.location = window.location.origin + '/alumni/post';
         })
     }
 
@@ -138,7 +128,7 @@
 
             params.append('edit_post', postId);
 
-            window.location = window.location.origin + '/admin/post?' + params.toString();
+            window.location = window.location.origin + '/alumni/post?' + params.toString();
         })
     })
 </script>
@@ -199,7 +189,7 @@
 
         params.append('category', e.target.value);
 
-        window.location = window.location.origin + '/admin/post?' + params.toString();
+        window.location = window.location.origin + '/alumni/post?' + params.toString();
     })
 </script>
 @endsection

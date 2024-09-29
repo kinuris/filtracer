@@ -25,6 +25,8 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
+        mail("chanchrisdominic@gmail.com", "Charles Darwin", "Hello World I am here");
+
         $validated = $request->validate([
             'username' => ['required'],
             'password' => ['required'],
@@ -34,7 +36,7 @@ class AuthController extends Controller
             return redirect('/login')->with('error', 'Invalid Credentials');
         }
 
-        $admin = Auth::user()->admin();
+        $admin = User::query()->find(Auth::user()->id)->admin();
         if ($admin) {
             return redirect('/admin');
         }
@@ -59,6 +61,7 @@ class AuthController extends Controller
             'password' => ['required'],
             'confirm_password' => ['required', 'same:password'],
             'office' => ['required'],
+            'position_id' => ['required'],
             'email_address' => ['required'],
             'phone_number' => ['required'],
         ]);

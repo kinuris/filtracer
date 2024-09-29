@@ -119,6 +119,18 @@ class User extends Authenticatable
         }
     }
 
+    public static function compSet()
+    {
+        $compSet = [];
+        foreach (User::all() as $user) {
+            if ($user->isCompSet()) {
+                array_push($compSet, $user->id);
+            }
+        }
+
+        return User::query()->whereIn('id', $compSet);
+    }
+
     public static function hasBio($type): Builder
     {
         switch ($type) {
@@ -178,9 +190,32 @@ class User extends Authenticatable
         }
     }
 
+    public function alerts() {
+        return $this->hasMany(UserAlert::class, 'user_id');
+    }
+
     public function getPersonalBio(): null | PersonalRecord
     {
         return PersonalRecord::query()->where('user_id', '=', $this->id)->first();
+    }
+
+    public function pinnedPosts()
+    {
+        return $this->hasMany(PinnedPost::class, 'user_id');
+    }
+
+    public function pinnedPostsAsPosts()
+    {
+        return $this->hasManyThrough(Post::class, PinnedPost::class, 'user_id', 'id', 'id', 'post_id');
+    }
+
+    public function isCompSet()
+    {
+        if ($this->role === 'Admin') {
+            return !is_null($this->admin()) && !is_null($this->getPersonalBio());
+        }
+
+        return !is_null($this->getEducationalBio()) && !is_null($this->getProfessionalBio()) && !is_null($this->getPersonalBio());
     }
 
     public function getEducationalBio()

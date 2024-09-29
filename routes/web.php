@@ -1,9 +1,11 @@
 <?php
 
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\AlertController;
 use App\Http\Controllers\AlumniController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ChatController;
+use App\Http\Controllers\PostController;
 use App\Models\Department;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -80,7 +82,25 @@ Route::controller(AlumniController::class)
             Route::post('/profbio/update/{alumni}', 'updateProfBio');
 
             Route::get('/alumni/chat', 'chatView');
+
+            Route::get('/alumni/post', 'postView');
         });
+    });
+
+Route::controller(PostController::class)
+    ->middleware('auth')
+    ->group(function () {
+        Route::post('/post/create', 'store');
+        Route::post('/post/edit/{post}', 'update');
+
+        Route::get('/post/pin/toggle/{post}', 'togglePinPost');
+        Route::get('/post/delete/{post}', 'destroy');
+    });
+
+Route::controller(AlertController::class)
+    ->middleware('auth')
+    ->group(function () {
+        Route::get('/alert/gen', 'genAlerts');
     });
 
 Route::controller(AdminController::class)
@@ -136,6 +156,11 @@ Route::controller(ChatController::class)
     ->group(function () {
         Route::get('/chat/messages/{group}', 'fetchChatMessages');
         Route::get('/chat/getgroup/{roomId}', 'getGroup');
+
+        Route::post('/chat/leave/{roomId}', 'leaveGroup');
+        Route::post('/chat/rename/{roomId}', 'renameGroup');
+
+        Route::post('/chat/add/{roomId}', 'addMembers');
 
         Route::post('/chat/makegroup', 'makeGroup');
         Route::post('/chat/send', 'send');

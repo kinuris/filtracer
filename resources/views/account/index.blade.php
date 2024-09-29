@@ -35,17 +35,17 @@
                     <td>{{ $user->role }}</td>
                     <td>{{ date_create($user->created_at)->format('Y-m-d') }}</td>
                     <td>
-                        <div class="flex justify-center place-items-center">
+                        <div class="flex justify-start max-w-24 place-items-center">
                             @php ($personal = $user->getPersonalBio())
                             @if ($personal !== null && $personal->status == 1)
-                            <a href=""><img src="{{ asset('/assets/verified_user.svg') }}" alt="Verified"></a>
+                            <a href="" class="w-6"><img class="w-5" src="{{ asset('/assets/verified_user.svg') }}" alt="Verified"></a>
                             @elseif ($personal !== null && $personal->status == 0)
-                            <button data-user-id="{{ $user->id }}" class="openVerifyModal"><img src="{{ asset('/assets/unverified_user.svg') }}" alt="Verified"></button>
+                            <button data-user-id="{{ $user->id }}" class="openVerifyModal w-6"><img src="{{ asset('/assets/unverified_user.svg') }}" alt="Verified"></button>
                             @endif
                             @if ($user->role !== 'Admin')
-                            <a class="mx-3" href="/user/view/{{ $user->id }}"><img src="{{ asset('assets/view.svg') }}" alt="View"></a>
+                            <a class="mx-3" href="/user/view/{{ $user->id }}"><img class="w-6" src="{{ asset('assets/view.svg') }}" alt="View"></a>
                             @else
-                            <div class="mr-3"></div>
+                            <a class="mx-3"><img class="w-6 opacity-0 pointer-events-none" src="{{ asset('assets/view.svg') }}" alt="View"></a>
                             @endif
                             <a href="/user/delete/{{ $user->id }}"><img src="{{ asset('assets/trash.svg') }}" alt="Trash"></a>
                         </div>
@@ -89,6 +89,10 @@
             const user = button.getAttribute('data-user-id');
 
             const params = new URLSearchParams(window.location.search);
+            if (params.has('verify_modal')) {
+                params.delete('verify_modal');
+            }
+
             params.append('verify_modal', user);
 
             window.location.replace('/account?' + params.toString());

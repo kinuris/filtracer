@@ -6,10 +6,10 @@ use App\Models\ChatGroup;
 use App\Models\Course;
 use App\Models\Department;
 use App\Models\Major;
+use App\Models\Post;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 
@@ -349,7 +349,8 @@ class AdminController extends Controller
             ->with('chatGroups', $user->chatGroups());
     }
 
-    public function createMajor(Request $request) {
+    public function createMajor(Request $request)
+    {
         $validated = $request->validate([
             'name' => ['required', 'unique:majors'],
             'course_id' => ['required'],
@@ -362,7 +363,29 @@ class AdminController extends Controller
         return redirect('/settings/major')->with('message', 'Major created successfully');
     }
 
-    public function postView() {
-        return view('post.admin');
+    public function postView()
+    {
+        $category = request('category', 'All Posts');
+
+        $posts = Post::query();
+
+        if ($category === 'Events') {
+            $posts = $posts->where('post_category', 'Event');
+        } else if ($category === 'Job Openings') {
+            $posts = $posts->where('post_category', 'Job Opening');
+        } else if ($category === 'Announcements') {
+            $posts = $posts->where('post_category', 'Announcement');
+        } else if ($category === 'Your Posts') {
+            $posts = $posts->where('user_id', Auth::user()->id);
+        } else if ($category === 'Pinned Posts') {
+            $posts = User::query()
+                ->find(Auth::user()->id)
+                ->pinnedPostsAsPosts();
+        }
+
+        $posts = $posts->latest()
+            ->get();
+
+        return view('post.admin')->with('posts', $posts);
     }
 }

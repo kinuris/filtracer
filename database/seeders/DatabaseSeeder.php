@@ -90,6 +90,7 @@ class DatabaseSeeder extends Seeder
             Admin::query()->create([
                 'user_id' => $admin->id,
                 'fullname' => $admin->name,
+                'position_id' => random_int(0, 9999),
                 'office' => fake()->randomElement([
                     'Alumni Office',
                     'CAS Faculty Office',
