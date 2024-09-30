@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
+use OwenIt\Auditing\Models\Audit;
 
 class AdminController extends Controller
 {
@@ -34,7 +35,17 @@ class AdminController extends Controller
 
     public function auditView()
     {
-        return view('audit.index');
+        $audits = Audit::query();
+
+        $search = request()->query('search');
+        if ($search) {
+            $audits = $audits->where('old_values', 'LIKE', '%' . $search . '%')
+                ->orWhere('new_values', 'LIKE', '%' . $search . '%');
+        }
+
+        $audits = $audits->paginate(5);
+
+        return view('audit.index')->with('audits', $audits);
     }
 
     public function reportsGraphicalView()

@@ -32,7 +32,7 @@ class Department extends Model
     }
 
     public function students() {
-        return $this->hasMany(User::class, 'department_id', 'id');
+        return $this->hasMany(User::class, 'department_id', 'id')->where('role', '=', 'Alumni');
     }
 
     public static function allValid() {

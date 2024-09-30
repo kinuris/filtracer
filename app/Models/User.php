@@ -131,6 +131,178 @@ class User extends Authenticatable
         return User::query()->whereIn('id', $compSet);
     }
 
+    public static function groupBy(string $type)
+    {
+        switch ($type) {
+            case 'Department':
+                return User::groupByDepartment();
+            case 'Batch':
+                return User::groupByBatch();
+            case 'Course':
+                return User::groupByCourse();
+            case 'Jobs':
+                return User::groupByJobs();
+            default:
+                throw new Exception('Invalid type: must be [Department, Batch, Course, Jobs]');
+        }
+    }
+
+    public static function groupByDepartment()
+    {
+        $users = User::query()->where('role', '!=', 'Admin')->get();
+
+        $groups = [];
+        foreach ($users as $user) {
+            if (isset($groups[$user->department->name])) {
+                array_push($groups[$user->department->name], $user);
+            } else {
+                $groups[$user->department->name] = [$user];
+            }
+        }
+
+        return $groups;
+    }
+
+    public static function groupByBatch()
+    {
+        $users = User::query()->where('role', '!=', 'Admin')->get();
+
+        $groups = [];
+        foreach ($users as $user) {
+            if (isset($groups[$user->getEducationalBio()->end])) {
+                array_push($groups[$user->getEducationalBio()->end], $user);
+            } else {
+                $groups[$user->getEducationalBio()->end] = [$user];
+            }
+        }
+
+        krsort($groups);
+
+        return $groups;
+    }
+
+    public static function groupByCourse()
+    {
+        $users = User::query()->where('role', '!=', 'Admin')->get();
+
+        $groups = [];
+        foreach ($users as $user) {
+            if (isset($groups[$user->course->name])) {
+                array_push($groups[$user->course->name], $user);
+            } else {
+                $groups[$user->course->name] = [$user];
+            }
+        }
+
+        ksort($groups);
+
+        return $groups;
+    }
+
+    public static function groupByJobs()
+    {
+        $users = User::query()->where('role', '!=', 'Admin')->get();
+
+        $groups = [];
+        foreach ($users as $user) {
+            $profRec = $user->getProfessionalBio();
+            if (isset($groups[$profRec->job_title])) {
+                array_push($groups[$profRec->job_title], $user);
+            } else {
+                $groups[$profRec->job_title] = [$user];
+            }
+        }
+
+        return $groups;
+    }
+
+    public static function countFromGroup($category, $group) {
+        switch ($category) {
+            case 'Employed Alumni':
+                return User::countEmployedFromGroup($group);
+            case 'Unemployed Alumni':
+                return User::countUnemployedFromGroup($group);
+            case 'Self-employed Alumni':
+                return User::countSelfEmployedFromGroup($group);
+            case 'Working Student':
+                return User::countWorkingStudentsFromGroup($group);
+            case 'Students':
+                return User::countStudentsFromGroup($group);
+            case 'Retired':
+                return User::countRetiredFromGroup($group);
+            case 'All Users':
+                return count($group);
+            default:
+                throw new Exception('Invalid type: must be [Employed, Unemployed, All Users]');
+        }
+    }
+
+    public static function countRetiredFromGroup($group) {
+        $total = 0;
+        foreach ($group as $user) {
+            if ($user->employment() === 'Retired') {
+                $total++;
+            }
+        }
+        
+        return $total;
+    }
+
+    public static function countWorkingStudentsFromGroup($group) {
+        $total = 0;
+        foreach ($group as $user) {
+            if ($user->employment() === 'Working Student') {
+                $total++;
+            }
+        }
+        
+        return $total;
+    }
+
+    public static function countStudentsFromGroup($group) {
+        $total = 0;
+        foreach ($group as $user) {
+            if ($user->employment() === 'Student') {
+                $total++;
+            }
+        }
+        
+        return $total;
+    }
+
+    public static function countSelfEmployedFromGroup($group) {
+        $total = 0;
+        foreach ($group as $user) {
+            if ($user->employment() === 'Self-employed') {
+                $total++;
+            }
+        }
+        
+        return $total;
+    }
+
+    public static function countUnemployedFromGroup($group) {
+        $total = 0;
+        foreach ($group as $user) {
+            if ($user->employment() === 'Unemployed') {
+                $total++;
+            }
+        }
+        
+        return $total;
+    }
+
+    public static function countEmployedFromGroup($group) {
+        $total = 0;
+        foreach ($group as $user) {
+            if ($user->employment() === 'Employed') {
+                $total++;
+            }
+        }
+        
+        return $total;
+    }
+
     public static function hasBio($type): Builder
     {
         switch ($type) {
@@ -190,7 +362,8 @@ class User extends Authenticatable
         }
     }
 
-    public function alerts() {
+    public function alerts()
+    {
         return $this->hasMany(UserAlert::class, 'user_id');
     }
 
@@ -222,7 +395,7 @@ class User extends Authenticatable
     {
         return EducationRecord::query()
             ->where('user_id', '=', $this->id)
-            ->orderBy('end', 'DESC')
+            ->latest()
             ->first();
     }
 
