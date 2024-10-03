@@ -233,7 +233,7 @@ class User extends Authenticatable
             case 'All Users':
                 return count($group);
             default:
-                throw new Exception('Invalid type: must be [Employed, Unemployed, All Users]');
+                throw new Exception('INDI PWEDE AHAHAHAHAH Invalid type: must be [Employed, Unemployed, Self-employed, Working Student, Students, Retired, All Users]');
         }
     }
 
