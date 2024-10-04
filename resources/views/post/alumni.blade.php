@@ -34,7 +34,7 @@
                 <div class="flex-1"></div>
 
                 <button type="button" class="rounded-lg p-2 px-3 bg-blue-600 text-white" id="openAddPostModal">Add New Post</button>
-                <a class="rounded-lg p-2 px-3 bg-blue-600 text-white ml-3">Your Profile</a>
+                <a class="rounded-lg p-2 px-3 bg-blue-600 text-white ml-3">Your Posts</a>
             </div>
         </form>
     </div>

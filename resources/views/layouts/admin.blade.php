@@ -90,7 +90,13 @@
         <div class="flex flex-col w-full max-h-screen">
             <nav class="bg-white w-full max-h-16 min-h-16 h-16 border-b flex place-items-center px-6">
                 <img class="w-6 mr-4" src="{{ asset('assets/search.svg') }}" alt="Dashboard">
-                <input class="p-2 min-w-96" placeholder="Search" type="text">
+                <div class="group relative">
+                    <input class="p-2 min-w-96 focus:outline-none" placeholder="Search" type="text" id="search">
+
+                    <div class="hidden overflow-auto w-full max-h-96 z-50 p-3 bg-white shadow-lg rounded-b-lg absolute group-focus-within:block" id="namesContainer">
+
+                    </div>
+                </div>
 
                 <div class="flex-1"></div>
 
@@ -166,6 +172,52 @@
     </div>
     <script src="https://printjs-4de6.kxcdn.com/print.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+    <script>
+        const search = document.querySelector('#search');
+        const namesContainer = document.querySelector('#namesContainer');
+
+        const users = [
+            <?php
+
+            use App\Models\User;
+            use Illuminate\Support\Facades\Auth;
+
+            foreach (User::all() as $user) {
+                if ($user->id == Auth::user()->id) {
+                    continue;
+                }
+
+                echo "{value: '" . $user->id . "', label: '" . $user->name . "'},";
+            }
+            ?>
+        ];
+
+        function putIntoNames(arr) {
+            namesContainer.innerHTML = '';
+
+            arr.forEach((element) => {
+                const a = document.createElement('a');
+                const li = document.createElement('li');
+
+                a.setAttribute('href', <?php echo (Auth::user()->role == 'Admin' ? '"/admin/chat"' : '"/alumni/chat"') ?> + '?initiate=' + element.value);
+                li.classList.add('list-none', 'px-2', 'py-4', 'hover:bg-gray-100');
+
+                li.innerHTML = element.label;
+                a.appendChild(li);
+                namesContainer.appendChild(a);
+            });
+        }
+
+        putIntoNames(users);
+
+        search.addEventListener('input', e => {
+            const arr = users.filter((element) => {
+                return element.label.toLowerCase().includes(e.target.value.toLowerCase());
+            });
+
+            putIntoNames(arr);
+        });
+    </script>
     <script>
         const alertContainer = document.querySelector('#alertContainer');
 
