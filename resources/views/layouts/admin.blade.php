@@ -97,8 +97,23 @@
                 <div class="group relative">
                     <img class="w-5 mr-4" src="{{ asset('assets/notification.svg') }}" alt="Dashboard">
 
+                    @php($alertCount = auth()->user()->alerts->where('is_read', '=', false)->count())
+                    @if ($alertCount > 0)
+                    <div class="w-3.5 h-3.5 flex place-items-center justify-center bg-red-500 absolute -top-0.5 -left-0.5 rounded-full">
+                        <p class="text-white text-[8px] text-center font-semibold">{{ $alertCount }}</p>
+                    </div>
+                    @endif
+
                     <div class="absolute right-3 top-3 z-40 hidden border group-hover:block bg-white shadow-lg rounded-lg overflow-hidden min-w-80">
-                        <p class="border-b p-3 font-bold">Notifications</p>
+                        <div class="flex border-b p-3 place-items-center justify-between">
+                            <p class="font-bold">Notifications</p>
+                            <a class="flex place-items-center" href="/alert/seenall">
+                                <span class="material-symbols-outlined">
+                                    mark_email_read
+                                </span>
+                            </a>
+                        </div>
+
                         <span class="block max-h-96 overflow-auto" id="alertContainer">
 
                         </span>

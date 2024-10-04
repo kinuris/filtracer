@@ -101,6 +101,7 @@ Route::controller(AlertController::class)
     ->middleware('auth')
     ->group(function () {
         Route::get('/alert/gen', 'genAlerts');
+        Route::get('/alert/seenall', 'seenAll');
     });
 
 Route::controller(AdminController::class)
