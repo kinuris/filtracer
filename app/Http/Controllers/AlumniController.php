@@ -452,7 +452,11 @@ class AlumniController extends Controller
         } else if ($category === 'Announcements') {
             $posts = $posts->where('post_category', 'Announcement');
         } else if ($category === 'Your Posts') {
-            $posts = $posts->where('user_id', Auth::user()->id); 
+            $posts = $posts->where('user_id', Auth::user()->id);
+        } else if ($category === 'Pinned Posts') {
+            $posts = User::query()
+                ->find(Auth::user()->id)
+                ->pinnedPostsAsPosts();
         }
 
         $posts = $posts->latest()->get();

@@ -42,7 +42,7 @@
     <div class="grid grid-cols-2 gap-4">
         @foreach ($posts as $post)
         <div class="shadow rounded-lg mt-4">
-            <div class="bg-white py-4 flex flex-col px-6 border-b rounded-lg">
+            <div class="bg-white py-4 flex flex-col px-6 border-b rounded-lg h-full">
                 <div class="flex">
                     <img class="w-10 h-10 rounded-full object-cover" src="{{ $post->creator->image() }}" alt="Poster Profile">
                     <div class="flex flex-col ml-3">
@@ -63,10 +63,16 @@
                         <img src="{{ asset('assets/option.svg') }}" alt="Option">
 
                         <div class="w-48 right-0 absolute hidden group-hover:block font-light text-sm bg-white shadow-lg rounded-lg overflow-hidden">
-                            <div class="pl-4 flex p-2 group hover:bg-gray-100 cursor-pointer">
+                            <a href="/post/pin/toggle/{{ $post->id }}" class="pl-4 flex p-2 group hover:bg-gray-100 cursor-pointer">
+                                @if ($post->isPinnedBy(auth()->user()))
+                                <img class="w-5" src="{{ asset('assets/post_unpin.svg') }}" alt="Pin Post">
+                                <button class="text-left w-full block px-4 py-2 hover:bg-gray-100">Unpin Post</button>
+                                @else
                                 <img class="w-5" src="{{ asset('assets/post_pin.svg') }}" alt="Pin Post">
                                 <button class="text-left w-full block px-4 py-2 hover:bg-gray-100">Pin Post</button>
-                            </div>
+                                @endif
+                            </a>
+                            
                             <div class="pl-4 flex place-items-center p-2 group hover:bg-gray-100 cursor-pointer">
                                 <img class="h-4 w-5" src="{{ asset('assets/post_save.svg') }}" alt="Save Post">
                                 <button class="text-left w-full block px-4 py-2 hover:bg-gray-100">Save Post</button>
@@ -94,6 +100,7 @@
                 <p class="text-sm mt-3">Status: <span class="text-gray-400 font-light">{{ $post->post_status }}</span></p>
 
                 <p class="text-sm mt-3">Posted on: <span class="text-gray-400 font-light">{{ $post->created_at->format('F j, Y \a\t g:i a') }}</span></p>
+                <div class="flex-1"></div>
                 <button onclick="copyToClipboard('{{ $post->source }}')" class="rounded-lg p-2 px-3 bg-blue-600 text-white mt-3">Copy Link to Share</button>
             </div>
         </div>

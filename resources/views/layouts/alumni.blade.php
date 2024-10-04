@@ -94,7 +94,7 @@
                         <div class="flex border-b p-3 place-items-center justify-between">
                             <p class="font-bold">Notifications</p>
                             <a class="flex place-items-center" href="/alert/seenall">
-                                <span class="material-symbols-outlined">
+                                <span class="material-symbols-outlined" title="Mark all as read">
                                     mark_email_read
                                 </span>
                             </a>
