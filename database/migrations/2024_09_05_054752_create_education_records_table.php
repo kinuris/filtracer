@@ -15,7 +15,9 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')
                 ->references('id')
-                ->on('users');
+                ->on('users')
+                ->onDelete('cascade')
+                ->onUpdate('cascade');
 
             $table->enum('school', [
                 'Filamer Christian University',
@@ -48,11 +50,15 @@ return new class extends Migration
 
             $table->foreignId('course_id')
                 ->references('id')
-                ->on('courses');
+                ->on('courses')
+                ->onDelete('cascade')
+                ->onUpdate('cascade');
 
             $table->foreignId('major_id')
                 ->references('id')
-                ->on('majors');
+                ->on('majors')
+                ->onDelete('cascade')
+                ->onUpdate('cascade');
 
             $table->year('start');
             $table->year('end');

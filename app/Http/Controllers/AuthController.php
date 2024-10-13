@@ -31,19 +31,19 @@ class AuthController extends Controller
         ]);
 
         if (!Auth::attempt($validated)) {
-            return redirect('/login')->with('error', 'Invalid Credentials');
+            return redirect('/login')->with('message', 'Invalid Credentials');
         }
 
         $admin = User::query()->find(Auth::user()->id)->admin();
         if ($admin) {
-            return redirect('/admin');
+            return redirect('/admin')->with('message', 'Login Successful');
         }
 
         if (is_null(Auth::user()->personalBio)) {
-            return redirect('/alumni/setup');
+            return redirect('/alumni/setup')->with('message', 'Setup your account!');
         }
 
-        return redirect('/alumni');
+        return redirect('/alumni')->with('message', 'Login Successful');
     }
 
     public function registerAdminView()

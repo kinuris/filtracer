@@ -4,7 +4,7 @@
         @if ($alert->is_read)
         <p class="text-sm max-w-[calc(100%-3rem)] text-gray-400">{{ $alert->title }}</p>
         @else
-        <p class="text-sm max-w-[calc(100%-3rem)]">{{ $alert->title }}</p>
+        <p class="text-sm max-w-[calc(100%-3rem)] font-semibold">{{ $alert->title }}</p>
         @endif
         <p class="text-[8px] text-blue-600 font-semibold">{{ $alert->created_at->diffForHumans() }}</p>
     </div>

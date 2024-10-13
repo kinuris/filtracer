@@ -31,7 +31,7 @@
                     <td>
                         <div class="flex justify-center place-items-center">
                             <a class="mr-3" href="/settings/department/edit/{{ $department->id }}"><img src="{{ asset('assets/settings_blue.svg') }}" alt="View"></a>
-                            <a href="/settings/deparment/delete/{{ $department->id }}"><img src="{{ asset('assets/trash.svg') }}" alt="Trash"></a>
+                            <a href="/settings/department/delete/{{ $department->id }}"><img src="{{ asset('assets/trash.svg') }}" alt="Trash"></a>
                         </div>
                     </td>
                 </tr>

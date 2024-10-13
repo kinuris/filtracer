@@ -16,11 +16,15 @@ return new class extends Migration
 
             $table->foreignId('chat_group_id')
                 ->references('id')
-                ->on('chat_groups');
+                ->on('chat_groups')
+                ->onDelete('cascade')
+                ->onUpdate('cascade');
             
             $table->foreignId('user_id')
                 ->references('id')
-                ->on('users');
+                ->on('users')
+                ->onDelete('cascade')
+                ->onUpdate('cascade');
 
             $table->timestamps();
         });

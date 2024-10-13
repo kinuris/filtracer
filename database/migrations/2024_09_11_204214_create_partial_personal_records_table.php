@@ -16,7 +16,9 @@ return new class extends Migration
 
             $table->foreignId('user_id')
                 ->references('id')
-                ->on('users');
+                ->on('users')
+                ->onDelete('cascade')
+                ->onUpdate('cascade');
 
             $table->string('email_address')->unique();
             $table->string('phone_number')->unqiue();

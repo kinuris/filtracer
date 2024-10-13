@@ -1,7 +1,7 @@
 @extends('layouts.admin')
 
 @section('content')
-<div class="bg-gray-100 w-full h-full p-8">
+<div class="bg-gray-100 w-full h-full p-8 max-h-[calc(100%-4rem)] overflow-auto">
     <h1 class="font-medium tracking-widest text-lg">Statistical Report</h1>
     <p class="text-gray-400 text-xs mb-2">Report / <span class="text-blue-500">Statistical</span></p>
 
@@ -13,6 +13,7 @@
                     <option value="All Users">All Users</option>
                     <!-- <option value="Registered Users">Registered Users</option> -->
                     <option value="Employed Alumni">Employed Alumni</option>
+                    <option value="Working Student">Working Student</option>
                     <option value="Unemployed Alumni">Unemployed Alumni</option>
                     <option value="Self-Employed Alumni">Self-Employed Alumni</option>
                     <option value="Student Alumni">Student Alumni</option>
@@ -33,7 +34,7 @@
                 </select>
 
                 <div class="flex-1"></div>
-                <button class="rounded-lg p-2 px-3 bg-blue-600 text-white" type="submit">Generate Report</button>
+                <button class="rounded-lg p-2 bg-blue-600 text-white" type="submit">Generate Report</button>
             </div>
         </form>
     </div>

@@ -91,12 +91,18 @@
                         </div>
                     </div>
                 </div>
+
+                @if ($post->attached_image !== null)
                 <img class="mt-3" src="{{ $post->image() }}" alt="Attachment">
+                @endif
+
                 <p class="text-lg font-bold mt-3">{{ $post->title }}</p>
                 <p class="text-sm text-gray-400 break-words">{{ $post->content }}</p>
 
+                @if ($post->source !== null)
                 <p class="text-sm mt-3">Source:</p>
                 <a class="text-sm underline text-blue-500" target="_blank" href="{{ $post->source }}">{{ $post->source }}</a>
+                @endif
 
                 @if ($post->post_category !== 'Announcement')
                 <p class="text-sm mt-3">Status: <span class="text-gray-400 font-light">{{ $post->post_status }}</span></p>
@@ -104,7 +110,23 @@
 
                 <p class="text-sm mt-3">Posted on: <span class="text-gray-400 font-light">{{ $post->created_at->format('F j, Y \a\t g:i a') }}</span></p>
                 <div class="flex-1"></div>
-                <button onclick="copyToClipboard('{{ $post->source }}')" class="rounded-lg p-2 px-3 bg-blue-600 text-white mt-3">Copy Link to Share</button>
+
+                <div class="flex mt-3">
+                    <a href="/post/pin/toggle/{{ $post->id }}" class="flex-1 pl-4 flex group bg-blue-600 cursor-pointer rounded-lg">
+                        @if ($post->isPinnedBy(auth()->user()))
+                        <img class="w-5" src="{{ asset('assets/post_unpin.svg') }}" alt="Pin Post">
+                        <button class="text-left w-full block px-4 py-2 text-white">Unpin Post</button>
+                        @else
+                        <img class="w-5" src="{{ asset('assets/post_pin.svg') }}" alt="Pin Post">
+                        <button class="text-left w-full block px-4 py-2 text-white">Pin Post</button>
+                        @endif
+                    </a>
+                    <div class="mx-1"></div>
+                    <a href="" class="flex-1 pl-4 flex group bg-blue-600 cursor-pointer rounded-lg place-items-center">
+                        <img class="h-4 w-5" src="{{ asset('assets/post_save.svg') }}" alt="Save Post">
+                        <button class="text-left w-full block px-4 py-2 text-white">Save Post</button>
+                    </a>
+                </div>
             </div>
         </div>
         @endforeach

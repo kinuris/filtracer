@@ -17,6 +17,13 @@ if ($department && $course) {
         case "Registered Users":
             throw new Exception('SHIT DONT WORK YET');
             break;
+        case "Working Student":
+            $users = App\Models\User::query()
+                ->where('role', '!=', 'Admin')
+                ->whereRelation('professionalRecords', 'employment_status', '=', 'Working Student')
+                ->whereRelation('course', 'courses.id', '=', $course->id)
+                ->get();
+            break;
         case "Employed Alumni":
             $users = App\Models\User::query()
                 ->where('role', '!=', 'Admin')
@@ -63,6 +70,13 @@ if ($department && $course) {
             break;
         case "Registered Users":
             break;
+        case "Working Student":
+            $users = App\Models\User::query()
+                ->where('role', '!=', 'Admin')
+                ->whereRelation('professionalRecords', 'employment_status', '=', 'Working Student')
+                ->whereRelation('department', 'departments.id', '=', $department->id)
+                ->get();
+            break;
         case "Employed Alumni":
             $users = App\Models\User::query()
                 ->where('role', '!=', 'Admin')
@@ -107,6 +121,12 @@ if ($department && $course) {
                 ->get();
             break;
         case "Registered Users":
+            break;
+        case "Working Student":
+            $users = App\Models\User::query()
+                ->where('role', '!=', 'Admin')
+                ->whereRelation('professionalRecords', 'employment_status', '=', 'Working Student')
+                ->get();
             break;
         case "Employed Alumni":
             $users = App\Models\User::query()

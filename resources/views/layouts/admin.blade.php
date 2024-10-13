@@ -187,7 +187,7 @@
                     continue;
                 }
 
-                echo "{value: '" . $user->id . "', label: '" . $user->name . "'},";
+                echo "{value: `" . $user->id . "`, label: `" . $user->name . "`},";
             }
             ?>
         ];

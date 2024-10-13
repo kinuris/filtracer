@@ -6,26 +6,34 @@
     <div class="shadow rounded-lg mt-4">
         <div class="bg-white p-8 flex place-items-center justify-between rounded-lg">
             <div class="flex">
-                <div class="flex flex-col mr-10">
-                    <p class="text-3xl font-bold">{{ $users->where('role', '!=', 'Admin')->count() }}</p>
+                <div class="flex flex-col mr-4">
+                    <p class="text-3xl font-bold">{{ $users->count() }}</p>
                     <p class="text-sm text-gray-400">Registered Users</p>
                 </div>
                 <img src="{{ asset('assets/registered.svg') }}" alt="Registered">
             </div>
 
             <div class="flex">
-                <div class="flex flex-col mr-10">
+                <div class="flex flex-col mr-4">
+                    <p class="text-3xl font-bold">{{ $users->where('role', '=', 'Alumni')->count() }}</p>
+                    <p class="text-sm text-gray-400">Registered Alumni</p>
+                </div>
+                <img src="{{ asset('assets/registered.svg') }}" alt="Registered">
+            </div>
+
+            <div class="flex">
+                <div class="flex flex-col mr-4">
                     <p class="text-3xl font-bold">{{ $users->where('role', '=', 'Alumni')->whereRelation('professionalRecords', 'employment_status', '=', 'Employed')->count() }}</p>
-                    <p class="text-sm text-gray-400">Employed Users</p>
+                    <p class="text-sm text-gray-400">Employed Alumni</p>
                 </div>
                 <img src="{{ asset('assets/employed.svg') }}" alt="Employed">
             </div>
 
             <div class="flex">
-                <div class="flex flex-col mr-10">
+                <div class="flex flex-col mr-4">
                     @php($users = App\Models\User::query())
                     <p class="text-3xl font-bold">{{ $users->where('role', '=', 'Alumni')->whereRelation('professionalRecords', 'employment_status', '=', 'Unemployed')->count() }}</p>
-                    <p class="text-sm text-gray-400">Unemployed Users</p>
+                    <p class="text-sm text-gray-400">Unemployed Alumni</p>
                 </div>
                 <img src="{{ asset('assets/unemployed.svg') }}" alt="Unemployed">
             </div>

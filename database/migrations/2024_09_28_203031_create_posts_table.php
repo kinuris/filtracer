@@ -16,16 +16,18 @@ return new class extends Migration
 
             $table->string('title');
             $table->text('content');
-            $table->string('source');
+            $table->string('source')->nullable();
 
             $table->enum('post_category', ['Event', 'Job Opening', 'Announcement']);
             $table->enum('post_status', ['Incoming', 'Ended', 'Open', 'Closed'])->nullable();
 
-            $table->string('attached_image');
+            $table->string('attached_image')->nullable();
 
             $table->foreignId('user_id')
                 ->references('id')
-                ->on('users');
+                ->on('users')
+                ->onDelete('cascade')
+                ->onUpdate('cascade');
 
             $table->timestamps();
         });

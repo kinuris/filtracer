@@ -21,7 +21,9 @@ return new class extends Migration
             $table->boolean('is_deleted')->default(0);
             $table->foreignId('department_id')
                 ->references('id')
-                ->on('departments');
+                ->on('departments')
+                ->onUpdate('cascade')
+                ->onDelete('cascade');
 
             $table->timestamps();
         });

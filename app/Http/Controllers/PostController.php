@@ -22,26 +22,28 @@ class PostController extends Controller
             $validated = $request->validate([
                 'title' => ['required'],
                 'content' => ['required'],
-                'source' => ['required'],
+                'source' => ['nullable'],
                 'post_category' => ['required'],
                 'post_status' => ['required'],
-                'attachment' => ['required', 'image', 'mimes:jpeg,png,jpg', 'max:10000'],
+                'attachment' => ['nullable', 'image', 'mimes:jpeg,png,jpg', 'max:10000'],
             ]);
         } else {
             $validated = $request->validate([
                 'title' => ['required'],
                 'content' => ['required'],
-                'source' => ['required'],
+                'source' => ['nullable'],
                 'post_category' => ['required'],
-                'attachment' => ['required', 'image', 'mimes:jpeg,png,jpg', 'max:10000'],
+                'attachment' => ['nullable', 'image', 'mimes:jpeg,png,jpg', 'max:10000'],
             ]);
         }
 
-        $filename = sha1(time()) . '.' . $request->file('attachment')->getClientOriginalExtension();
-        $request->file('attachment')->storePubliclyAs('public/post/attachments', $filename);
-        $validated['attached_image'] = $filename;
-        $validated['user_id'] = Auth::user()->id;
+        if ($request->hasFile('attachment')) {
+            $filename = sha1(time()) . '.' . $request->file('attachment')->getClientOriginalExtension();
+            $request->file('attachment')->storePubliclyAs('public/post/attachments', $filename);
+            $validated['attached_image'] = $filename;
+        }
 
+        $validated['user_id'] = Auth::user()->id;
         Post::query()->create($validated);
 
         if (Auth::user()->role == 'Admin') {

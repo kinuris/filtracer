@@ -399,4 +399,22 @@ class AdminController extends Controller
 
         return view('post.admin')->with('posts', $posts);
     }
+
+    public function deleteMajorView(Major $major) {
+        $major->delete();
+
+        return redirect('/settings/major')->with('message', 'Major deleted successfully');
+    }
+
+    public function deleteCourseView(Course $course) {
+        $course->delete();
+
+        return redirect('/settings/course')->with('message', 'Course deleted successfully');
+    }
+
+    public function deleteDepartmentView(Department $department) {
+        $department->delete();
+
+        return redirect('/settings/department')->with('message', 'Department deleted successfully');
+    }
 }

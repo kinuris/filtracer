@@ -158,6 +158,14 @@
     const send = document.getElementById('send');
 
     if (send) {
+        document.addEventListener('keypress', (e) => {
+            if (message.value.length < 1) return;
+
+            if (e.key === 'Enter') {
+                send.click();
+            }
+        });
+
         send.addEventListener('click', async () => {
             if (message.value.length < 1) return;
 
@@ -187,7 +195,16 @@
             } = await response.json();
 
             const htmlRes = await fetch(`/chat/messages/${group}`);
-            messages.innerHTML = await htmlRes.text();
+            const text = await htmlRes.text();
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(text, 'text/html');
+            const msg = doc.querySelectorAll('.ind-chat-msg');
+
+            if (msg && msg.length === 1) {
+                window.location.reload();
+            }
+
+            messages.innerHTML = text;
         });
     }
 </script>

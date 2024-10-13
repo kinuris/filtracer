@@ -15,7 +15,9 @@ return new class extends Migration
             $table->id();
             $table->foreignId('professional_record_id')
                 ->references('id')
-                ->on('professional_records');
+                ->on('professional_records')
+                ->onDelete('cascade')
+                ->onUpdate('cascade');
 
             $table->string('link');
             $table->string('name');

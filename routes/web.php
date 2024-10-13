@@ -151,6 +151,10 @@ Route::controller(AdminController::class)
         Route::get('/settings/major/edit/{major}', 'editMajorView');
         Route::post('/settings/major/edit/{major}', 'editMajor');
         Route::post('/settings/major/create', 'createMajor');
+
+        Route::get('/settings/major/delete/{major}', 'deleteMajorView');
+        Route::get('/settings/course/delete/{course}', 'deleteCourseView');
+        Route::get('/settings/department/delete/{department}', 'deleteDepartmentView');
     });
 
 Route::controller(ChatController::class)

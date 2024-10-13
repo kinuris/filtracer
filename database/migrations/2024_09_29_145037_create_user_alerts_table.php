@@ -20,7 +20,8 @@ return new class extends Migration
 
             $table->foreignId('user_id')
                 ->references('id')
-                ->on('users');
+                ->on('users')
+                ->onDelete('cascade');
             
             $table->boolean('is_read')
                 ->default(false);

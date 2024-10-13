@@ -186,6 +186,7 @@ class ChatController extends Controller
 
                 UserAlert::query()->create([
                     'title' => 'You received a new message',
+                    'action' => ($receiver->role == 'Admin' ? '/admin/chat' : '/alumni/chat') . '?initiate=' . $receiver->id,
                     'content' => $request->post('message'),
                     'user_id' => $receiver->id,
                 ]);

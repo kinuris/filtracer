@@ -72,7 +72,7 @@
                                 <button class="text-left w-full block px-4 py-2 hover:bg-gray-100">Pin Post</button>
                                 @endif
                             </a>
-                            
+
                             <div class="pl-4 flex place-items-center p-2 group hover:bg-gray-100 cursor-pointer">
                                 <img class="h-4 w-5" src="{{ asset('assets/post_save.svg') }}" alt="Save Post">
                                 <button class="text-left w-full block px-4 py-2 hover:bg-gray-100">Save Post</button>
@@ -101,7 +101,22 @@
 
                 <p class="text-sm mt-3">Posted on: <span class="text-gray-400 font-light">{{ $post->created_at->format('F j, Y \a\t g:i a') }}</span></p>
                 <div class="flex-1"></div>
-                <button onclick="copyToClipboard('{{ $post->source }}')" class="rounded-lg p-2 px-3 bg-blue-600 text-white mt-3">Copy Link to Share</button>
+                <div class="flex mt-3">
+                    <a href="/post/pin/toggle/{{ $post->id }}" class="flex-1 pl-4 flex group bg-blue-600 cursor-pointer rounded-lg">
+                        @if ($post->isPinnedBy(auth()->user()))
+                        <img class="w-5" src="{{ asset('assets/post_unpin.svg') }}" alt="Pin Post">
+                        <button class="text-left w-full block px-4 py-2 text-white">Unpin Post</button>
+                        @else
+                        <img class="w-5" src="{{ asset('assets/post_pin.svg') }}" alt="Pin Post">
+                        <button class="text-left w-full block px-4 py-2 text-white">Pin Post</button>
+                        @endif
+                    </a>
+                    <div class="mx-1"></div>
+                    <a href="" class="flex-1 pl-4 flex group bg-blue-600 cursor-pointer rounded-lg place-items-center">
+                        <img class="h-4 w-5" src="{{ asset('assets/post_save.svg') }}" alt="Save Post">
+                        <button class="text-left w-full block px-4 py-2 text-white">Save Post</button>
+                    </a>
+                </div>
             </div>
         </div>
         @endforeach

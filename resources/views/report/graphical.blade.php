@@ -17,9 +17,9 @@
                 <option {{ $category == 'Students' ? 'selected' : '' }} value="Students">Student</option>
                 <option {{ $category == 'Working Student' ? 'selected' : '' }} value="Working Student">Working Student</option>
                 <option {{ $category == 'Retired' ? 'selected' : '' }} value="Retired">Retired Alumni</option>
-                <option {{ $category == 'Salary' ? 'selected' : '' }} value="Salary">Salary</option>
+                <!-- <option {{ $category == 'Salary' ? 'selected' : '' }} value="Salary">Salary</option>
                 <option {{ $category == 'Waiting Time' ? 'selected' : '' }} value="Waiting Time">Waiting Time</option>
-                <option {{ $category == 'Job Search Methods' ? 'selected' : '' }} value="Job Search Methods">Job Search Methods</option>
+                <option {{ $category == 'Job Search Methods' ? 'selected' : '' }} value="Job Search Methods">Job Search Methods</option> -->
             </select>
 
             <p class="text-md mr-3">By</p>
@@ -50,6 +50,7 @@
 
 @section('script')
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
 <script>
     const category = document.getElementById('category');
     const subCategory = document.getElementById('subcategory');
@@ -99,8 +100,11 @@
     $depts = Department::allValid();
     ?>
 
+    <?php $total = 0 ?>
+
     new Chart(ctx, {
         type: 'bar',
+        plugins: [ChartDataLabels],
         data: {
             labels: [
                 <?php
@@ -114,6 +118,7 @@
                 data: [
                     <?php
                     foreach ($yAxis as $value) {
+                        $total += $value;
                         echo $value . ',';
                     }
                     ?>
@@ -152,6 +157,15 @@
                 legend: {
                     display: false,
                 },
+                datalabels: {
+                    formatter: (value, ctx) => {
+                        return `${value} (${value / <?php echo $total ?> * 100}%)`;
+                    },
+                    display: ctx => {
+                        return ctx.chart.data.datasets[0].data[ctx.dataIndex] > 0
+                    },
+                    anchor: 'center',
+                }
             }
         }
     });

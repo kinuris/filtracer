@@ -59,7 +59,7 @@ class User extends Authenticatable
 
     public function getNameAttribute()
     {
-        if ($this->role === 'Alumni') {
+        if ($this->role === 'Alumni' && $this->isCompSet()) {
             return $this->getPersonalBio()->getFullname();
         } else {
             return $this->attributes['name'];
