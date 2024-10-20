@@ -8,6 +8,7 @@ use App\Models\Department;
 use App\Models\Major;
 use App\Models\Post;
 use App\Models\User;
+use App\Models\UserAlert;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -155,7 +156,8 @@ class AdminController extends Controller
 
     public function accountsView()
     {
-        $users = User::hasBio('personal');
+        $users = User::hasBio('personal')
+            ->where('id', '!=', Auth::user()->id);
 
         $search = request()->query('search');
         if ($search) {
@@ -183,6 +185,8 @@ class AdminController extends Controller
         $course = (int) $request->query('course');
         if ($course && $course !== -1) {
             $users = User::isCourse($request->query('course'));
+
+            dd($users->get());
         }
 
         $search = $request->query('search');
@@ -192,7 +196,9 @@ class AdminController extends Controller
 
         $users = $users
             ->where('department_id', '=', $department->id)
+            ->where('role', '=', 'Alumni')
             ->paginate(5);
+
         $courses = $department->getCourses();
 
         return view('alumni.index')
@@ -325,7 +331,38 @@ class AdminController extends Controller
     {
         $user->getPersonalBio()->update(['status' => 1]);
 
-        return redirect('/account')->with('message', 'User verified successfully');
+        $content = 'User: ' . $user->name . ' has been VERIFIED by ' . Auth::user()->name;
+        $action = $user->role === 'Admin' ? ('/account?unverify_modal=' . $user->id) : '/user/view/' . $user->id;
+
+        foreach (User::query()->where('role', '=', 'Admin')->get() as $admin) {
+            UserAlert::query()->create([
+                'title' => 'User VERIFIED',
+                'content' => $content,
+                'action' => $action,
+                'user_id' => $admin->id
+            ]);
+        }
+
+        return redirect('/account')->with('message', 'User VERIFIED successfully');
+    }
+
+    public function unverifyUser(User $user)
+    {
+        $user->getPersonalBio()->update(['status' => 0]);
+
+        $content = 'User: ' . $user->name . ' has been UNVERIFIED by ' . Auth::user()->name;
+        $action = $user->role === 'Admin' ? ('/account?verify_modal=' . $user->id) : '/user/view/' . $user->id;
+
+        foreach (User::query()->where('role', '=', 'Admin')->get() as $admin) {
+            UserAlert::query()->create([
+                'title' => 'User UNVERIFIED',
+                'content' => $content,
+                'action' => $action,
+                'user_id' => $admin->id
+            ]);
+        }
+
+        return redirect('/account')->with('message', 'User UNVERIFIED successfully');
     }
 
     public function createCourse(Request $request)
@@ -388,6 +425,10 @@ class AdminController extends Controller
             $posts = $posts->where('post_category', 'Announcement');
         } else if ($category === 'Your Posts') {
             $posts = $posts->where('user_id', Auth::user()->id);
+        } else if ($category === 'Saved Posts') {
+            $posts = User::query()
+                ->find(Auth::user()->id)
+                ->savedPostsAsPosts();
         } else if ($category === 'Pinned Posts') {
             $posts = User::query()
                 ->find(Auth::user()->id)
@@ -400,21 +441,31 @@ class AdminController extends Controller
         return view('post.admin')->with('posts', $posts);
     }
 
-    public function deleteMajorView(Major $major) {
+    public function deleteMajorView(Major $major)
+    {
         $major->delete();
 
         return redirect('/settings/major')->with('message', 'Major deleted successfully');
     }
 
-    public function deleteCourseView(Course $course) {
+    public function deleteCourseView(Course $course)
+    {
         $course->delete();
 
         return redirect('/settings/course')->with('message', 'Course deleted successfully');
     }
 
-    public function deleteDepartmentView(Department $department) {
+    public function deleteDepartmentView(Department $department)
+    {
         $department->delete();
 
         return redirect('/settings/department')->with('message', 'Department deleted successfully');
+    }
+
+    public function userDelete(User $user)
+    {
+        $user->delete();
+
+        return redirect('/account')->with('message', 'User deleted successfully');
     }
 }
