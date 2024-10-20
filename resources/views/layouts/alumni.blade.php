@@ -18,7 +18,7 @@
 <body>
     <div class="flex w-screen">
         @if (request()->path() !== 'alumni/chat')
-        <a href="/alumni/chat" class="fixed rounded-full bottom-0 right-0 mb-6 mr-6 shadow-lg bg-blue-600 transition-transform hover:scale-110">
+        <a href="/alumni/chat" class="fixed rounded-full bottom-0 right-0 mb-6 mr-6 z-50 shadow-lg bg-blue-600 transition-transform hover:scale-110">
             <img class="w-8 m-3" src="{{ asset('assets/chat.svg') }}" alt="Chat">
         </a>
         @endif
@@ -61,7 +61,7 @@
             </a>
         </div>
 
-        <div class="flex flex-col w-full max-h-screen">
+        <div class="flex flex-col w-full max-h-screen relative">
             <nav class="bg-white w-full max-h-16 min-h-16 h-16 border-b flex place-items-center px-6">
                 <img class="w-6 mr-4" src="{{ asset('assets/search.svg') }}" alt="Dashboard">
                 <div class="group relative">
@@ -141,8 +141,13 @@
                         </a>
                     </div>
                 </div>
-
             </nav>
+            @if (session('message'))
+            <div class="flex absolute top-20 left-2 z-40 bg-white shadow-lg p-4 rounded-lg place-items-center">
+                <img class="w-8 mr-3" src="{{ asset('assets/success.svg') }}" alt="Success">
+                <h1>{{ session('message') }}</h1>
+            </div>
+            @endif
             @yield('content')
         </div>
     </div>
