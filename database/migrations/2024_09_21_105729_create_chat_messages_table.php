@@ -17,7 +17,7 @@ return new class extends Migration
             $table->enum('type', ['text', 'image', 'file'])
                 ->default('text');
 
-            $table->binary('content');
+            $table->string('content');
 
             $table->foreignId('chat_group_id')
                 ->references('id')
