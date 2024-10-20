@@ -12,6 +12,7 @@ use App\Models\ProfessionalRecordHardSkill;
 use App\Models\ProfessionalRecordMethod;
 use App\Models\ProfessionalRecordSoftSkill;
 use App\Models\User;
+use App\Models\UserAlert;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -241,6 +242,7 @@ class AlumniController extends Controller
         $validated['email_address'] = $validated['email'];
         $validated['user_id'] = $alumni->id;
 
+
         PersonalRecord::query()->create($validated);
 
         return redirect('/alumni/setup/educational')->with('message', 'Personal record created successfully');
@@ -380,6 +382,18 @@ class AlumniController extends Controller
             ]);
         }
 
+        $content = Auth::user()->name . ' alumni account has been completed';
+        $action = '/user/view/' . $alumni->id;
+
+        foreach (User::query()->where('role', '=', 'Admin')->get() as $admin) {
+            UserAlert::query()->create([
+                'title' => 'Alumni Account Completed',
+                'content' => $content,
+                'action' => $action,
+                'user_id' => $admin->id,
+            ]);
+        }
+
         return redirect('/alumni')->with('message', 'Profile picture updated successfully');
     }
 
@@ -453,6 +467,10 @@ class AlumniController extends Controller
             $posts = $posts->where('post_category', 'Announcement');
         } else if ($category === 'Your Posts') {
             $posts = $posts->where('user_id', Auth::user()->id);
+        } else if ($category === 'Saved Posts') {
+            $posts = User::query()
+                ->find(Auth::user()->id)
+                ->savedPostsAsPosts();
         } else if ($category === 'Pinned Posts') {
             $posts = User::query()
                 ->find(Auth::user()->id)
