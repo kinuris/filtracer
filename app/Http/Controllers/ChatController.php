@@ -32,6 +32,17 @@ class ChatController extends Controller
         $previousName = $group->name;
         $group->update($validated);
 
+        $file = request()->file('profile_pic');
+        if ($file) {
+
+            $filename = sha1(time()) . '.' . $file->getClientOriginalExtension();
+            $file->storePubliclyAs('public/chat/images', $filename);
+
+            $group->update([
+                'image_link' => $filename,
+            ]);
+        }
+
         foreach ($group->users()->get() as $user) {
             UserAlert::query()->create([
                 'title' => 'Renamed group chat to ' . $group->name,
@@ -43,9 +54,9 @@ class ChatController extends Controller
 
         $sender = User::query()->find(Auth::user()->id);
         if ($sender->role == 'Admin') {
-            return redirect('/admin/chat')->with('message', 'Left Group');
+            return redirect('/admin/chat')->with('message', 'Renamed Group');
         } else {
-            return redirect('/alumni/chat')->with('message', 'Left Group');
+            return redirect('/alumni/chat')->with('message', 'Renamed Group');
         }
     }
 
@@ -166,11 +177,20 @@ class ChatController extends Controller
     public function send(Request $request)
     {
         $user = User::query()->find(Auth::user()->id);
-        $request->validate([
-            'sender' => 'required',
-            'message' => 'required',
-            'room_id' => 'required',
-        ]);
+
+        if ($request->hasFile('message')) {
+            $request->validate([
+                'sender' => 'required',
+                'message' => ['required', 'file', 'max:10000'],
+                'room_id' => 'required',
+            ]);
+        } else {
+            $request->validate([
+                'sender' => 'required',
+                'message' => 'required',
+                'room_id' => 'required',
+            ]);
+        }
 
         if ($request->post('sender') != $user->id) {
             return abort(403);
@@ -187,15 +207,29 @@ class ChatController extends Controller
                 UserAlert::query()->create([
                     'title' => 'You received a new message',
                     'action' => ($receiver->role == 'Admin' ? '/admin/chat' : '/alumni/chat') . '?initiate=' . $receiver->id,
-                    'content' => $request->post('message'),
+                    'content' => $request->hasFile('message') ? 'File sent to you' : $request->post('message'),
                     'user_id' => $receiver->id,
                 ]);
 
-                ChatMessage::query()->create([
-                    'sender_id' => $user->id,
-                    'content' => $request->post('message'),
-                    'chat_group_id' => $group->id,
-                ]);
+                if ($request->hasFile('message')) {
+                    $file = $request->file('message');
+                    $filename = sha1(time() . $file->getClientOriginalName()) . '.' . base64_encode($file->getClientOriginalName()) . '.' . $file->getClientOriginalExtension();
+                    $file->storePubliclyAs('public/chat/files', $filename);
+
+                    ChatMessage::query()->create([
+                        'sender_id' => $user->id,
+                        'type' => 'file',
+                        'content' => $filename,
+                        'chat_group_id' => $group->id,
+                    ]);
+                } else {
+                    ChatMessage::query()->create([
+                        'sender_id' => $user->id,
+                        'type' => 'text',
+                        'content' => $request->post('message'),
+                        'chat_group_id' => $group->id,
+                    ]);
+                }
 
                 return response()->json(['group' => $group->id]);
             } else {
@@ -209,15 +243,29 @@ class ChatController extends Controller
                 UserAlert::query()->create([
                     'title' => 'You received a new message',
                     'action' => ($receiver->role == 'Admin' ? '/admin/chat' : '/alumni/chat') . '?initiate=' . $receiver->id,
-                    'content' => $request->post('message'),
+                    'content' => $request->hasFile('message') ? 'File sent to you' : $request->post('message'),
                     'user_id' => $receiver->id,
                 ]);
 
-                ChatMessage::query()->create([
-                    'sender_id' => $user->id,
-                    'content' => $request->post('message'),
-                    'chat_group_id' => $group->id,
-                ]);
+                if ($request->hasFile('message')) {
+                    $file = $request->file('message');
+                    $filename = sha1(time() . $file->getClientOriginalName()) . '.' . base64_encode($file->getClientOriginalName()) . '.' . $file->getClientOriginalExtension();
+                    $file->storePubliclyAs('public/chat/files', $filename);
+
+                    ChatMessage::query()->create([
+                        'sender_id' => $user->id,
+                        'type' => 'file',
+                        'content' => $filename,
+                        'chat_group_id' => $group->id,
+                    ]);
+                } else {
+                    ChatMessage::query()->create([
+                        'sender_id' => $user->id,
+                        'type' => 'text',
+                        'content' => $request->post('message'),
+                        'chat_group_id' => $group->id,
+                    ]);
+                }
 
                 ChatAssociation::query()->create([
                     'chat_group_id' => $group->id,
@@ -235,19 +283,36 @@ class ChatController extends Controller
             $group = ChatGroup::query()->where('internal_id', '=', $request->post('room_id'))->first();
 
             foreach ($group->users()->get() as $userRec) {
+                if ($user->id == $userRec->id) {
+                    continue;
+                }
+
                 UserAlert::query()->create([
                     'title' => 'You received a new message',
                     'action' => ($userRec->role == 'Admin' ? '/admin/chat' : '/alumni/chat') . '?initiate=' . urlencode($group->internal_id),
-                    'content' => $group->name . ': ' .  $request->post('message'),
+                    'content' => $group->name . ': ' . ($request->hasFile('message') ? 'File sent to you' : $request->post('message')),
                     'user_id' => $userRec->id,
                 ]);
             }
+            if ($request->hasFile('message')) {
+                $file = $request->file('message');
+                $filename = sha1(time() . $file->getClientOriginalName()) . '.' . base64_encode($file->getClientOriginalName()) . '.' . $file->getClientOriginalExtension();
+                $file->storePubliclyAs('public/chat/files', $filename);
 
-            ChatMessage::query()->create([
-                'sender_id' => $user->id,
-                'content' => $request->post('message'),
-                'chat_group_id' => $group->id,
-            ]);
+                ChatMessage::query()->create([
+                    'sender_id' => $user->id,
+                    'type' => 'file',
+                    'content' => $filename,
+                    'chat_group_id' => $group->id,
+                ]);
+            } else {
+                ChatMessage::query()->create([
+                    'sender_id' => $user->id,
+                    'type' => 'text',
+                    'content' => $request->post('message'),
+                    'chat_group_id' => $group->id,
+                ]);
+            }
 
             return response()->json(['group' => $group->id]);
         }

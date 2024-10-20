@@ -1,10 +1,14 @@
 @extends('layouts.admin')
 
+@section('title', 'Admin Chat')
+
 @section('content')
 @if (request('initiate'))
 @include('components.chat-members-modal')
 @include('components.leave-group-modal')
 @include('components.rename-group-modal')
+@include('components.see-images-modal')
+@include('components.see-files-modal')
 @endif
 <div class="max-h-[calc(100%-4rem)]">
     <div class="bg-gray-100 w-full h-full p-8 flex flex-col overflow-auto max-h-[calc(100%-0.01px)]">
@@ -35,12 +39,12 @@
                                 <div class="w-48 right-0 absolute hidden group-hover:block font-light text-sm bg-white shadow-lg rounded-lg overflow-hidden">
                                     <div class="flex p-2 group hover:bg-gray-100 cursor-pointer">
                                         <img class="w-5" src="{{ asset('assets/file.svg') }}" alt="Chat Members">
-                                        <button class="text-left w-full block px-4 py-2 hover:bg-gray-100">See Files</button>
+                                        <button id="openSeeFilesModal" class="text-left w-full block px-4 py-2 hover:bg-gray-100">See Files</button>
                                     </div>
 
                                     <div class="flex p-2 group hover:bg-gray-100 cursor-pointer">
                                         <img class="w-5" src="{{ asset('assets/image.svg') }}" alt="Chat Members">
-                                        <button class="text-left w-full block px-4 py-2 hover:bg-gray-100">See Images</button>
+                                        <button id="openSeeImagesModal" class="text-left w-full block px-4 py-2 hover:bg-gray-100">See Images</button>
                                     </div>
 
                                     @if (!is_numeric(request('initiate')))
@@ -51,7 +55,7 @@
 
                                     <div class="flex p-2 group hover:bg-gray-100 cursor-pointer">
                                         <img class="w-5" src="{{ asset('assets/rename.svg') }}" alt="Chat Members">
-                                        <button class="text-left w-full block px-4 py-2 hover:bg-gray-100" id="openRenameGroupModal">Rename Group</button>
+                                        <button class="text-left w-full block px-4 py-2 hover:bg-gray-100" id="openRenameGroupModal">Edit Group</button>
                                     </div>
 
                                     <div class="flex p-2 group hover:bg-gray-100 cursor-pointer">
@@ -81,7 +85,13 @@
                             <div class="flex flex-col">
                                 <p class="text-sm font-normal">{{ $group->name }}</p>
                                 @php($first = $group->messages()->latest()->first())
+                                @if ($first->isImage())
+                                <p class="text-xs font-light text-gray-400 line-clamp-1 max-w-48">{{ $first && $first->sender->id == auth()->user()->id ? 'You: ' : ''}} Sent an image</p>
+                                @elseif ($first->isFile())
+                                <p class="text-xs font-light text-gray-400 line-clamp-1 max-w-48">{{ $first && $first->sender->id == auth()->user()->id ? 'You: ' : ''}} Sent a file</p>
+                                @else
                                 <p class="text-xs font-light text-gray-400 line-clamp-1 max-w-48">{{ $first && $first->sender->id == auth()->user()->id ? 'You: ' : ''}}{{ $first ? $first->content : 'No Messages Yet' }}</p>
+                                @endif
                             </div>
                         </a>
                         @endforeach
@@ -98,7 +108,13 @@
                         </div>
                         <div class="div w-full bg-white/80 backdrop-blur-sm py-3 flex flex-col justify-end absolute px-4 right-0 bottom-0">
                             <div class="flex">
-                                <input class="border rounded-lg bg-gray-50 font-light text-sm p-2 min-w-72 flex-1" placeholder="Type something here..." type="text" name="message" id="message">
+                                <input class="border rounded-l-lg border-r-0 bg-gray-50 font-light text-sm  min-w-72 flex-1 focus:outline-none px-2" placeholder="Type something here..." type="text" name="message" id="message">
+                                <button class="bg-gray-50 border border-l-0 w-10 h-10 flex justify-center place-items-center rounded-r-lg">
+                                    <label class="cursor-pointer p-2" for="attachment">
+                                        <img class="w-5 h-5" src="{{ asset('assets/attachment.svg') }}" alt="Attachment">
+                                    </label>
+                                </button>
+                                <input class="hidden" type="file" name="attachment" id="attachment" accept="image/png,image/jpg,image/jpeg,application/pdf">
                                 <button id="send" class="shadow bg-blue-600 w-10 h-10 flex justify-center place-items-center rounded-lg ml-3 transition-transform hover:scale-110">
                                     <img class="w-5 h-5" src="{{ asset('assets/send.svg') }}" alt="Send">
                                 </button>
@@ -114,6 +130,16 @@
 @endsection
 
 @section('script')
+<script>
+    const groupImagePreviewSelector = document.getElementById('groupImagePreviewSelector');
+    const groupImagePreview = document.getElementById('groupImagePreview');
+
+    if (groupImagePreviewSelector) {
+        groupImagePreviewSelector.addEventListener('change', () => {
+            groupImagePreview.src = URL.createObjectURL(groupImagePreviewSelector.files[0]);
+        });
+    }
+</script>
 <script>
     const openRenameGroupModal = document.getElementById('openRenameGroupModal');
     const renameGroupModal = document.getElementById('renameGroupModal');
@@ -231,6 +257,67 @@
 @endif
 
 @if ($selected)
+<script>
+    const seeFilesModal = document.getElementById('seeFilesModal');
+    const closeSeeFilesModal = document.getElementById('closeSeeFilesModal');
+    const openSeeFilesModal = document.getElementById('openSeeFilesModal');
+
+    openSeeFilesModal.addEventListener('click', () => {
+        seeFilesModal.classList.remove('hidden');
+    });
+
+    closeSeeFilesModal.addEventListener('click', () => {
+        seeFilesModal.classList.add('hidden');
+    });
+
+    seeFilesModal.addEventListener('click', (e) => {
+        if (e.target === seeFilesModal) {
+            seeFilesModal.classList.add('hidden');
+        }
+    })
+</script>
+<script>
+    const seeImagesModal = document.getElementById('seeImagesModal');
+    const closeSeeImagesModal = document.getElementById('closeSeeImagesModal');
+    const openSeeImagesModal = document.getElementById('openSeeImagesModal');
+
+    openSeeImagesModal.addEventListener('click', () => {
+        seeImagesModal.classList.remove('hidden');
+    });
+
+    closeSeeImagesModal.addEventListener('click', () => {
+        seeImagesModal.classList.add('hidden');
+    });
+
+    seeImagesModal.addEventListener('click', (e) => {
+        if (e.target === seeImagesModal) {
+            seeImagesModal.classList.add('hidden');
+        }
+    })
+</script>
+<script>
+    const attachment = document.getElementById('attachment');
+    attachment.addEventListener('change', async (e) => {
+        const file = e.target.files[0];
+
+        if (!file) {
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('message', file);
+        formData.append('sender', <?php echo Auth::user()->id ?>);
+        formData.append('room_id', '<?php echo isset($selected->internal_id) ? $selected->internal_id : ($selected ? $selected->id : 'null') ?>');
+
+        const response = await fetch('/chat/send', {
+            method: 'POST', 
+            headers: {
+                'X-CSRF-TOKEN': <?php echo '"' . csrf_token() . '"' ?>,
+            },
+            body: formData,
+        })
+    });
+</script>
 <script>
     const openLeaveGroupModal = document.getElementById('openLeaveGroupModal');
     const leaveGroupModal = document.getElementById('leaveGroupModal');
