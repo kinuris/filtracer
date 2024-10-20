@@ -94,12 +94,15 @@ Route::controller(PostController::class)
         Route::post('/post/edit/{post}', 'update');
 
         Route::get('/post/pin/toggle/{post}', 'togglePinPost');
+        Route::get('/post/save/toggle/{post}', 'toggleSavePost');
+
         Route::get('/post/delete/{post}', 'destroy');
     });
 
 Route::controller(AlertController::class)
     ->middleware('auth')
     ->group(function () {
+        Route::get('/alert/complete/{alert}', 'completeAlert');
         Route::get('/alert/gen', 'genAlerts');
         Route::get('/alert/seenall', 'seenAll');
     });
@@ -114,6 +117,7 @@ Route::controller(AdminController::class)
 
         Route::get('/department/{department}', 'alumniListView');
         Route::get('/user/view/{user}', 'userView');
+        Route::get('/user/delete/{user}', 'userDelete');
 
         Route::get('/report/graphical', 'reportsGraphicalView');
 
@@ -123,6 +127,7 @@ Route::controller(AdminController::class)
         Route::get('/account', 'accountsView');
         Route::get('/admin/profile', 'myProfileView');
         Route::get('/admin/useraccount/verify/{user}', 'verifyUser');
+        Route::get('/admin/useraccount/unverify/{user}', 'unverifyUser');
 
         Route::get('/audit', 'auditView');
 
