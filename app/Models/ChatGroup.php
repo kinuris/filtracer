@@ -11,12 +11,13 @@ class ChatGroup extends Model
     protected $table = 'chat_groups';
     protected $fillable = [
         'internal_id',
-        'name', 
-        'image_link', 
+        'name',
+        'image_link',
         'creator_id',
     ];
 
-    public static function genInternalNoCollision() {
+    public static function genInternalNoCollision()
+    {
         while (true) {
             $i = random_int(0, 999999);
             $internal_id = '#' . $i;
@@ -24,7 +25,7 @@ class ChatGroup extends Model
                 return $internal_id;
             }
         }
-    } 
+    }
 
     public function getNameAttribute()
     {
@@ -58,6 +59,11 @@ class ChatGroup extends Model
 
             return $user->image();
         }
+
+        if ($this->image_link) {
+            return asset('storage/chat/images/' . $this->image_link);
+        }
+
         return fake()->imageUrl();
     }
 
