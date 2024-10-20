@@ -216,7 +216,8 @@ class User extends Authenticatable
         return $groups;
     }
 
-    public static function countFromGroup($category, $group) {
+    public static function countFromGroup($category, $group)
+    {
         switch ($category) {
             case 'Employed Alumni':
                 return User::countEmployedFromGroup($group);
@@ -237,69 +238,75 @@ class User extends Authenticatable
         }
     }
 
-    public static function countRetiredFromGroup($group) {
+    public static function countRetiredFromGroup($group)
+    {
         $total = 0;
         foreach ($group as $user) {
             if ($user->employment() === 'Retired') {
                 $total++;
             }
         }
-        
+
         return $total;
     }
 
-    public static function countWorkingStudentsFromGroup($group) {
+    public static function countWorkingStudentsFromGroup($group)
+    {
         $total = 0;
         foreach ($group as $user) {
             if ($user->employment() === 'Working Student') {
                 $total++;
             }
         }
-        
+
         return $total;
     }
 
-    public static function countStudentsFromGroup($group) {
+    public static function countStudentsFromGroup($group)
+    {
         $total = 0;
         foreach ($group as $user) {
             if ($user->employment() === 'Student') {
                 $total++;
             }
         }
-        
+
         return $total;
     }
 
-    public static function countSelfEmployedFromGroup($group) {
+    public static function countSelfEmployedFromGroup($group)
+    {
         $total = 0;
         foreach ($group as $user) {
             if ($user->employment() === 'Self-employed') {
                 $total++;
             }
         }
-        
+
         return $total;
     }
 
-    public static function countUnemployedFromGroup($group) {
+    public static function countUnemployedFromGroup($group)
+    {
         $total = 0;
         foreach ($group as $user) {
             if ($user->employment() === 'Unemployed') {
                 $total++;
             }
         }
-        
+
         return $total;
     }
 
-    public static function countEmployedFromGroup($group) {
+    public static function countEmployedFromGroup($group)
+    {
         $total = 0;
         foreach ($group as $user) {
             if ($user->employment() === 'Employed') {
                 $total++;
             }
         }
-        
+
         return $total;
     }
 
@@ -317,7 +324,9 @@ class User extends Authenticatable
                 return User::query()->whereIn('id', $ids);
                 break;
             case 'educational':
-                $ids = EducationRecord::query()->get('user_id');
+                $ids = EducationRecord::query()
+                    ->get('user_id')
+                    ->toArray();
 
                 return User::query()->whereIn('id', $ids);
                 break;
@@ -377,9 +386,19 @@ class User extends Authenticatable
         return $this->hasMany(PinnedPost::class, 'user_id');
     }
 
+    public function savedPosts()
+    {
+        return $this->hasMany(SavedPost::class, 'user_id');
+    }
+
     public function pinnedPostsAsPosts()
     {
         return $this->hasManyThrough(Post::class, PinnedPost::class, 'user_id', 'id', 'id', 'post_id');
+    }
+
+    public function savedPostsAsPosts()
+    {
+        return $this->hasManyThrough(Post::class, SavedPost::class, 'user_id', 'id', 'id', 'post_id');
     }
 
     public function isCompSet()
