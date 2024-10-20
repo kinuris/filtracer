@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'Course List')
+@section('title', 'Settings > Courses')
 
 @section('content')
 @include('components.add-course-modal')

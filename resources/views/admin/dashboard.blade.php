@@ -1,5 +1,7 @@
 @extends('layouts.admin')
 
+@section('title', 'Dashboard')
+
 @section('content')
 @php($users = App\Models\User::query())
 <div class="bg-gray-100 w-full h-full p-8 flex flex-col max-h-[calc(100%-4rem)] overflow-auto">
@@ -10,7 +12,7 @@
                     <p class="text-3xl font-bold">{{ $users->count() }}</p>
                     <p class="text-sm text-gray-400">Registered Users</p>
                 </div>
-                <img src="{{ asset('assets/registered.svg') }}" alt="Registered">
+                <img class="w-10" src="{{ asset('assets/registered.svg') }}" alt="Registered">
             </div>
 
             <div class="flex">
@@ -18,7 +20,7 @@
                     <p class="text-3xl font-bold">{{ $users->where('role', '=', 'Alumni')->count() }}</p>
                     <p class="text-sm text-gray-400">Registered Alumni</p>
                 </div>
-                <img src="{{ asset('assets/registered.svg') }}" alt="Registered">
+                <img class="w-10" src="{{ asset('assets/registered.svg') }}" alt="Registered">
             </div>
 
             <div class="flex">
@@ -26,7 +28,7 @@
                     <p class="text-3xl font-bold">{{ $users->where('role', '=', 'Alumni')->whereRelation('professionalRecords', 'employment_status', '=', 'Employed')->count() }}</p>
                     <p class="text-sm text-gray-400">Employed Alumni</p>
                 </div>
-                <img src="{{ asset('assets/employed.svg') }}" alt="Employed">
+                <img class="w-10" src="{{ asset('assets/employed.svg') }}" alt="Employed">
             </div>
 
             <div class="flex">
@@ -35,7 +37,7 @@
                     <p class="text-3xl font-bold">{{ $users->where('role', '=', 'Alumni')->whereRelation('professionalRecords', 'employment_status', '=', 'Unemployed')->count() }}</p>
                     <p class="text-sm text-gray-400">Unemployed Alumni</p>
                 </div>
-                <img src="{{ asset('assets/unemployed.svg') }}" alt="Unemployed">
+                <img class="w-10" src="{{ asset('assets/unemployed.svg') }}" alt="Unemployed">
             </div>
         </div>
     </div>
@@ -78,7 +80,6 @@
 
     new Chart(ctx, {
         type: 'bar',
-
         data: {
             labels: [
                 <?php
@@ -118,18 +119,19 @@
             }]
         },
         options: {
-            responsive: true,
-            scales: {
-                y: {
-                    beginAtZero: true
-                }
-            }
-        },
-        options: {
             plugins: {
                 legend: {
                     display: false,
                 },
+            },
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1,
+                    }
+                }
             }
         },
     });

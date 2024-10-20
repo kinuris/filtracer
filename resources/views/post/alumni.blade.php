@@ -2,6 +2,8 @@
 
 @section('content')
 
+@section('title', 'Posts')
+
 @include('components.add-post-modal')
 
 @if (request('edit_post'))
@@ -34,7 +36,7 @@
                 <div class="flex-1"></div>
 
                 <button type="button" class="rounded-lg p-2 px-3 bg-blue-600 text-white" id="openAddPostModal">Add New Post</button>
-                <a class="rounded-lg p-2 px-3 bg-blue-600 text-white ml-3">Your Posts</a>
+                <a href="?category=Your+Posts" class="rounded-lg p-2 px-3 bg-blue-600 text-white ml-3">Your Posts</a>
             </div>
         </form>
     </div>
@@ -73,34 +75,48 @@
                                 @endif
                             </a>
 
-                            <div class="pl-4 flex place-items-center p-2 group hover:bg-gray-100 cursor-pointer">
+                            <a href="/post/save/toggle/{{ $post->id }}" class="pl-4 flex place-items-center p-2 group hover:bg-gray-100 cursor-pointer">
                                 <img class="h-4 w-5" src="{{ asset('assets/post_save.svg') }}" alt="Save Post">
+                                @if ($post->isSavedBy(auth()->user()))
+                                <button class="text-left w-full block px-4 py-2 hover:bg-gray-100">Unsave Post</button>
+                                @else
                                 <button class="text-left w-full block px-4 py-2 hover:bg-gray-100">Save Post</button>
-                            </div>
+                                @endif
+                            </a>
+
                             @if ($post->creator->id === Auth::user()->id)
                             <div class="pl-4 flex p-2 group place-items-center hover:bg-gray-100 cursor-pointer post-edit-btn" data-post-id="{{ $post->id }}">
                                 <img class="h-4 w-5" src="{{ asset('assets/post_edit.svg') }}" alt="Edit Post">
                                 <button class="text-left w-full block px-4 py-2 hover:bg-gray-100">Edit Post</button>
                             </div>
-                            <div class="pl-4 flex p-2 group place-items-center hover:bg-gray-100 cursor-pointer">
+                            <a href="/post/delete/{{ $post->id }}" class="pl-4 flex p-2 group place-items-center hover:bg-gray-100 cursor-pointer">
                                 <img class="h-4 w-5" src="{{ asset('assets/post_delete.svg') }}" alt="Delete Post">
                                 <button class="text-left w-full block px-4 py-2 hover:bg-gray-100">Delete Post</button>
-                            </div>
+                            </a>
                             @endif
                         </div>
                     </div>
                 </div>
+
+                @if ($post->attached_image !== null)
                 <img class="mt-3" src="{{ $post->image() }}" alt="Attachment">
+                @endif
+
                 <p class="text-lg font-bold mt-3">{{ $post->title }}</p>
                 <p class="text-sm text-gray-400 break-words">{{ $post->content }}</p>
 
+                @if ($post->source !== null)
                 <p class="text-sm mt-3">Source:</p>
                 <a class="text-sm underline text-blue-500" target="_blank" href="{{ $post->source }}">{{ $post->source }}</a>
+                @endif
 
+                @if ($post->post_category !== 'Announcement')
                 <p class="text-sm mt-3">Status: <span class="text-gray-400 font-light">{{ $post->post_status }}</span></p>
+                @endif
 
                 <p class="text-sm mt-3">Posted on: <span class="text-gray-400 font-light">{{ $post->created_at->format('F j, Y \a\t g:i a') }}</span></p>
                 <div class="flex-1"></div>
+
                 <div class="flex mt-3">
                     <a href="/post/pin/toggle/{{ $post->id }}" class="flex-1 pl-4 flex group bg-blue-600 cursor-pointer rounded-lg">
                         @if ($post->isPinnedBy(auth()->user()))
@@ -112,9 +128,13 @@
                         @endif
                     </a>
                     <div class="mx-1"></div>
-                    <a href="" class="flex-1 pl-4 flex group bg-blue-600 cursor-pointer rounded-lg place-items-center">
+                    <a href="/post/save/toggle/{{ $post->id }}" class="flex-1 pl-4 flex group bg-blue-600 cursor-pointer rounded-lg place-items-center">
                         <img class="h-4 w-5" src="{{ asset('assets/post_save.svg') }}" alt="Save Post">
+                        @if ($post->isSavedBy(auth()->user()))
+                        <button class="text-left w-full block px-4 py-2 text-white">Unsave Post</button>
+                        @else
                         <button class="text-left w-full block px-4 py-2 text-white">Save Post</button>
+                        @endif
                     </a>
                 </div>
             </div>

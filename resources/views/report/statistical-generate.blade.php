@@ -1,5 +1,7 @@
 @extends('layouts.admin')
 
+@section('title', 'Statistical Report')
+
 <?php
 
 $department = App\Models\Department::find(request('department') ?? -1);

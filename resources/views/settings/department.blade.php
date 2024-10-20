@@ -1,5 +1,7 @@
 @extends('layouts.admin')
 
+@section('title', 'Settings > Departments')
+
 @section('content')
 @include('components.add-department-modal')
 <div class="bg-gray-100 w-full h-full p-8 flex flex-col">

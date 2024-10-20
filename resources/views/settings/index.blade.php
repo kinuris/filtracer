@@ -1,5 +1,7 @@
 @extends('layouts.admin')
 
+@section('title', 'Settings')
+
 @section('content')
 <div class="bg-gray-100 w-full h-full p-8 flex flex-col">
     <h1 class="font-medium tracking-widest text-lg">Settings</h1>

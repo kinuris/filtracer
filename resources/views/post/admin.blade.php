@@ -1,7 +1,8 @@
 @extends('layouts.admin')
 
-@section('content')
+@section('title', 'Posts')
 
+@section('content')
 @include('components.add-post-modal')
 
 @if (request('edit_post'))
@@ -34,7 +35,7 @@
                 <div class="flex-1"></div>
 
                 <button type="button" class="rounded-lg p-2 px-3 bg-blue-600 text-white" id="openAddPostModal">Add New Post</button>
-                <a class="rounded-lg p-2 px-3 bg-blue-600 text-white ml-3">Your Posts</a>
+                <a href="?category=Your+Posts" class="rounded-lg p-2 px-3 bg-blue-600 text-white ml-3">Your Posts</a>
             </div>
         </form>
     </div>
@@ -73,10 +74,14 @@
                                 @endif
                             </a>
 
-                            <div class="pl-4 flex place-items-center p-2 group hover:bg-gray-100 cursor-pointer">
+                            <a href="/post/save/toggle/{{ $post->id }}" class="pl-4 flex place-items-center p-2 group hover:bg-gray-100 cursor-pointer">
                                 <img class="h-4 w-5" src="{{ asset('assets/post_save.svg') }}" alt="Save Post">
+                                @if ($post->isSavedBy(auth()->user()))
+                                <button class="text-left w-full block px-4 py-2 hover:bg-gray-100">Unsave Post</button>
+                                @else
                                 <button class="text-left w-full block px-4 py-2 hover:bg-gray-100">Save Post</button>
-                            </div>
+                                @endif
+                            </a>
 
                             @if ($post->creator->id === Auth::user()->id)
                             <div class="pl-4 flex p-2 group place-items-center hover:bg-gray-100 cursor-pointer post-edit-btn" data-post-id="{{ $post->id }}">
@@ -122,9 +127,13 @@
                         @endif
                     </a>
                     <div class="mx-1"></div>
-                    <a href="" class="flex-1 pl-4 flex group bg-blue-600 cursor-pointer rounded-lg place-items-center">
+                    <a href="/post/save/toggle/{{ $post->id }}" class="flex-1 pl-4 flex group bg-blue-600 cursor-pointer rounded-lg place-items-center">
                         <img class="h-4 w-5" src="{{ asset('assets/post_save.svg') }}" alt="Save Post">
+                        @if ($post->isSavedBy(auth()->user()))
+                        <button class="text-left w-full block px-4 py-2 text-white">Unsave Post</button>
+                        @else
                         <button class="text-left w-full block px-4 py-2 text-white">Save Post</button>
+                        @endif
                     </a>
                 </div>
             </div>

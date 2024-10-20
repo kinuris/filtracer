@@ -1,5 +1,7 @@
 @extends('layouts.admin')
 
+@section('title', 'Profile Details')
+
 @section('content')
 @php($query = request()->query('type') ?? 'personal')
 <div class="bg-gray-100 w-full h-full p-8 flex flex-col max-h-[calc(100%-4rem)]">
@@ -129,7 +131,7 @@
                         <p class="flex-[2] border p-2 rounded-lg text-gray-400 bg-gray-100 line-clamp-1 overflow-auto">{{ $educ->school }}</p>
                     </div>
                     <div class="flex justify-between place-items-center flex-1 mx-4 h-fit">
-                        <p class="flex-1 tracking-wider text-slate-700">Civil Status</p>
+                        <p class="flex-1 tracking-wider text-slate-700">Course</p>
                         <p class="flex-[2] border p-2 rounded-lg text-gray-400 bg-gray-100">{{ $educ->getCourse()->name }}</p>
                     </div>
                 </div>

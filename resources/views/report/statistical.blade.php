@@ -1,5 +1,7 @@
 @extends('layouts.admin')
 
+@section('title', 'Statistical Report')
+
 @section('content')
 <div class="bg-gray-100 w-full h-full p-8 max-h-[calc(100%-4rem)] overflow-auto">
     <h1 class="font-medium tracking-widest text-lg">Statistical Report</h1>
@@ -20,7 +22,7 @@
                     <option value="Retired Alumni">Retired Alumni</option>
                 </select>
 
-                <p class="tracking-wider font-semibold ml-10 mr-4">Of</p>
+                <p class="tracking-wider font-semibold ml-4 mr-4">Of</p>
                 <select onchange="handleDepartmentChange()" class="g-gray-100 p-2 max-w-56 rounded border text-gray-400 mr-4" name="department" id="department">
                     <option value="-1">All Departments</option>
                     @php($depts = App\Models\Department::allValid())
@@ -34,7 +36,7 @@
                 </select>
 
                 <div class="flex-1"></div>
-                <button class="rounded-lg p-2 bg-blue-600 text-white" type="submit">Generate Report</button>
+                <button class="rounded p-2 ml-1 text-sm bg-blue-600 text-white" type="submit">Generate Report</button>
             </div>
         </form>
     </div>
@@ -91,7 +93,7 @@
         option.value = '-1';
         option.innerHTML = 'All Courses';
 
-        category.innerHTML = ''; 
+        category.innerHTML = '';
         category.appendChild(option);
 
         for (let course of courses) {

@@ -1,5 +1,7 @@
 @extends('layouts.admin')
 
+@section('title', 'Profile Report' . ' - ' . $alumni->name)
+
 @section('content')
 <div class="bg-gray-100 w-full h-full p-8 flex flex-col overflow-auto max-h-[calc(100%-4rem)]">
     <div class="flex justify-between">

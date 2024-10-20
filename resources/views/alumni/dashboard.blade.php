@@ -1,5 +1,7 @@
 @extends('layouts.alumni')
 
+@section('title', 'Dashboard')
+
 @section('content')
 <div class="bg-gray-100 w-full h-full p-8 flex flex-col max-h-[calc(100%-4rem)]">
     @php($user = auth()->user())
@@ -24,6 +26,50 @@
                 </div>
             </div>
         </div>
+
+        <div class="flex my-3">
+            <div class="flex flex-col bg-white shadow rounded-lg flex-1 max-h-36 overflow-auto">
+                <div class="flex justify-between border-b p-4 sticky top-0 bg-white/80 backdrop-blur-[2px]">
+                    <p class="font-bold">Notifications</p>
+                    <img src="{{ asset('assets/option.svg') }}" alt="Menu">
+                </div>
+
+                <div id="alertContainerBottom"></div>
+            </div>
+
+            <div class="mx-3"></div>
+
+            <div class="flex flex-col bg-white shadow rounded-lg flex-1 max-h-36 overflow-auto relative">
+                <div class="flex justify-between border-b p-4 sticky top-0 bg-white/80 backdrop-blur-[2px]">
+                    <p class="font-bold">Messages</p>
+                    <img src="{{ asset('assets/option.svg') }}" alt="Menu">
+                </div>
+
+                <div id="messageContainerBottom"></div>
+            </div>
+        </div>
     </div>
 </div>
+@endsection
+
+@section('script')
+<script>
+    const alertContainerBottom = document.querySelector('#alertContainerBottom');
+    const messageContainerBottom = document.querySelector('#messageContainerBottom');
+
+    (function() {
+        async function repeat() {
+            const alerts = await fetch('/alert/gen');
+
+            const text = await alerts.text();
+
+            alertContainerBottom.innerHTML = text;
+            messageContainerBottom.innerHTML = text;
+        }
+
+        repeat();
+
+        setInterval(repeat, 1000);
+    })()
+</script>
 @endsection

@@ -1,7 +1,10 @@
 @extends('layouts.admin')
 
+@section('title', 'User Accounts')
+
 @section('content')
 @include('components.verify-modal')
+@include('components.unverify-modal')
 <div class="bg-gray-100 w-full h-full p-8">
     <h1 class="font-medium tracking-widest text-lg mb-6">User Accounts</h1>
 
@@ -38,9 +41,9 @@
                         <div class="flex justify-start max-w-24 place-items-center">
                             @php ($personal = $user->getPersonalBio())
                             @if ($personal !== null && $personal->status == 1)
-                            <a href="" class="w-6"><img class="w-5" src="{{ asset('/assets/verified_user.svg') }}" alt="Verified"></a>
+                            <button data-user-id="{{ $user->id }}" class="openUnverifyModal w-6"><img class="w-5" src="{{ asset('/assets/verified_user.svg') }}" alt="Verified"></button>
                             @elseif ($personal !== null && $personal->status == 0)
-                            <button data-user-id="{{ $user->id }}" class="openVerifyModal w-6"><img src="{{ asset('/assets/unverified_user.svg') }}" alt="Verified"></button>
+                            <button data-user-id="{{ $user->id }}" class="openVerifyModal w-6"><img class="w-5" src="{{ asset('/assets/unverified_user.svg') }}" alt="Verified"></button>
                             @endif
                             @if ($user->role !== 'Admin')
                             <a class="mx-3" href="/user/view/{{ $user->id }}"><img class="w-6" src="{{ asset('assets/view.svg') }}" alt="View"></a>
@@ -64,22 +67,43 @@
 @section('script')
 <script>
     const verifyModal = document.getElementById('verifyModal');
+    const unverifyModal = document.getElementById('unverifyModal');
+
     const closeVerifyModal = document.getElementById('closeVerifyModal');
+    const closeUnverifyModal = document.getElementById('closeUnverifyModal');
 
     const params = new URLSearchParams(window.location.search);
+
     const user = params.get('verify_modal');
+    const userUnverify = params.get('unverify_modal');
 
     if (user) {
         verifyModal.classList.remove('hidden');
     }
 
-    closeVerifyModal.addEventListener('click', () => {
-        verifyModal.classList.add('hidden');
-    });
+    if (userUnverify) {
+        unverifyModal.classList.remove('hidden');
+    }
+
+    if (closeVerifyModal) {
+        closeVerifyModal.addEventListener('click', () => {
+            verifyModal.classList.add('hidden');
+        });
+    }
+
+    if (closeUnverifyModal) {
+        closeUnverifyModal.addEventListener('click', () => {
+            unverifyModal.classList.add('hidden');
+        });
+    }
 
     window.addEventListener('click', (e) => {
         if (e.target === verifyModal) {
             verifyModal.classList.add('hidden');
+        }
+
+        if (e.target === unverifyModal) {
+            unverifyModal.classList.add('hidden');
         }
     })
 </script>
@@ -89,11 +113,34 @@
             const user = button.getAttribute('data-user-id');
 
             const params = new URLSearchParams(window.location.search);
+            if (params.has('unverify_modal')) {
+                params.delete('unverify_modal');
+            }
+
             if (params.has('verify_modal')) {
                 params.delete('verify_modal');
             }
 
             params.append('verify_modal', user);
+
+            window.location.replace('/account?' + params.toString());
+        });
+    }
+
+    for (let button of document.querySelectorAll('.openUnverifyModal')) {
+        button.addEventListener('click', () => {
+            const user = button.getAttribute('data-user-id');
+
+            const params = new URLSearchParams(window.location.search);
+            if (params.has('verify_modal')) {
+                params.delete('verify_modal');
+            }
+
+            if (params.has('unverify_modal')) {
+                params.delete('unverify_modal');
+            }
+
+            params.append('unverify_modal', user);
 
             window.location.replace('/account?' + params.toString());
         });

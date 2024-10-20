@@ -1,5 +1,7 @@
 @extends('layouts.admin')
 
+@section('title', 'My Profile')
+
 @section('content')
 @php($user = auth()->user())
 <div class="bg-gray-100 w-full h-full p-8 flex flex-col max-h-[calc(100%-4rem)]">

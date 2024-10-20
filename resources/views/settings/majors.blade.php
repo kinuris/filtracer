@@ -1,5 +1,7 @@
 @extends('layouts.admin')
 
+@section('title', 'Settings > Majors')
+
 @section('content')
 @include('components.add-major-modal')
 <div class="bg-gray-100 w-full h-full p-8 flex flex-col max-h-[calc(100%-4rem)] overflow-auto">

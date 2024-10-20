@@ -1,5 +1,7 @@
 @extends('layouts.admin')
 
+@section('title', 'Departments')
+
 @section('content')
 <div class="bg-gray-100 w-full h-full p-8">
     <h1 class="font-medium tracking-widest text-lg mb-4">Departments</h1>

@@ -1,5 +1,7 @@
 @extends('layouts.admin')
 
+@section('title', 'Audit Trail')
+
 @section('content')
 <div class="bg-gray-100 w-full h-full p-8 max-h-[calc(100%-4rem)] overflow-auto">
     <h1 class="font-medium tracking-widest text-lg mb-4">Audit Trail</h1>

@@ -1,5 +1,7 @@
 @extends('layouts.admin')
 
+@section('title', 'Settings > Account')
+
 @section('content')
 @include('components.reset-password-modal')
 @php($user = Auth::user())
