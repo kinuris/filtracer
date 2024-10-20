@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\PinnedPost;
 use App\Models\Post;
+use App\Models\SavedPost;
 use App\Models\User;
+use App\Models\UserAlert;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -46,6 +48,15 @@ class PostController extends Controller
         $validated['user_id'] = Auth::user()->id;
         Post::query()->create($validated);
 
+        foreach (User::query()->where('role', '=', 'Admin')->get() as $admin) {
+            UserAlert::query()->create([
+                'title' => 'New ' . $request->post('post_category'),
+                'content' => 'New post has been created by ' . Auth::user()->name,
+                'action' => '/admin/post',
+                'user_id' => $admin->id
+            ]);
+        }
+
         if (Auth::user()->role == 'Admin') {
             return redirect('/admin/post')->with('message', 'Post created successfully');
         } else {
@@ -70,13 +81,25 @@ class PostController extends Controller
             ]);
         }
 
-        return back()->with('message', 'Post pinned successfully');
+        return back()->with('message', 'Pinned post toggled successfully');
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Post $post) {}
+    public function toggleSavePost(Post $post)
+    {
+        $user = User::query()->find(Auth::user()->id);
+        $saved = $user->savedPosts()->where('post_id', $post->id)->exists();
+
+        if ($saved) {
+            SavedPost::query()->where('post_id', $post->id)->delete();
+        } else {
+            SavedPost::query()->create([
+                'post_id' => $post->id,
+                'user_id' => Auth::user()->id,
+            ]);
+        }
+
+        return back()->with('message', 'Saved post toggled successfully');
+    }
 
     /**
      * Update the specified resource in storage.
@@ -89,7 +112,7 @@ class PostController extends Controller
             $validated = $request->validate([
                 'title' => ['required'],
                 'content' => ['required'],
-                'source' => ['required'],
+                'source' => ['nullable'],
                 'post_category' => ['required'],
                 'post_status' => ['required'],
                 'attachment' => ['nullable', 'image', 'mimes:jpeg,png,jpg', 'max:10000'],
@@ -98,7 +121,7 @@ class PostController extends Controller
             $validated = $request->validate([
                 'title' => ['required'],
                 'content' => ['required'],
-                'source' => ['required'],
+                'source' => ['nullable'],
                 'post_category' => ['required'],
                 'attachment' => ['nullable', 'image', 'mimes:jpeg,png,jpg', 'max:10000'],
             ]);

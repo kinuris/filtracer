@@ -22,6 +22,10 @@ class Post extends Model
         return $user->pinnedPosts()->where('post_id', '=', $this->id)->exists();
     }
 
+    public function isSavedBy(User $user) {
+        return $user->savedPosts()->where('post_id', '=', $this->id)->exists();
+    }
+
     public function creator() {
         return $this->belongsTo(User::class, 'user_id');
     }
