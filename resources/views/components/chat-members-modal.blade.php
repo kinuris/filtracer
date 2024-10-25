@@ -26,6 +26,20 @@
             <div class="flex px-4 py-3 border-b border-gray-50 hover:bg-gray-100 place-items-center @if($loop->iteration == count($group->users)) rounded-b-lg @endif">
                 <img class="w-10 h-10 mr-3 object-cover rounded-full" src="{{ $user->image() }}" alt="Profile">
                 <p>{{ $user->name }}</p>
+
+                <div class="flex-1"></div>
+
+                <div class="group relative">
+                    <img src="{{ asset('assets/option.svg') }}" alt="">
+
+                    <div class="w-48 right-0 absolute hidden group-hover:block font-light text-sm bg-white shadow-lg rounded-lg overflow-hidden">
+                        <a href="/chat/group/remove/{{ urlencode($group->internal_id) }}/{{ $user->id }}">
+                            <div class="p-2 hover:bg-gray-200">
+                                <p>Remove from Chat</p>
+                            </div>
+                        </a>
+                    </div>
+                </div>
             </div>
             @endforeach
         </div>

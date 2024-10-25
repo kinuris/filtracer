@@ -6,7 +6,7 @@
         @else
         <p class="text-sm max-w-[calc(100%-3rem)] font-semibold">{{ $alert->title }}</p>
         @endif
-        <p class="text-[8px] text-blue-600 font-semibold">{{ $alert->created_at->diffForHumans() }}</p>
+        <p class="text-[8px] text-blue-600 font-semibold text-right">{{ $alert->created_at->diffForHumans() }}</p>
     </div>
     <p class="text-xs text-gray-400 line-clamp-1">{{ $alert->content }}</p>
 </a>

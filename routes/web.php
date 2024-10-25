@@ -166,6 +166,7 @@ Route::controller(ChatController::class)
     ->group(function () {
         Route::get('/chat/messages/{group}', 'fetchChatMessages');
         Route::get('/chat/getgroup/{roomId}', 'getGroup');
+        Route::get('/chat/group/remove/{groupId}/{user}', 'removeUserFromGroup');
 
         Route::post('/chat/leave/{roomId}', 'leaveGroup');
         Route::post('/chat/rename/{roomId}', 'renameGroup');

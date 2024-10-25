@@ -60,6 +60,33 @@ class ChatController extends Controller
         }
     }
 
+    public function removeUserFromGroup(string $roomId, User $user)
+    {
+        $group = ChatGroup::query()
+            ->where('internal_id', '=', $roomId)
+            ->first();
+
+        ChatAssociation::query()
+            ->where('chat_group_id', '=', $group->id)
+            ->where('user_id', '=', $user->id)
+            ->delete();
+
+        foreach ($group->users()->get() as $usr) {
+            UserAlert::query()->create([
+                'title' => 'Removed ' . $user->name . ' from ' . $group->name,
+                'action' => (User::find($usr->id)->role == 'Admin' ? '/admin/chat' : '/alumni/chat') . '?initiate=' . urlencode($group->internal_id),
+                'content' => 'User: ' . $user->name . ' was removed from ' . $group->name . ' by ' . Auth::user()->name,
+                'user_id' => $usr->id,
+            ]);
+        }
+
+        if (Auth::user()->role === 'Admin') {
+            return redirect('/admin/chat')->with('message', 'Removed ' . $user->name . ' from ' . $group->name);
+        } else {
+            return redirect('/alumni/chat')->with('message', 'Removed ' . $user->name . ' from ' . $group->name);
+        }
+    }
+
     public function addMembers(Request $request, string $roomId)
     {
         if (is_numeric($roomId)) {
