@@ -45,7 +45,7 @@ class DatabaseSeeder extends Seeder
         ]);
 
         Department::query()->create([
-            'name' => 'College of Electronics and Telecommunications',
+            'name' => 'College of Electronics Engineering',
             'logo' => 'coe.png',
         ]);
 
