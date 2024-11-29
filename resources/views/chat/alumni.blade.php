@@ -85,12 +85,14 @@
                             <div class="flex flex-col">
                                 <p class="text-sm font-normal">{{ $group->name }}</p>
                                 @php($first = $group->messages()->latest()->first())
+                                @if(!is_null($first))
                                 @if ($first->isImage())
                                 <p class="text-xs font-light text-gray-400 line-clamp-1 max-w-48">{{ $first && $first->sender->id == auth()->user()->id ? 'You: ' : ''}} Sent an image</p>
                                 @elseif ($first->isFile())
                                 <p class="text-xs font-light text-gray-400 line-clamp-1 max-w-48">{{ $first && $first->sender->id == auth()->user()->id ? 'You: ' : ''}} Sent a file</p>
                                 @else
                                 <p class="text-xs font-light text-gray-400 line-clamp-1 max-w-48">{{ $first && $first->sender->id == auth()->user()->id ? 'You: ' : ''}}{{ $first ? $first->content : 'No Messages Yet' }}</p>
+                                @endif
                                 @endif
                             </div>
                         </a>
