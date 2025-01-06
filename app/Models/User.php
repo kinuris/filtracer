@@ -61,8 +61,8 @@ class User extends Authenticatable
     {
         if ($this->role === 'Alumni' && $this->isCompSet()) {
             return $this->getPersonalBio()->getFullname();
-        } else {
-            return $this->attributes['name'];
+        } else if ($this->role == 'Admin') {
+            return $this->admin()->getFullnameAttribute();
         }
     }
 
@@ -79,6 +79,15 @@ class User extends Authenticatable
     public function chatGroups()
     {
         return $this->hasManyThrough(ChatGroup::class, ChatAssociation::class, 'user_id', 'id', 'id', 'chat_group_id');
+    }
+
+    public function adminGenerated()
+    {
+        return $this->hasOne(AdminGenerated::class, 'user_id');
+    }
+
+    public function importGenerated() {
+        return $this->hasONe(ImportGenerated::class, 'user_id');
     }
 
     public function professionalBio()
@@ -149,7 +158,7 @@ class User extends Authenticatable
 
     public static function groupByDepartment()
     {
-        $users = User::query()->where('role', '!=', 'Admin')->get();
+        $users = User::compSet()->where('role', '!=', 'Admin')->get();
 
         $groups = [];
         foreach ($users as $user) {
@@ -165,7 +174,7 @@ class User extends Authenticatable
 
     public static function groupByBatch()
     {
-        $users = User::query()->where('role', '!=', 'Admin')->get();
+        $users = User::compSet()->where('role', '!=', 'Admin')->get();
 
         $groups = [];
         foreach ($users as $user) {
@@ -183,7 +192,7 @@ class User extends Authenticatable
 
     public static function groupByCourse()
     {
-        $users = User::query()->where('role', '!=', 'Admin')->get();
+        $users = User::compSet()->where('role', '!=', 'Admin')->get();
 
         $groups = [];
         foreach ($users as $user) {
@@ -201,7 +210,7 @@ class User extends Authenticatable
 
     public static function groupByJobs()
     {
-        $users = User::query()->where('role', '!=', 'Admin')->get();
+        $users = User::compSet()->where('role', '!=', 'Admin')->get();
 
         $groups = [];
         foreach ($users as $user) {
@@ -358,6 +367,12 @@ class User extends Authenticatable
 
     public function image()
     {
+        if ($this->role == 'Admin') {
+            $admin = $this->admin();
+
+            return is_null($admin) ? fake()->imageUrl() : asset('storage/user/images/' . $admin->profile_picture);
+        }
+
         $bio = $this->getPersonalBio();
 
         if (is_null($bio)) {
@@ -431,6 +446,15 @@ class User extends Authenticatable
     public function professionalRecords()
     {
         return $this->hasOne(ProfessionalRecord::class, 'user_id');
+    }
+
+    public function personalRecords()
+    {
+        return $this->hasOne(PersonalRecord::class, 'user_id');
+    }
+
+    public function adminRelation() {
+        return $this->hasOne(Admin::class, 'user_id');
     }
 
     public function admin(): null | Admin

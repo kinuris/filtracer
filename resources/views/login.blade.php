@@ -15,8 +15,16 @@
             <div class="flex flex-col h-full bg-white aspect-[5/6] shadow-lg rounded-2xl p-20 pt-8 pb-12">
                 <img class="h-fit w-80" src="{{ asset('assets/filtracer.svg') }}" alt="Filtracer Logo">
 
-                <input class="rounded-lg border border-gray-200 p-2 mb-3 mt-8" type="text" placeholder="Username" name="username" id="username">
-                <input class="rounded-lg border border-gray-200 p-2" type="password" placeholder="Password" name="password" id="password">
+                <div class="flex flex-col mb-3 mt-8">
+                    <label for="username" class="mb-0.5 text-sm  text-gray-700">Username</label>
+                    <input class="rounded-lg border border-gray-200 p-2" type="text" placeholder="Username" name="username" id="username">
+                </div>
+
+                <div class="flex flex-col mb-3">
+                    <label for="password" class="mb-0.5 text-sm text-gray-700">Password</label>
+                    <input class="rounded-lg border border-gray-200 p-2" type="password" placeholder="Password" name="password" id="password">
+                </div>
+
                 <p class="text-gray-300 text-center text-sm my-4">Protected by reCaptcha v3</p>
                 <button class="g-recaptcha bg-[#147DC8] rounded-lg text-white py-2"
                     data-sitekey="6Lcd9TEqAAAAAHY7KfIvIqaRPwuyrg0uEeGd8zkb"
@@ -36,6 +44,13 @@
             </div>
         </form>
     </div>
+
+    @if (session('message'))
+    <div class="flex absolute top-5 left-5 z-40 bg-white shadow-lg p-4 rounded-lg place-items-center">
+        <img class="w-8 mr-3" src="{{ asset('assets/success.svg') }}" alt="Success">
+        <h1>{{ session('message') }}</h1>
+    </div>
+    @endif
 
     <script src="https://www.google.com/recaptcha/api.js"></script>
     <script>

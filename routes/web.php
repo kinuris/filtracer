@@ -6,6 +6,7 @@ use App\Http\Controllers\AlumniController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\PostController;
+use App\Http\Controllers\SuperAdminController;
 use App\Models\Department;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -21,6 +22,20 @@ Route::get('/', function () {
         }
     }
 })->middleware('auth');
+
+Route::get('/fullurl/{path}', function ($path) {
+    $url = urldecode(base64_decode($path));
+
+    $queryParams = http_build_query(request()->input());
+
+    if (str_contains($url, '?')) {
+        $url = $url . '&' . $queryParams;
+    } else {
+        $url = $url . '?' . $queryParams;
+    }
+
+    return redirect($url); 
+});
 
 Route::get('/department/courses/{dept}', function (Department $dept) {
     return response()->json(['courses' => $dept->getCourses()]);
@@ -145,7 +160,7 @@ Route::controller(AdminController::class)
 
         Route::get('/settings/account', 'accountsSettingsView');
         Route::post('/settings/account/edit/{user}', 'accountEdit');
-        Route::post('/settings/account/profilepic/{admin}', 'uploadProfilePicture');
+        Route::post('/settings/account/profilepic/{user}', 'uploadProfilePicture');
 
         Route::get('/settings/course', 'coursesSettingsView');
         Route::get('/settings/course/edit/{course}', 'editCourseView');
@@ -175,4 +190,20 @@ Route::controller(ChatController::class)
 
         Route::post('/chat/makegroup', 'makeGroup');
         Route::post('/chat/send', 'send');
+    });
+
+Route::controller(SuperAdminController::class)
+    ->middleware('role:Superadmin')
+    ->group(function () {
+        Route::get('/account/create-individual', 'createAccountView');
+        Route::post('/account/create-individual', 'createAccount');
+
+        Route::post('/account/create-admin', 'createAdmin');
+
+        Route::get('/account/create-bulk', 'createBulkView');
+        Route::post('/account/import', 'accountImport');
+
+        Route::get('/account/imports', 'viewImports');
+
+        Route::post('/manage/account/update/{user}', 'updateAccount');
     });

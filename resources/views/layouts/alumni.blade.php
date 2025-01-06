@@ -142,13 +142,13 @@
                     </div>
                 </div>
             </nav>
+            @yield('content')
             @if (session('message'))
             <div class="flex absolute top-20 left-2 z-40 bg-white shadow-lg p-4 rounded-lg place-items-center">
                 <img class="w-8 mr-3" src="{{ asset('assets/success.svg') }}" alt="Success">
                 <h1>{{ session('message') }}</h1>
             </div>
             @endif
-            @yield('content')
         </div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>

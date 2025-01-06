@@ -19,5 +19,9 @@ class Major extends Model
         return $this->belongsTo(Course::class);
     }
 
+    public function departmentThroughCourse()
+    {
+        return $this->hasOneThrough(Department::class, Course::class, 'id', 'id', 'course_id', 'department_id');
+    }
     use HasFactory;
 }

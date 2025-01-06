@@ -56,7 +56,7 @@ class AdminController extends Controller
 
     public function reportsStatisticalView()
     {
-        $users = User::query()->where('role', '=', 'Alumni')->orderBy('created_at', 'DESC');
+        $users = User::compSet()->where('role', '=', 'Alumni')->orderBy('created_at', 'DESC');
 
         $users = $users->paginate(5);
 
@@ -68,21 +68,33 @@ class AdminController extends Controller
         return view('report.statistical-generate');
     }
 
-    public function uploadProfilePicture(Request $request, User $admin)
+    public function uploadProfilePicture(Request $request, User $user)
     {
         $request->validate([
             'profile' => ['required', 'mimes:jpg,jpeg,png', 'max:10000']
         ]);
 
         $profile = $request->file('profile');
-        Storage::delete('public/user/images/' . $admin->personalBio->profile_picture);
 
-        $filename = sha1(time() . $admin->name) . '.' . $profile->getClientOriginalExtension();
+        if ($user->role == 'Admin') {
+            Storage::delete('public/user/images/' . $user->admin()->profile_picture);
+        } else {
+            Storage::delete('public/user/images/' . $user->personalBio->profile_picture);
+        }
+
+        $filename = sha1(time() . $user->name) . '.' . $profile->getClientOriginalExtension();
         $profile->storePubliclyAs('public/user/images', $filename);
 
-        $admin->getPersonalBio()->update([
-            'profile_picture' => $filename,
-        ]);
+        if ($user->role == 'Admin') {
+            $user->admin()->update([
+                'profile_picture' => $filename
+            ]);
+        } else {
+            $user->getPersonalBio()->update([
+                'profile_picture' => $filename,
+            ]);
+        }
+
 
         return redirect('/settings/account')->with('message', 'Profile picture uploaded successfully!');
     }
@@ -156,21 +168,49 @@ class AdminController extends Controller
 
     public function accountsView()
     {
-        $users = User::hasBio('personal')
-            ->where('id', '!=', Auth::user()->id);
+        $users = User::query();
+
+        if (request('mode') === 'generated') {
+            $users = User::has('adminGenerated');
+        }
+
+        $role = request()->query('user_role', 'Alumni');
+        if ($role === 'Alumni' && request('mode') !== 'generated') {
+            $users = User::compSet()->where('role', '=', 'Alumni');
+        } elseif ($role === 'Alumni' && request('mode') === 'generated') {
+            $users = User::has('adminGenerated')
+                ->where('role', '=', 'Alumni')
+                ->whereHas('adminGenerated');
+        } else {
+            $users = $users->where('id', '!=', Auth::user()->id)
+                ->where('role', '=', 'Admin');
+        }
+
 
         $search = request()->query('search');
         if ($search) {
-            $users = $users->whereRelation('personalBio', 'first_name', 'LIKE', '%' . $search . '%')
-                ->orWhereRelation('personalBio', 'middle_name', 'LIKE', '%' . $search . '%')
-                ->orWhereRelation('personalBio', 'last_name', 'LIKE', '%' . $search . '%');
+            if ($role === 'Alumni') {
+                $users = $users->whereRelation('personalBio', 'first_name', 'LIKE', '%' . $search . '%')
+                    ->orWhereRelation('personalBio', 'middle_name', 'LIKE', '%' . $search . '%')
+                    ->orWhereRelation('personalBio', 'last_name', 'LIKE', '%' . $search . '%');
+            } else {
+                $users = $users->whereRelation('adminRelation', 'first_name', 'LIKE', '%' . $search . '%')
+                    ->orWhereRelation('adminRelation', 'middle_name', 'LIKE', '%' . $search . '%')
+                    ->orWhereRelation('adminRelation', 'last_name', 'LIKE', '%' . $search . '%');
+            }
         }
 
         $status = (int) request()->query('user_status', -1);
         if ($status !== -1) {
-            $users = $users->whereHas('personalBio', function ($query) {
-                $query->where('status', '=', request()->query('user_status'));
-            });
+            if ($role === 'Alumni') {
+                $users = $users->whereHas('personalBio', function ($query) {
+                    $query->where('status', '=', request()->query('user_status'));
+                });
+            } else {
+                $users = $users->whereHas('adminRelation', function ($query) {
+                    $query->where('is_verified', '=', request()->query('user_status'));
+                });
+            }
         }
 
         $users = $users->paginate(6);
@@ -270,7 +310,10 @@ class AdminController extends Controller
     public function accountEdit(Request $request, User $user)
     {
         $validated = $request->validate([
-            'name' => ['required'],
+            'first_name' => ['required'],
+            'middle_name' => ['nullable'],
+            'last_name' => ['required'],
+            'suffix' => ['nullable'],
             'position' => ['required'],
             'department' => ['required'],
             'email' => ['required'],
@@ -280,9 +323,10 @@ class AdminController extends Controller
         $validated['department_id'] = $validated['department'];
         $validated['email_address'] = $validated['email'];
         $validated['phone_number'] = $validated['phone'];
+        $validated['position_id'] = $validated['position'];
 
         $user->update($validated);
-        $user->personalBio->update($validated);
+        $user->admin()->update($validated);
 
         return redirect('/settings/account')->with('message', 'Account updated successfully');
     }
@@ -329,7 +373,11 @@ class AdminController extends Controller
 
     public function verifyUser(User $user)
     {
-        $user->getPersonalBio()->update(['status' => 1]);
+        if ($user->admin() != null) {
+            $user->admin()->update(['is_verified' => true]);
+        } else {
+            $user->getPersonalBio()->update(['status' => 1]);
+        }
 
         $content = 'User: ' . $user->name . ' has been VERIFIED by ' . Auth::user()->name;
         $action = $user->role === 'Admin' ? ('/account?unverify_modal=' . $user->id) : '/user/view/' . $user->id;
@@ -348,7 +396,11 @@ class AdminController extends Controller
 
     public function unverifyUser(User $user)
     {
-        $user->getPersonalBio()->update(['status' => 0]);
+        if ($user->admin() != null) {
+            $user->admin()->update(['is_verified' => false]);
+        } else {
+            $user->getPersonalBio()->update(['status' => 0]);
+        }
 
         $content = 'User: ' . $user->name . ' has been UNVERIFIED by ' . Auth::user()->name;
         $action = $user->role === 'Admin' ? ('/account?verify_modal=' . $user->id) : '/user/view/' . $user->id;

@@ -12,7 +12,7 @@
             <img class="w-32 h-32 rounded-full object-cover shadow-md mr-8" src="{{ $user->image() }}" alt="Profile">
             <div class="flex flex-col">
                 <p class="text-lg">{{ $user->name }}</p>
-                <p class="text-gray-400 text-sm">{{ $user->department->name }}</p>
+                <p class="text-gray-400 text-sm">{{ $user->department->name }} / {{ $user->admin()->is_super ? 'Superadmin' : 'Admin' }}</p>
             </div>
 
             <div class="flex-1"></div>
@@ -22,7 +22,7 @@
         </div>
     </div>
 
-    @php ($personal = $user->personalBio)
+    @php ($personal = $user->admin())
     <div class="shadow rounded-lg mt-4 box-border h-full max-h-full overflow-auto">
         <div class="bg-white py-4 flex flex-col border-b rounded-lg min-h-full">
             <h1 class="px-6 pb-4 font-medium tracking-widest text-md">Personal Information</h1>
@@ -41,8 +41,8 @@
 
                 <div class="flex mt-4">
                     <div class="flex flex-1">
-                        <p class="flex-[2] text-gray-500">Position</p>
-                        <p class="flex-[5] font-bold">{{ $user->role }}</p>
+                        <p class="flex-[2] text-gray-500">Company ID</p>
+                        <p class="flex-[5] font-bold">{{ $user->admin()->position_id }}</p>
                     </div>
                     <div class="flex flex-1">
                         <p class="flex-[2] text-gray-500">Email</p>

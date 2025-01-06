@@ -14,8 +14,11 @@ return new class extends Migration
         Schema::create('admins', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('user_id');
-            $table->string('fullname');
+            $table->string('first_name');
+            $table->string('middle_name')->nullable();
+            $table->string('last_name');
             $table->string('position_id');
+            $table->string('suffix')->nullable();
 
             $table->enum('office', [
                 'Alumni Office',
@@ -35,12 +38,17 @@ return new class extends Migration
             $table->string('profile_picture')->nullable();
             $table->boolean('is_deleted')->default(0);
             $table->timestamps();
-            
+
             $table->foreign('user_id')
                 ->references('id')
                 ->on('users')
                 ->onUpdate('cascade')
                 ->onDelete('cascade');
+
+            $table->boolean('is_super')
+                ->default(false);
+            
+            $table->boolean('is_verified')->default(false);
         });
     }
 

@@ -409,7 +409,7 @@
     new Choices(receivers, {
         choices: [
             <?php
-            foreach (User::compSet()->get() as $user) {
+            foreach (User::query()->get() as $user) {
                 if ($user->id !== Auth::user()->id) {
                     echo '{ value: ' . $user->id . ', ' . 'label: "' .  $user->name . '"'  . '},';
                 }

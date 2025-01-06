@@ -16,7 +16,20 @@ class AdminScoped
      */
     public function handle(Request $request, Closure $next, ...$roles): Response
     {
-        if (Auth::check() && in_array(Auth::user()->role, $roles)) {
+        $user = Auth::user();
+        if (count($roles) === 1 && $roles[0] === 'Superadmin') {
+            $admin = $user->admin();
+
+            if (!isset($admin)) {
+                return redirect('/');
+            }
+
+            if ($admin->is_super) {
+                return $next($request);
+            }
+        }
+
+        if (Auth::check() && in_array($user->role, $roles)) {
             return $next($request);
         }
 

@@ -19,11 +19,19 @@
         <p class="mt-3">Username</p>
         <p class="bg-gray-100 p-2 border rounded text-gray-500">{{ $user->username }}</p>
 
-        <p class="mt-3">Email</p>
+        @if ($user->role != 'Admin')
+         <p class="mt-3">Email</p>
         <p class="bg-gray-100 p-2 border rounded text-gray-500">{{ $user->getPersonalBio()->email_address }}</p>
 
         <p class="mt-3">Contact Number</p>
-        <p class="bg-gray-100 p-2 border rounded text-gray-500">{{ $user->getPersonalBio()->phone_number }}</p>
+        <p class="bg-gray-100 p-2 border rounded text-gray-500">{{ $user->getPersonalBio()->phone_number }}</p>   
+        @else
+          <p class="mt-3">Email</p>
+        <p class="bg-gray-100 p-2 border rounded text-gray-500">{{ $user->admin()->email_address }}</p>
+
+        <p class="mt-3">Contact Number</p>
+        <p class="bg-gray-100 p-2 border rounded text-gray-500">{{ $user->admin()->phone_number }}</p>  
+        @endif
 
         @if ($user->role != 'Admin')
         <p class="mt-3">Student ID</p>

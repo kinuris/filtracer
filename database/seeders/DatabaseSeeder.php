@@ -20,8 +20,8 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         Department::query()->create([
-           'name' => 'Admins Assigned',
-           'logo' => 'ccs.png',  
+            'name' => 'Admins Assigned',
+            'logo' => 'ccs.png',
         ]);
 
         Department::query()->create([
@@ -68,9 +68,17 @@ class DatabaseSeeder extends Seeder
             }
         }
 
-        User::factory(20)->create();
+        User::factory(10)->create();
         User::query()->create([
             'name' => 'Chris D. Chan',
+            'username' => 'superadmin',
+            'password' => bcrypt('password'),
+            'department_id' => Department::allValid()->random()->id,
+            'role' => 'Admin',
+        ]);
+
+        User::query()->create([
+            'name' => 'Admin N. Ai',
             'username' => 'admin',
             'password' => bcrypt('password'),
             'department_id' => Department::allValid()->random()->id,
@@ -89,7 +97,8 @@ class DatabaseSeeder extends Seeder
         foreach ($admins as $admin) {
             Admin::query()->create([
                 'user_id' => $admin->id,
-                'fullname' => $admin->name,
+                'first_name' => $admin->username === 'superadmin' ? 'Admin' : fake()->firstName(),
+                'last_name' => fake()->lastName(),
                 'position_id' => random_int(0, 9999),
                 'office' => fake()->randomElement([
                     'Alumni Office',
@@ -106,11 +115,15 @@ class DatabaseSeeder extends Seeder
                 'email_address' => fake()->email(),
                 'phone_number' => fake()->phoneNumber(),
                 'profile_picture' => null,
+                'is_verified' => $admin->username === 'admin',
+                'is_super' => $admin->username === 'superadmin',
             ]);
         }
 
+
         foreach (User::noBio('educational')->get() as $user) {
-            $major = Major::all()->random();
+            $major = Major::query()->whereRelation('departmentThroughCourse', 'departments.id', '=', $user->department_id)->get()->random();
+            $year = fake()->year();
 
             EducationRecord::query()->create([
                 'user_id' => $user->id,
@@ -142,16 +155,18 @@ class DatabaseSeeder extends Seeder
                 ]),
                 'major_id' => $major->id,
                 'course_id' => $major->course->id,
-                'start' => fake()->year(),
-                'end' => fake()->year(),
+                'start' => $year,
+                'end' => $year + 4,
             ]);
         }
 
         foreach (User::noBio('personal')->get() as $user) {
+            if ($user->role === 'Admin') continue;
+
             PersonalRecord::query()->create([
                 'user_id' => $user->id,
                 'student_id' => $user->id,
-                'first_name' => fake()->firstName(),
+                'first_name' => $user->username === 'alumni' ? 'Alumni' : fake()->firstName(),
                 'middle_name' => fake()->optional()->lastName(),
                 'last_name' => fake()->lastName(),
                 'suffix' => null,

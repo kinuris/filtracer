@@ -30,6 +30,10 @@ class EducationRecord extends Model implements Auditable
         return $this->belongsTo(Course::class, 'course_id');
     }
 
+    public function major() {
+        return $this->belongsTo(Major::class, 'major_id');
+    }
+
     public function getCourse() {
         return Course::find($this->course_id);
     }

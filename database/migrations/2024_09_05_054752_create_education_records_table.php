@@ -61,7 +61,7 @@ return new class extends Migration
                 ->onUpdate('cascade');
 
             $table->year('start');
-            $table->year('end');
+            $table->year('end')->nullable();
 
             $table->timestamps();
         });

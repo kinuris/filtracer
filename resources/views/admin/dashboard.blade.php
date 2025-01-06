@@ -12,7 +12,7 @@
                     <p class="text-3xl font-bold">{{ $users->count() }}</p>
                     <p class="text-sm text-gray-400">Registered Users</p>
                 </div>
-                <img class="w-10" src="{{ asset('assets/registered.svg') }}" alt="Registered">
+                <img class="w-10" src="{{ asset('assets/users.svg') }}" alt="Registered">
             </div>
 
             <div class="flex">
@@ -80,6 +80,7 @@
 
     new Chart(ctx, {
         type: 'bar',
+        plugins: [ChartDataLabels],
         data: {
             labels: [
                 <?php
@@ -123,6 +124,17 @@
                 legend: {
                     display: false,
                 },
+                datalabels: {
+                    formatter: (value, ctx) => {
+                        let sum = 0;
+                        let dataArr = ctx.chart.data.datasets[0].data;
+                        dataArr.map(data => {
+                            sum += data;
+                        });
+                        let percentage = (value * 100 / sum).toFixed(2) + "%";
+                        return percentage;
+                    },
+                }
             },
             responsive: true,
             scales: {

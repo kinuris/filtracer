@@ -11,28 +11,46 @@
         <form action="/report/statistical/generate">
             <div class="bg-white py-4 flex place-items-center px-6 border-b rounded-lg">
                 <p class="tracking-wider font-semibold mr-4">All</p>
-                <select class="g-gray-100 p-2 rounded border text-gray-400" name="category" id="category">
-                    <option value="All Users">All Users</option>
-                    <!-- <option value="Registered Users">Registered Users</option> -->
-                    <option value="Employed Alumni">Employed Alumni</option>
-                    <option value="Working Student">Working Student</option>
-                    <option value="Unemployed Alumni">Unemployed Alumni</option>
-                    <option value="Self-Employed Alumni">Self-Employed Alumni</option>
-                    <option value="Student Alumni">Student Alumni</option>
-                    <option value="Retired Alumni">Retired Alumni</option>
+                <select onchange="handleChangeCategory()" class="g-gray-100 p-2 rounded border text-gray-400" name="category" id="category">
+                    <optgroup label="All">
+                        <option value="All Users">Alumni</option>
+                    </optgroup>
+                    <optgroup label="Employment">
+                        <!-- <option value="Registered Users">Registered Users</option> -->
+                        <option @if (request('category')=='Employed Alumni' ) selected @endif value="Employed Alumni">Employed Alumni</option>
+                        <option @if (request('category')=='Working Student' ) selected @endif value="Working Student">Working Student</option>
+                        <option @if (request('category')=='Unemployed Alumni' ) selected @endif value="Unemployed Alumni">Unemployed Alumni</option>
+                        <option @if (request('category')=='Self-Employed Alumni' ) selected @endif value="Self-Employed Alumni">Self-Employed Alumni</option>
+                        <option @if (request('category')=='Student Alumni' ) selected @endif value="Student Alumni">Student Alumni</option>
+                        <option @if (request('category')=='Retired Alumni' ) selected @endif value="Retired Alumni">Retired Alumni</option>
+                    </optgroup>
+                    <optgroup label="User Status">
+                        <option @if (request('category')=='Verified Alumni' ) selected @endif value="Verified Alumni">Verified Alumni</option>
+                        <option @if (request('category')=='Unverified Alumni' ) selected @endif value="Unverified Alumni">Unverified Alumni</option>
+                        <option @if (request('category')=='Verified Admin' ) selected @endif value="Verified Admin">Verified Admin</option>
+                        <option @if (request('category')=='Unverified Admin' ) selected @endif value="Unverified Admin">Unverified Admin</option>
+                        <option @if (request('category')=='Verified User' ) selected @endif value="Verified User">Verified Users</option>
+                        <option @if (request('category')=='Unverified User' ) selected @endif value="Unverified User">Unverified Users</option>
+                    </optgroup>
                 </select>
 
-                <p class="tracking-wider font-semibold ml-4 mr-4">Of</p>
-                <select onchange="handleDepartmentChange()" class="g-gray-100 p-2 max-w-56 rounded border text-gray-400 mr-4" name="department" id="department">
+                <p class="tracking-wider font-semibold ml-4 mr-4">From</p>
+                <select @if(request('locked')) disabled @endif onchange="handleDepartmentChange()" class="g-gray-100 p-2 max-w-56 rounded border text-gray-400 mr-4" name="department" id="department">
                     <option value="-1">All Departments</option>
                     @php($depts = App\Models\Department::allValid())
                     @foreach ($depts as $dept)
-                    <option value="{{ $dept->id }}">{{ $dept->name }}</option>
+                    <option @if (request('department')==$dept->id) selected @endif value="{{ $dept->id }}">{{ $dept->name }}</option>
                     @endforeach
                 </select>
 
-                <select class="g-gray-100 p-2 min-w-56 rounded border text-gray-400" name="courses" id="courses">
+                <select @if(request('locked')) disabled @endif onchange="handleCourseChange()" class="g-gray-100 p-2 min-w-56 rounded border text-gray-400" name="courses" id="courses">
                     <option value="-1">All Courses</option>
+                    @php($dept = App\Models\Department::find(request('department')))
+                    @if (isset($dept))
+                    @foreach ($dept->getCourses() as $course)
+                    <option @if (request('courses')==$course->id) selected @endif value="{{ $course->id }}">{{ $course->name }}</option>
+                    @endforeach
+                    @endif
                 </select>
 
                 <div class="flex-1"></div>
@@ -81,28 +99,61 @@
 
 @section('script')
 <script>
-    const category = document.getElementById('courses');
+    function handleDepartmentChange() {
+        const department = document.getElementById('department').value;
 
-    async function handleDepartmentChange() {
-        const response = await fetch('/department/courses/' + document.getElementById('department').value);
-        const {
-            courses
-        } = await response.json();
+        const params = new URLSearchParams(window.location.search);
+        params.set('department', department);
 
-        const option = document.createElement('option');
-        option.value = '-1';
-        option.innerHTML = 'All Courses';
-
-        category.innerHTML = '';
-        category.appendChild(option);
-
-        for (let course of courses) {
-            const child = document.createElement('option');
-            child.innerText = course.name;
-            child.value = course.id;
-
-            category.appendChild(child);
-        }
+        window.location.href = '/report/statistical?' + params.toString();
     }
+
+    function handleCourseChange() {
+        const course = document.getElementById('courses').value;
+
+        const params = new URLSearchParams(window.location.search);
+        params.set('courses', course);
+
+        window.location.href = '/report/statistical?' + params.toString();
+    }
+
+    function handleChangeCategory() {
+        const category = document.getElementById('category').value;
+
+        const params = new URLSearchParams(window.location.search);
+        if (category === "Verified Admin" || category === "Unverified Admin" || category === "Verified User" || category === "Unverified User") {
+            params.set('locked', true);
+        } else {
+            params.delete('locked');
+        }
+
+        params.set('category', category);
+
+        window.location.href = '/report/statistical?' + params.toString();
+    }
+
+    // const category = document.getElementById('courses');
+
+    // async function handleDepartmentChange() {
+    //     const response = await fetch('/department/courses/' + document.getElementById('department').value);
+    //     const {
+    //         courses
+    //     } = await response.json();
+
+    //     const option = document.createElement('option');
+    //     option.value = '-1';
+    //     option.innerHTML = 'All Courses';
+
+    //     category.innerHTML = '';
+    //     category.appendChild(option);
+
+    //     for (let course of courses) {
+    //         const child = document.createElement('option');
+    //         child.innerText = course.name;
+    //         child.value = course.id;
+
+    //         category.appendChild(child);
+    //     }
+    // }
 </script>
 @endsection

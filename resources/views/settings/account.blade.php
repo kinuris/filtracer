@@ -18,34 +18,52 @@
                     </div>
                     <hr>
                     <div class="mx-6 mt-3">
-                        <div>
-                            <p class="mb-1 font-thin">Full Name</p>
-                            <input value="{{ $user->name }}" class="w-full text-gray-500 font-thin border rounded-md p-2 bg-gray-50" type="text" name="name" id="name">
+                        <div class="flex">
+                            <div class="flex-1 mr-2">
+                                <p class="mb-1 font-thin">First Name</p>
+                                <input value="{{ $user->admin()->first_name }}" class="w-full text-gray-500 font-thin border rounded-md p-2 bg-gray-50" type="text" name="first_name" id="first_name">
+                            </div>
+                            <div class="flex-1 ml-2">
+                                <p class="mb-1 font-thin">Middle Name</p>
+                                <input value="{{ $user->admin()->middle_name }}" class="w-full text-gray-500 font-thin border rounded-md p-2 bg-gray-50" type="text" name="middle_name" id="middle_name">
+                            </div>
                         </div>
 
-                        <div class="mt-3">
-                            <p class="mb-1 font-thin">Position</p>
-                            <input value="{{ $user->role }}" class="w-full text-gray-500 font-thin border rounded-md p-2 bg-gray-50" type="text" readonly name="position" id="position">
+                        <div class="flex mt-3">
+                            <div class="flex-1 mr-2">
+                                <p class="mb-1 font-thin">Last Name</p>
+                                <input value="{{ $user->admin()->last_name }}" class="w-full text-gray-500 font-thin border rounded-md p-2 bg-gray-50" type="text" name="last_name" id="last_name">
+                            </div>
+                            <div class="flex-1 ml-2">
+                                <p class="mb-1 font-thin">Suffix</p>
+                                <input value="{{ $user->admin()->suffix }}" class="w-full text-gray-500 font-thin border rounded-md p-2 bg-gray-50" type="text" name="suffix" id="suffix">
+                            </div>
                         </div>
 
-                        <div class="mt-3">
-                            <p class="mb-1 font-thin">Office</p>
-                            <select class="w-full text-gray-500 font-thin border rounded-md p-2 bg-gray-50" name="department" id="department">
-                                @php($depts = App\Models\Department::allValid())
-                                @foreach ($depts as $dept)
-                                <option {{ $user->department->name === $dept->name ? 'selected' : ''}} value="{{ $dept->id }}">{{ $dept->name }}</option>
-                                @endforeach
-                            </select>
+                        <div class="flex mt-3">
+                            <div class="flex-1 mr-2">
+                                <p class="mb-1 font-thin">Company ID</p>
+                                <input value="{{ $user->admin()->position_id }}" class="w-full text-gray-500 font-thin border rounded-md p-2 bg-gray-50" type="text" name="position" id="position">
+                            </div>
+                            <div class="flex-1 ml-2">
+                                <p class="mb-1 font-thin">Office</p>
+                                <select class="w-full text-gray-500 font-thin border rounded-md p-2 bg-gray-50" name="department" id="department">
+                                    @php($depts = App\Models\Department::allValid())
+                                    @foreach ($depts as $dept)
+                                    <option {{ $user->department->name === $dept->name ? 'selected' : ''}} value="{{ $dept->id }}">{{ $dept->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
                         </div>
 
                         <div class="mt-3">
                             <p class="mb-1 font-thin">Email</p>
-                            <input value="{{ $user->personalBio ? $user->personalBio->email_address : '' }}" class="w-full text-gray-500 font-thin border rounded-md p-2 bg-gray-50" type="email" name="email" id="email">
+                            <input value="{{ $user->admin()->email_address }}" class="w-full text-gray-500 font-thin border rounded-md p-2 bg-gray-50" type="email" name="email" id="email">
                         </div>
 
                         <div class="mt-3">
                             <p class="mb-1 font-thin">Phone Number</p>
-                            <input value="{{ $user->personalBio ? $user->personalBio->phone_number : '' }}" class="w-full text-gray-500 font-thin border rounded-md p-2 bg-gray-50" type="tel" name="phone" id="phone">
+                            <input value="{{ $user->admin()->phone_number }}" class="w-full text-gray-500 font-thin border rounded-md p-2 bg-gray-50" type="tel" name="phone" id="phone">
                         </div>
 
                         <div class="mt-3">

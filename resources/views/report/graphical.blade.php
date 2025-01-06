@@ -161,7 +161,7 @@
                 },
                 datalabels: {
                     formatter: (value, ctx) => {
-                        return `${value} (${value / <?php echo $total ?> * 100}%)`;
+                        return `${value} (${(value / <?php echo $total ?> * 100).toFixed(2)}%)`;
                     },
                     display: ctx => {
                         return ctx.chart.data.datasets[0].data[ctx.dataIndex] > 0

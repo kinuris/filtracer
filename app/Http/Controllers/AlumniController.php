@@ -71,7 +71,7 @@ class AlumniController extends Controller
             'course' => ['required'],
             'major' => ['required'],
             'start' => ['required'],
-            'end' => ['required'],
+            'end' => ['nullable', 'after:start'],
         ]);
 
         $validated['user_id'] = $alumni->id;
@@ -270,7 +270,7 @@ class AlumniController extends Controller
             'course' => ['required'],
             'major' => ['required'],
             'start' => ['required'],
-            'end' => ['required'],
+            'end' => ['nullable'],
         ]);
 
         $validated['school_location'] = $validated['location'];

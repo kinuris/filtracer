@@ -76,17 +76,26 @@
                         </select>
 
                         <label class="mt-3" for="industry">Industry</label>
-                        <input class="text-gray-400 border rounded-lg p-2" type="text" name="industry">
+                        <input class="text-gray-400 border rounded-lg p-2 @error('industry') border-red-500 @enderror" type="text" name="industry" value="{{ old('industry') }}">
+                        @error('industry')
+                        <span class="text-red-500 text-sm">{{ $message }}</span>
+                        @enderror
                     </div>
 
                     <div class="mx-2"></div>
 
                     <div class="flex flex-col flex-1">
                         <label for="job-title">Current Job Title</label>
-                        <input class="text-gray-400 border rounded-lg p-2" type="text" name="job_title">
+                        <input class="text-gray-400 border rounded-lg p-2 @error('job_title') border-red-500 @enderror" type="text" name="job_title" value="{{ old('job_title') }}">
+                        @error('job_title')
+                        <span class="text-red-500 text-sm">{{ $message }}</span>
+                        @enderror
 
                         <label class="mt-3" for="company">Company / Employer</label>
-                        <input class="text-gray-400 border rounded-lg p-2" type="text" name="company">
+                        <input class="text-gray-400 border rounded-lg p-2 @error('company') border-red-500 @enderror" type="text" name="company" value="{{ old('company') }}">
+                        @error('company')
+                        <span class="text-red-500 text-sm">{{ $message }}</span>
+                        @enderror
 
                         @php($ranges = [
                         'No Income',
@@ -107,7 +116,10 @@
                         </select>
 
                         <label class="mt-3" for="location">Location</label>
-                        <input class="text-gray-400 border rounded-lg p-2" type="text" name="work_location">
+                        <input class="text-gray-400 border rounded-lg p-2 @error('work_location') border-red-500 @enderror" type="text" name="work_location" value="{{ old('work_location') }}">
+                        @error('work_location')
+                        <span class="text-red-500 text-sm">{{ $message }}</span>
+                        @enderror
                     </div>
                 </div>
 

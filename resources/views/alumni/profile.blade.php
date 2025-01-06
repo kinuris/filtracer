@@ -58,7 +58,7 @@
                             <p class="text-gray-400 mt-4">Username</p>
                             <p>{{ $user->username }}</p>
 
-                            <p class="text-gray-400 mt-4">Permanent Address</p>
+                            <p class="text-gray-400 mt-4">Home Address</p>
                             <p class="mr-3">{{ $personal->permanent_address }}</p>
                         </div>
 

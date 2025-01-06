@@ -49,10 +49,16 @@
                         </select>
 
                         <label class="mt-3" for="location">Location</label>
-                        <input class="text-gray-400 border rounded-lg p-2" type="text" name="location">
+                        <input class="text-gray-400 border rounded-lg p-2 @error('location') border-red-500 @enderror" type="text" name="location" value="{{ old('location') }}">
+                        @error('location')
+                        <span class="text-red-500 text-sm block">{{ $message }}</span>
+                        @enderror
 
                         <label class="mt-3" for="start">Year Started</label>
-                        <input class="text-gray-400 border rounded-lg p-2" type="number" name="start" id="start">
+                        <input class="text-gray-400 border rounded-lg p-2 @error('start') border-red-500 @enderror" type="number" name="start" id="start" value="{{ old('start') }}">
+                        @error('start')
+                        <span class="text-red-500 text-sm block">{{ $message }}</span>
+                        @enderror
                     </div>
 
                     <div class="mx-2"></div>
@@ -73,7 +79,10 @@
                         </select>
 
                         <label class="mt-3" for="end">Year Graduated</label>
-                        <input class="text-gray-400 border rounded-lg p-2" type="number" name="end">
+                        <input class="text-gray-400 border rounded-lg p-2 @error('end') border-red-500 @enderror" type="number" name="end" value="{{ old('end') }}">
+                        @error('end')
+                        <span class="text-red-500 text-sm block">{{ $message }}</span>
+                        @enderror
                     </div>
                 </div>
 
