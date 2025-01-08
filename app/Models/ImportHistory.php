@@ -23,5 +23,9 @@ class ImportHistory extends Model
         return strlen($this->data) / 1024;
     }
 
+    public function importGenerateds() {
+        return $this->hasMany(ImportGenerated::class, 'import_history_id');
+    } 
+
     use HasFactory;
 }

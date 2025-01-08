@@ -4,13 +4,13 @@
 
 @section('content')
 <div class="bg-gray-100 w-full h-full p-8 overflow-auto max-h-[calc(100vh-64px)] relative">
-    <div id="loading-modal" class="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center hidden justify-center">
+    <div id="loading-modal" class="fixed inset-0 z-50 bg-gray-800 bg-opacity-75 flex items-center hidden justify-center">
         <div class="spinner-border animate-spin inline-block w-32 h-32 border-4 border-t-transparent border-white rounded-full text-white" role="status">
             <span class="visually-hidden"></span>
         </div>
     </div>
 
-    <div id="wrong-file-structure-modal" class="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center hidden">
+    <div id="wrong-file-structure-modal" class="fixed inset-0 z-50 bg-gray-800 bg-opacity-75 flex items-center justify-center hidden">
         <div class="bg-white rounded-lg p-8 text-center">
             <h2 class="text-xl font-semibold mb-4">Wrong File Structure</h2>
             <p class="mb-6">The uploaded file does not have the correct structure. Please ensure the file is a valid CSV with the required columns.</p>
@@ -18,7 +18,7 @@
         </div>
     </div>
 
-    <div id="import-success-modal" class="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center hidden">
+    <div id="import-success-modal" class="fixed inset-0 z-50 bg-gray-800 bg-opacity-75 flex items-center justify-center hidden">
         <div class="bg-white rounded-lg p-8 text-center">
             <h2 class="text-xl font-semibold mb-4">Import Successful</h2>
             <p class="mb-6">The data has been successfully imported.</p>
@@ -26,11 +26,27 @@
         </div>
     </div>
 
-    <div id="department-not-found-modal" class="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center hidden">
+    <div id="department-not-found-modal" class="fixed inset-0 z-50 bg-gray-800 bg-opacity-75 flex items-center justify-center hidden">
         <div class="bg-white rounded-lg p-8 text-center">
             <h2 class="text-xl font-semibold mb-4">Department Not Found</h2>
             <p class="mb-6">The department specified in the CSV file was not found. Please check the file and try again.</p>
             <button onclick="closeDepartmentNotFoundModal()" class="bg-blue-600 text-white rounded py-2 px-4">Close</button>
+        </div>
+    </div>
+
+    <div id="database-error-modal" class="fixed inset-0 z-50 bg-gray-800 bg-opacity-75 flex items-center justify-center hidden">
+        <div class="bg-white rounded-lg p-8 text-center">
+            <h2 class="text-xl font-semibold mb-4">Database Error</h2>
+            <p class="mb-6 w-[max(50vw,600px)]" id="message"></p>
+            <button onclick="closeDatabaseErrorModal()" class="bg-blue-600 text-white rounded py-2 px-4">Close</button>
+        </div>
+    </div>
+
+    <div id="file-exists-modal" class="fixed inset-0 z-50 bg-gray-800 bg-opacity-75 flex items-center justify-center hidden">
+        <div class="bg-white rounded-lg p-8 text-center">
+            <h2 class="text-xl font-semibold mb-4">File Already Exists</h2>
+            <p class="mb-6">The file you are trying to upload already exists. Please rename the file or upload a different file.</p>
+            <button onclick="closeFileExistsModal()" class="bg-blue-600 text-white rounded py-2 px-4">Close</button>
         </div>
     </div>
 
@@ -52,7 +68,13 @@
     <div class="shadow rounded-lg mt-8">
         <form>
             <div class="bg-white py-4 flex items-center px-6 border-b rounded-t-lg">
-                <input type="text" name="search" placeholder="Search..." class="border rounded py-2 px-4 w-full max-w-96">
+                <input type="text" name="search" placeholder="Search..." value="{{ request('search') }}" class="border rounded py-2 px-4 w-full max-w-96">
+                <select name="import_history" class="border rounded py-2 px-4 ml-4">
+                    <option value="-1">All</option>
+                    @foreach(App\Models\ImportHistory::all() as $history)
+                    <option value="{{ $history->id }}" {{ request('import_history') == $history->id ? 'selected' : '' }}>{{ $history->filename }}</option>
+                    @endforeach
+                </select>
                 <div class="flex-1"></div>
                 <!-- <select name="account_type" class="border rounded py-2 px-4 ml-4">
                     <option value="alumni">Alumni Accounts</option>
@@ -102,12 +124,22 @@
 
 @section('script')
 <script>
+    function closeFileExistsModal() {
+        document.getElementById('file-exists-modal').classList.add('hidden');
+    }
+
     function closeWrongFileStructureModal() {
         document.getElementById('wrong-file-structure-modal').classList.add('hidden');
     }
 
     function closeImportSuccessModal() {
         document.getElementById('import-success-modal').classList.add('hidden');
+
+        window.location.reload();
+    }
+
+    function closeDatabaseErrorModal() {
+        document.getElementById('database-error-modal').classList.add('hidden');
     }
 
     function closeDepartmentNotFoundModal() {
@@ -139,6 +171,15 @@
 
             if (data.status === 'deptnf') {
                 document.getElementById('department-not-found-modal').classList.remove('hidden');
+            }
+
+            if (data.status === 'insertf') {
+                document.getElementById('database-error-modal').classList.remove('hidden');
+                document.getElementById('message').innerText = data.message;
+            }
+
+            if (data.status === 'fexist') {
+                document.getElementById('file-exists-modal').classList.remove('hidden');
             }
 
             return;

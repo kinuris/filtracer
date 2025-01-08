@@ -56,7 +56,7 @@ class AdminController extends Controller
 
     public function reportsStatisticalView()
     {
-        $users = User::compSet()->where('role', '=', 'Alumni')->orderBy('created_at', 'DESC');
+        $users = User::partialSet()->where('role', '=', 'Alumni')->orderBy('created_at', 'DESC');
 
         $users = $users->paginate(5);
 

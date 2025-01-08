@@ -8,6 +8,7 @@
     <link
         rel="stylesheet"
         href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
+    <link rel="shortcut icon" href="{{ asset('assets/favicon.svg') }}" type="image/x-icon">
 
     @yield('header')
     @vite('resources/css/app.css')

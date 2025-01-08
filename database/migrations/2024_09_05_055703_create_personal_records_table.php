@@ -36,7 +36,7 @@ return new class extends Migration
 
             $table->string('permanent_address');
             $table->string('current_address');
-            $table->string('email_address')->unique();
+            $table->string('email_address');
             $table->string('phone_number');
             $table->string('social_link')->nullable();
             $table->string('profile_picture')->nullable();

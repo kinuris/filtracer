@@ -10,7 +10,10 @@ use App\Models\ImportHistory;
 use App\Models\PartialPersonalRecord;
 use App\Models\PersonalRecord;
 use App\Models\User;
+use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class SuperAdminController extends Controller
@@ -179,6 +182,30 @@ class SuperAdminController extends Controller
     {
         $users = User::has('importGenerated');
 
+
+        $importHistoryId = request()->query('import_history');
+        if ($importHistoryId && $importHistoryId != -1) {
+            $userIds = ImportHistory::query()->find($importHistoryId)->importGenerateds()->pluck('user_id')->unique();
+
+            $users = User::whereIn('id', $userIds);
+        }
+
+        if ($search = request()->query('search')) {
+            $users = $users->where(function ($query) use ($search) {
+                $query->where('username', 'like', "%{$search}%")
+                    ->orWhereHas('partialPersonal', function ($query) use ($search) {
+                        $query->where('first_name', 'like', "%{$search}%")
+                            ->orWhere('last_name', 'like', "%{$search}%")
+                            ->orWhere('student_id', 'like', "%{$search}%");
+                    })
+                    ->orWhereHas('personalBio', function ($query) use ($search) {
+                        $query->where('first_name', 'like', "%{$search}%")
+                            ->orWhere('last_name', 'like', "%{$search}%")
+                            ->orWhere('student_id', 'like', "%{$search}%");
+                    });
+            });
+        }
+
         $users = $users->paginate(6);
 
         return view('superadmin.bulk-create-account')->with('users', $users);
@@ -205,11 +232,6 @@ class SuperAdminController extends Controller
 
         $filename  = $request->json('filename');
         [$deptShorthand,, $batchEnd] = explode('-', $filename);
-        // ImportHistory::query()->create([
-        //     'filename' => $filename,
-        //     'data' => json_encode($data),
-        //     'user_id' => Auth::user()->id,
-        // ]);
 
         $departments = [];
         foreach (Department::all() as $dept) {
@@ -224,48 +246,70 @@ class SuperAdminController extends Controller
 
         $department = $departments[0];
 
-        foreach ($data as $row) {
-            $username = strtolower($row['Student No.']);
-            $password = substr(str_shuffle('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'), 0, 8);
-            $role = 'Alumni';
-            $firstname = $row['First Name'];
-            $middlename = $row['Middle Name'];
-            $lastname = $row['Last Name'];
-            $suffix = $row['Suffix'];
-            $phonenumber = $row['Contact No. - Parent/Guardian'];
-            $email = $row['Email Address'];
-            // $course = $row['Course'];
-            // $homeaddress = $row['Home Address'];
-
-            $user = User::query()->create([
-                'name' => 'autofill',
-                'username' => $username,
-                'password' => bcrypt($password),
-                'role' => $role,
-                'department_id' => $department->id,
-            ]);
-
-            PartialPersonalRecord::query()->create([
-                'student_id' => $username,
-                'user_id' => $user->id,
-                'first_name' => $firstname,
-                'middle_name' => $middlename,
-                'last_name' => $lastname,
-                'suffix' => $suffix,
-                'phone_number' => $phonenumber,
-                'email_address' => $email,
-            ]);
-
-            ImportGenerated::query()->create([
-                'user_id' => $user->id,
-                'default_password' => $password,
-            ]);
+        if (ImportHistory::query()->where('filename', $filename)->exists()) {
+            return response()->json(['status' => 'fexist'], 400);
         }
+
+        DB::beginTransaction();
+
+        try {
+            $history = ImportHistory::query()->create([
+                'filename' => $filename,
+                'data' => json_encode($data),
+                'user_id' => Auth::user()->id,
+            ]);
+
+            foreach ($data as $row) {
+                $username = strtolower($row['Student No.']);
+                $password = substr(str_shuffle('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'), 0, 8);
+                $role = 'Alumni';
+                $firstname = $row['First Name'];
+                $middlename = $row['Middle Name'];
+                $lastname = $row['Last Name'];
+                $suffix = $row['Suffix'];
+                $phonenumber = $row['Contact No. - Parent/Guardian'];
+                $email = $row['Email Address'];
+                // $course = $row['Course'];
+                // $homeaddress = $row['Home Address'];
+
+                $user = User::query()->create([
+                    'name' => 'autofill',
+                    'username' => $username,
+                    'password' => bcrypt($password),
+                    'role' => $role,
+                    'department_id' => $department->id,
+                ]);
+
+                PartialPersonalRecord::query()->create([
+                    'student_id' => $username,
+                    'user_id' => $user->id,
+                    'first_name' => $firstname,
+                    'middle_name' => $middlename,
+                    'last_name' => $lastname,
+                    'suffix' => $suffix,
+                    'phone_number' => $phonenumber,
+                    'email_address' => $email,
+                ]);
+
+                ImportGenerated::query()->create([
+                    'user_id' => $user->id,
+                    'default_password' => $password,
+                    'import_history_id' => $history->id,
+                ]);
+            }
+        } catch (Exception $e) {
+            DB::rollBack();
+
+            return response()->json(['message' => $e->getMessage(), 'status' => 'insertf'], 400);
+        }
+
+        DB::commit();
 
         return response()->json(['message' => 'Accounts created successfully', 'status' => 'success']);
     }
 
-    public function viewImports() {
+    public function viewImports()
+    {
         $imports = ImportHistory::paginate(6);
 
         return view('superadmin.view-imports')->with('imports', $imports);

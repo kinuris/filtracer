@@ -9,7 +9,7 @@ $course = App\Models\Course::find(request('courses') ?? -1);
 $category = request('category');
 
 if ($department && $course) {
-    $query = App\Models\User::compSet()
+    $query = App\Models\User::partialSet()
         ->where('role', '!=', 'Admin')
         ->whereRelation('course', 'courses.id', '=', $course->id);
 
@@ -35,7 +35,7 @@ if ($department && $course) {
 
     $users = $query->get();
 } else if ($department) {
-    $query = App\Models\User::compSet()->where('role', '!=', 'Admin')->whereRelation('department', 'departments.id', '=', $department->id);
+    $query = App\Models\User::partialSet()->where('role', '!=', 'Admin')->whereRelation('department', 'departments.id', '=', $department->id);
 
     switch ($category) {
         case "All Users":
@@ -60,7 +60,7 @@ if ($department && $course) {
 } else {
     switch ($category) {
         case "All Users":
-            $users = App\Models\User::compSet()
+            $users = App\Models\User::partialSet()
                 ->where('role', '!=', 'Admin')
                 ->get();
             break;
@@ -72,14 +72,14 @@ if ($department && $course) {
         case "Self-Employed Alumni":
         case "Student Alumni":
         case "Retired Alumni":
-            $users = App\Models\User::compSet()
+            $users = App\Models\User::partialSet()
                 ->where('role', '!=', 'Admin')
                 ->whereRelation('professionalRecords', 'employment_status', '=', str_replace(' ', '', $category))
                 ->get();
             break;
         case "Verified Alumni":
         case "Unverified Alumni":
-            $users = App\Models\User::compSet()
+            $users = App\Models\User::partialSet()
                 ->where('role', '!=', 'Admin')
                 ->whereRelation('personalRecords', 'status', '=', $category === "Verified Alumni" ? 1 : 0)
                 ->get();
@@ -96,8 +96,16 @@ if ($department && $course) {
         case "Unverified User":
             $users = App\Models\User::query()
                 ->where(function ($query) use ($category) {
-                    $query->where('role', '!=', 'Admin')
-                        ->whereRelation('personalRecords', 'status', '=', $category === "Verified User" ? 1 : 0);
+                    if ($category === "Verified User") {
+                        $query->where('role', '!=', 'Admin')
+                            ->whereRelation('personalRecords', 'status', '=', 1);
+                    } else {
+                        $query->where('role', '!=', 'Admin')
+                            ->where(function ($query) {
+                                $query->whereDoesntHave('personalRecords')
+                                      ->orWhereRelation('personalRecords', 'status', '=', 0);
+                            });
+                    }
                 })
                 ->orWhere(function ($query) use ($category) {
                     $query->where('role', '=', 'Admin')
@@ -145,7 +153,11 @@ if ($department && $course) {
                         @foreach ($users as $user)
                         <tr>
                             <td class="py-1">{{ $user->id }}</td>
-                            <td>{{ $user->name }}</td>
+                            @if ($user->role === 'Admin')
+                            <td>{{ $user->admin()->getFullnameAttribute() }}</td>
+                            @else
+                            <td>{{ $user->partialPersonal->getFullnameAttribute() }}</td>
+                            @endif
                             @if ($user->role === 'Admin')
                             @php($admin = $user->admin())
                             <td>{{ $admin->position_id }}</td>
@@ -153,9 +165,9 @@ if ($department && $course) {
                             <td>{{ $admin->phone_number }}</td>
 
                             @else
-                            <td>{{ $user->personalBio->student_id }}</td>
-                            <td>{{ $user->personalBio->email_address }}</td>
-                            <td>{{ $user->personalBio->phone_number }}</td>
+                            <td>{{ $user->partialPersonal->student_id }}</td>
+                            <td>{{ $user->partialPersonal->email_address }}</td>
+                            <td>{{ $user->partialPersonal->phone_number }}</td>
                             @endif
                         </tr>
                         @endforeach

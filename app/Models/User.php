@@ -87,7 +87,7 @@ class User extends Authenticatable
     }
 
     public function importGenerated() {
-        return $this->hasONe(ImportGenerated::class, 'user_id');
+        return $this->hasOne(ImportGenerated::class, 'user_id');
     }
 
     public function professionalBio()
@@ -138,6 +138,10 @@ class User extends Authenticatable
         }
 
         return User::query()->whereIn('id', $compSet);
+    }
+
+    public static function partialSet() {
+        return User::query()->whereHas('partialPersonal');
     }
 
     public static function groupBy(string $type)

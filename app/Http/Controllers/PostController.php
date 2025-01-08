@@ -10,6 +10,7 @@ use App\Models\UserAlert;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 
 class PostController extends Controller
 {
@@ -21,7 +22,7 @@ class PostController extends Controller
         $isAnnouncement = $request->post('post_category') == 'Announcement';
 
         if (!$isAnnouncement) {
-            $validated = $request->validate([
+            $validator = Validator::make($request->all(), [
                 'title' => ['required'],
                 'content' => ['required'],
                 'source' => ['nullable'],
@@ -29,14 +30,22 @@ class PostController extends Controller
                 'post_status' => ['required'],
                 'attachment' => ['nullable', 'image', 'mimes:jpeg,png,jpg', 'max:10000'],
             ]);
+
+            if ($validator->fails()) {
+                return back()->withErrors($validator)->withInput()->with('openModal', 1);
+            }
         } else {
-            $validated = $request->validate([
+            $validator = Validator::make($request->all(), [
                 'title' => ['required'],
                 'content' => ['required'],
                 'source' => ['nullable'],
                 'post_category' => ['required'],
                 'attachment' => ['nullable', 'image', 'mimes:jpeg,png,jpg', 'max:10000'],
             ]);
+
+            if ($validator->fails()) {
+                return back()->withErrors($validator)->withInput()->with('openModal', 1);
+            }
         }
 
         if ($request->hasFile('attachment')) {

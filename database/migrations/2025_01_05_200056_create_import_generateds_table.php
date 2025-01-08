@@ -21,6 +21,10 @@ return new class extends Migration
                 ->on('users')
                 ->cascadeOnDelete();
 
+            $table->foreignId('import_history_id')
+                ->references('id')
+                ->on('import_histories');
+
             $table->timestamps();
         });
     }

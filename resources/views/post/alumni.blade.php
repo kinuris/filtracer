@@ -50,7 +50,7 @@
                     <div class="flex flex-col ml-3">
                         <p>{{ $post->creator->name }}</p>
                         <div class="flex place-items-center">
-                            <p class="text-xs text-gray-400">{{ $post->creator->role }}</p>
+                            <p class="text-xs text-gray-400">{{ $post->creator->role === 'Admin' ? ($post->creator->admin()->is_super ? 'Superadmin' : 'Admin' ) : 'Alumni'  }}</p>
                             @if ($post->post_category === 'Event')
                             <img src="{{ asset('assets/calendar.svg') }}" class="inline w-3 h-3 ml-1" alt="Event Post">
                             @elseif ($post->post_category === 'Job Opening')

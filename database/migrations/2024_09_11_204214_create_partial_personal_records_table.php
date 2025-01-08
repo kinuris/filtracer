@@ -25,7 +25,7 @@ return new class extends Migration
                 ->onDelete('cascade')
                 ->onUpdate('cascade');
 
-            $table->string('email_address')->unique();
+            $table->string('email_address');
             $table->string('phone_number')->unqiue();
             $table->string('student_id')->unique();
 

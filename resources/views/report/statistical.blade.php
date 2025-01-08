@@ -80,9 +80,9 @@
                 <tr class="border-b text-gray-500">
                     <td class="text-blue-900 py-3 px-8 font-thin">{{ $user->id }}</td>
                     <td>{{ $user->name }}</td>
-                    <td>{{ $user->personalBio->student_id }}</td>
-                    <td>{{ $user->personalBio->email_address }}</td>
-                    <td>{{ $user->personalBio->phone_number }}</td>
+                    <td>{{ $user->partialPersonal->student_id }}</td>
+                    <td>{{ $user->partialPersonal->email_address }}</td>
+                    <td>{{ $user->partialPersonal->phone_number }}</td>
                     <td>
                         <a class="bg-blue-600 text-white p-2 rounded-md" href="/user/view/{{ $user->id }}">See Profile</a>
                     </td>

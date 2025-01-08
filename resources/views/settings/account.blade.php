@@ -106,7 +106,7 @@
                                 <div id="nofile" class="aspect-[2.5] max-w-80 mx-auto w-full min-w-64 mt-0  flex justify-center place-items-center">
                                     <p class="text-blue-600 text-xs">Click to upload</p>
                                 </div>
-                                <input class="hidden" type="file" name="profile" id="profile">
+                                <input class="hidden" type="file" name="profile" id="profile" accept="image/png,image/jpg,image/jpeg">
                             </div>
                         </label>
 
