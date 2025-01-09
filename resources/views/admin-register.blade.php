@@ -9,18 +9,7 @@
     <link rel="shortcut icon" href="{{ asset('assets/favicon.svg') }}" type="image/x-icon">
 </head>
 
-@php($offices = [
-'Alumni Office',
-'CAS Faculty Office',
-'CBA Faculty Office',
-'CCS Faculty Office',
-'CCJE Faculty Office',
-'CHTM Faculty Office',
-'CN Faculty Office',
-'COE Faculty Office',
-'CTE Faculty Office',
-'Graduate School Faculty Office'
-])
+@php($offices = App\Models\Department::allValid())
 
 <body>
     <div class="bg-gray-100 w-screen h-screen flex justify-center place-items-center">
@@ -100,13 +89,17 @@
                             @endif
                         </div>
 
-                        <div class="flex flex-col">
+                        <div class="flex flex-col relative">
                             <label class="text-sm font-semibold mb-1" for="office">Office</label>
-                            <select class="rounded-lg border border-gray-200 text-gray-400 p-2" name="office" id="office">
+                            <select class="rounded-lg border p-2 mb-3 {{ $errors->has('office') ? 'border-red-500' : 'border-gray-200' }}" name="office" id="office">
+                                <option value="" disabled selected>Select Department</option>
                                 @foreach ($offices as $office)
-                                <option value="{{ $office }}" {{ old('office') == $office ? 'selected' : '' }}>{{ $office }}</option>
+                                <option value="{{ $office->id }}" {{ old('office') == $office->id ? 'selected' : '' }}>{{ $office->name }}</option>
                                 @endforeach
                             </select>
+                            @if ($errors->has('office'))
+                            <span class="text-red-500 text-[10px] absolute -bottom-0.5">{{ $errors->first('office') }}</span>
+                            @endif
                         </div>
                     </div>
                     @else

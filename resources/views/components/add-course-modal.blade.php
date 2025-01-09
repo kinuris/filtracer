@@ -11,12 +11,19 @@
 
             @php($departments = \App\Models\Department::allValid())
             <div class="flex flex-col mt-3">
+                @if (Auth::user()->admin()->is_super)
                 <label for="department">Department</label>
                 <select class="text-gray-400 border rounded-lg p-2 mt-1" name="department" id="department">
                     @foreach ($departments as $department)
                     <option value="{{ $department->id }}">{{ $department->name }}</option>
                     @endforeach
                 </select>
+                @else
+                <label for="department">Department</label>
+                <select class="text-gray-400 border rounded-lg p-2 mt-1" name="department" id="department" disabled>
+                    <option value="{{ Auth::user()->admin()->officeRelation->id }}">{{ Auth::user()->admin()->officeRelation->name }}</option>
+                </select>
+                @endif
             </div>
 
             <div class="flex justify-end mt-6">

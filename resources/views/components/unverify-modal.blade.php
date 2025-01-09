@@ -44,10 +44,10 @@
         <p class="bg-gray-100 p-2 border rounded text-gray-500">{{ $user->getEducationalBio()->start }} - {{ $user->getEducationalBio()->end }}</p>
         @else
         <p class="mt-3">Position ID</p>
-        <p class="bg-gray-100 p-2 border rounded text-gray-500">{{ $user->admin()->position_id }}</p>
+        <p class="bg-gray-100 p-2 border rounded text-gray-500">{{ $user->adminRelation->position_id }}</p>
 
         <p class="mt-3">Office</p>
-        <p class="bg-gray-100 p-2 border rounded text-gray-500">{{ $user->admin()->office }}</p>
+        <p class="bg-gray-100 p-2 border rounded text-gray-500">{{ $user->adminRelation->officeRelation->name }}</p>
         @endif
 
         <div class="mt-4 flex">

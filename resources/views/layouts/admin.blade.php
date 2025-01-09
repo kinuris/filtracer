@@ -67,6 +67,15 @@
                 </div>
             </a>
 
+            @if (Auth::user()->admin()->is_super)
+            <a href="/backup">
+                <div class="hover:bg-gray-100 font-medium tracking-wide hover:text-blue-500 rounded-lg p-3 flex place-items-center">
+                    <img class="w-7 mr-4" src="{{ asset('assets/backup.svg') }}" alt="Dashboard">
+                    Backup
+                </div>
+            </a>
+            @endif
+
             <div class="relative group">
                 <a href="#" class="hover:bg-gray-100 font-medium tracking-wide hover:text-blue-500 rounded-lg p-3 flex place-items-center">
                     <img class="w-7 mr-4" src="{{ asset('assets/reports.svg') }}" alt="Dashboard">

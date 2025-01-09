@@ -45,7 +45,7 @@
 
                 <div class="flex flex-col flex-1">
                     <label for="category-status">Post Status</label>
-                    <select class="text-gray-400 border rounded-lg p-2 mt-1" name="post_status" id="category-status">
+                    <select required class="text-gray-400 border rounded-lg p-2 mt-1 @error('post_status') border-red-500 @enderror" name="post_status" id="category-status">
                         <optgroup label="Event" id="event-statuses">
                             <option disabled selected value="">Select Event Status</option>
                             <option value="Incoming" {{ old('post_status') == 'Incoming' ? 'selected' : '' }}>Incoming</option>
@@ -57,6 +57,9 @@
                             <option value="Closed" {{ old('post_status') == 'Closed' ? 'selected' : '' }}>Closed</option>
                         </optgroup>
                     </select>
+                    @error('post_status')
+                    <span class="text-red-500 text-[10px] absolute mt-1 -bottom-3.5 left-0">{{ $message }}</span>
+                    @enderror
                 </div>
             </div>
 

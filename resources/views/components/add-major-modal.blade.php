@@ -9,7 +9,11 @@
                 <input class="text-gray-400 border rounded-lg p-2 mt-1" placeholder="Major Name" type="text" name="name" id="name">
             </div>
 
-            @php($courses = \App\Models\Course::all())
+            @if (Auth::user()->admin()->is_super)
+            @php($courses = \App\Models\Course::query()->get())
+            @else
+            @php($courses = \App\Models\Course::query()->where('department_id', '=', Auth::user()->admin()->office)->get())
+            @endif
             <div class="flex flex-col mt-3">
                 <label for="course">Course</label>
                 <select class="text-gray-400 border rounded-lg p-2 mt-1" name="course_id" id="course">

@@ -48,6 +48,8 @@ class PostController extends Controller
             }
         }
 
+        $validated = $validator->validated();
+
         if ($request->hasFile('attachment')) {
             $filename = sha1(time()) . '.' . $request->file('attachment')->getClientOriginalExtension();
             $request->file('attachment')->storePubliclyAs('public/post/attachments', $filename);
@@ -55,7 +57,11 @@ class PostController extends Controller
         }
 
         $validated['user_id'] = Auth::user()->id;
-        Post::query()->create($validated);
+        $post = Post::query()->create($validated);
+
+        if (User::find(Auth::user()->id)->admin() !== null) {
+           $post->update(['status' => 'Approved']); 
+        }
 
         foreach (User::query()->where('role', '=', 'Admin')->get() as $admin) {
             UserAlert::query()->create([

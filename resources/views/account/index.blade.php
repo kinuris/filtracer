@@ -65,7 +65,11 @@
                 <tr class="border-b">
                     <td class="text-blue-900 py-4">{{ $user->id }}</td>
                     @if (request('mode') === 'generated')
+                    @if ($user->role === 'Admin')
+                    <td class="text-blue-900">{{ $user->adminRelation->fullname }}</td>
+                    @else
                     <td class="text-blue-900">{{ $user->partialPersonal->fullname }}</td>
+                    @endif
                     @else
                     <td class="text-blue-900">{{ $user->name }}</td>
                     @endif

@@ -1,18 +1,7 @@
 @extends('layouts.admin')
 
 @section('title', 'Create Account')
-@php($offices = [
-'Alumni Office',
-'CAS Faculty Office',
-'CBA Faculty Office',
-'CCS Faculty Office',
-'CCJE Faculty Office',
-'CHTM Faculty Office',
-'CN Faculty Office',
-'COE Faculty Office',
-'CTE Faculty Office',
-'Graduate School Faculty Office'
-])
+@php($offices = App\Models\Department::allValid())
 
 @php($mode = request('mode', 'alumni'))
 @section('content')
@@ -155,7 +144,7 @@
                         <select name="office" id="office" class="w-full px-3 py-2 border rounded-lg" required>
                             <option value="" disabled {{ old('office') ? '' : 'selected' }}>Select your office</option>
                             @foreach ($offices as $office)
-                            <option value="{{ $office }}" {{ old('office') == $office ? 'selected' : '' }}>{{ $office }}</option>
+                            <option value="{{ $office->id }}" {{ old('office') == $office ? 'selected' : '' }}>{{ $office->name }}</option>
                             @endforeach
                         </select>
                     </div>

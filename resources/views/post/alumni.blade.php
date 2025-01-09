@@ -36,7 +36,7 @@
                 <div class="flex-1"></div>
 
                 <button type="button" class="rounded-lg p-2 px-3 bg-blue-600 text-white" id="openAddPostModal">Add New Post</button>
-                <a href="?category=Your+Posts" class="rounded-lg p-2 px-3 bg-blue-600 text-white ml-3">Your Posts</a>
+                <a href="?category=Your+Posts" class="rounded-lg p-2 px-3 bg-blue-600 text-white ml-3">View My Posts</a>
             </div>
         </form>
     </div>
@@ -159,7 +159,6 @@
             window.location = window.location.origin + '/alumni/post';
         })
     }
-
     postEditBtn.forEach((btn) => {
         btn.addEventListener('click', () => {
             const postId = btn.getAttribute('data-post-id');
@@ -183,6 +182,10 @@
     const openAddPostModal = document.getElementById('openAddPostModal');
     const addPostModal = document.getElementById('addPostModal');
     const closeAddPostModal = document.getElementById('closeAddPostModal');
+
+    <?php if (session('openModal') && session('openModal') === 1): ?>
+        addPostModal.classList.remove('hidden');
+    <?php endif ?>
 
     const creationCategory = document.getElementById('creation-category');
     const categoryStatus = document.getElementById('category-status');

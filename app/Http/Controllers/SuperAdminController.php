@@ -9,7 +9,9 @@ use App\Models\ImportGenerated;
 use App\Models\ImportHistory;
 use App\Models\PartialPersonalRecord;
 use App\Models\PersonalRecord;
+use App\Models\Post;
 use App\Models\User;
+use App\Models\UserAlert;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -125,6 +127,7 @@ class SuperAdminController extends Controller
             'suffix' => ['nullable'],
             'employee_id' => ['required'],
             'email' => ['required', 'email'],
+            'office' => ['required'],
             'contact_number' => ['required'],
             'username' => ['required', 'unique:users,username'],
             'password' => ['required'],
@@ -168,7 +171,7 @@ class SuperAdminController extends Controller
 
         AdminGenerated::query()->create([
             'user_id' => $user->id,
-            'default' => $defaultPassword,
+            'default_password' => $defaultPassword,
         ]);
 
         Admin::query()->create(array_merge([
@@ -313,5 +316,65 @@ class SuperAdminController extends Controller
         $imports = ImportHistory::paginate(6);
 
         return view('superadmin.view-imports')->with('imports', $imports);
+    }
+
+    public function deletePost(Post $post)
+    {
+        try {
+            UserAlert::query()->create([
+                'title' => 'Your post has been removed by Superadmin',
+                'action' => '/',
+                'content' => $post->title . ' has been deleted',
+                'user_id' => $post->creator->id,
+            ]);
+
+            $post->delete();
+
+            return back()->with('message', 'Post deleted successfully.');
+        } catch (Exception $e) {
+            return back()->withErrors(['error' => 'Failed to delete post: ' . $e->getMessage()]);
+        }
+    }
+
+    public function postRequestView()
+    {
+        $statusSelect = request()->query('status', 'Pending');  
+
+        $posts = Post::query()
+            ->where('status', '=', $statusSelect)
+            ->latest()
+            ->get();
+
+        return view('superadmin.post-request')->with('posts', $posts);
+    }
+
+    public function postChangeStat(Request $request, Post $post)
+    {
+        $status = $request->query('status');
+
+        $validator = Validator::make(['status' => $status], [
+            'status' => ['required', 'in:Approved,Denied'],
+        ]);
+
+        if ($validator->fails()) {
+            return back()->withErrors($validator)->withInput();
+        }
+
+        $validated = $validator->validated();
+
+        try {
+            $post->update(['status' => $validated['status']]);
+
+            UserAlert::query()->create([
+                'title' => 'Your post status has been changed by Superadmin',
+                'action' => '/',
+                'content' => 'The status of your post "' . $post->title . '" has been changed to ' . $validated['status'],
+                'user_id' => $post->creator->id,
+            ]);
+
+            return back()->with('message', 'Post status updated successfully.');
+        } catch (Exception $e) {
+            return back()->withErrors(['error' => 'Failed to update post status: ' . $e->getMessage()]);
+        }
     }
 }

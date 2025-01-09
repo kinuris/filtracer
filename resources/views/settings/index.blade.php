@@ -6,7 +6,8 @@
 <div class="bg-gray-100 w-full h-full p-8 flex flex-col">
     <h1 class="font-medium tracking-widest text-lg">Settings</h1>
 
-    <div class="flex">
+    <div class="flex gap-4">
+        @if (Auth::user()->admin()->is_super)
         <div class="shadow rounded-lg mt-6 flex-1">
             <a href="/settings/department">
                 <div class="bg-white h-24 p-7 flex place-items-center border-b rounded-lg">
@@ -20,8 +21,7 @@
                 </div>
             </a>
         </div>
-
-        <div class="mx-2"></div>
+        @endif
 
         <div class="shadow rounded-lg mt-6 flex-1">
             <a href="/settings/course">

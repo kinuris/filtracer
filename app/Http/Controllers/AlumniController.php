@@ -457,7 +457,7 @@ class AlumniController extends Controller
     {
         $category = request('category', 'All Posts');
 
-        $posts = Post::query();
+        $posts = Post::query()->where('status', '=', 'Approved');
 
         if ($category === 'Events') {
             $posts = $posts->where('post_category', 'Event');

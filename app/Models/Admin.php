@@ -28,6 +28,10 @@ class Admin extends Model
         return $this->first_name . ' ' . ($this->middle_name ? strtoupper(substr($this->middle_name, 0, 1)) . '. ' : '') . $this->last_name . ' ' . $this->suffix;
     }
 
+    public function officeRelation() {
+        return $this->belongsTo(Department::class, 'office', 'id');
+    }
+
     protected $casts = [
         'is_verified' => 'boolean',
     ];

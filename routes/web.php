@@ -4,6 +4,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AlertController;
 use App\Http\Controllers\AlumniController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\BackupController;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\SuperAdminController;
@@ -204,6 +205,20 @@ Route::controller(SuperAdminController::class)
         Route::post('/account/import', 'accountImport');
 
         Route::get('/account/imports', 'viewImports');
+        Route::post('/post/delete/{post}', 'deletePost');
 
         Route::post('/manage/account/update/{user}', 'updateAccount');
+        Route::get('/post/request', 'postRequestView');
+
+        Route::get('/post/changestat/{post}', 'postChangeStat');
+    });
+
+Route::controller(BackupController::class)
+    ->middleware('role:Superadmin')
+    ->group(function () {
+        Route::get('/backup', 'index');
+
+        Route::post('/backup/download/{backup}', 'downloadBackup');
+        Route::post('/backup/start', 'startBackup');
+
     });

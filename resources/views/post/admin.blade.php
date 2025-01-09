@@ -35,7 +35,10 @@
                 <div class="flex-1"></div>
 
                 <button type="button" class="rounded-lg p-2 px-3 bg-blue-600 text-white" id="openAddPostModal">Add New Post</button>
-                <a href="?category=Your+Posts" class="rounded-lg p-2 px-3 bg-blue-600 text-white ml-3">Your Posts</a>
+                <a href="?category=Your+Posts" class="rounded-lg p-2 px-3 bg-blue-600 text-white ml-3">View My Posts</a>
+                @if (Auth::user()->role === 'Admin' && Auth::user()->admin()->is_super)
+                <a href="/post/request" class="rounded-lg p-2 px-3 bg-blue-600 text-white ml-3">Post Requests</a>
+                @endif
             </div>
         </form>
     </div>
@@ -83,6 +86,14 @@
                                 @endif
                             </a>
 
+                            @if (Auth::user()->role === 'Admin' && Auth::user()->admin()->is_super)
+                            <form action="/post/delete/{{ $post->id }}" method="POST" class="pl-4 flex p-2 group place-items-center hover:bg-gray-100 cursor-pointer">
+                                @csrf
+                                <img class="h-4 w-5" src="{{ asset('assets/post_delete.svg') }}" alt="Delete Post">
+                                <button type="submit" class="text-left w-full block px-4 py-2 text-red-600">(Superadmin) Delete Post</button>
+                            </form>
+                            @endif
+
                             @if ($post->creator->id === Auth::user()->id)
                             <div class="pl-4 flex p-2 group place-items-center hover:bg-gray-100 cursor-pointer post-edit-btn" data-post-id="{{ $post->id }}">
                                 <img class="h-4 w-5" src="{{ asset('assets/post_edit.svg') }}" alt="Edit Post">
@@ -93,6 +104,7 @@
                                 <button class="text-left w-full block px-4 py-2 hover:bg-gray-100">Delete Post</button>
                             </a>
                             @endif
+
                         </div>
                     </div>
                 </div>

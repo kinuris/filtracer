@@ -20,18 +20,22 @@ return new class extends Migration
             $table->string('position_id');
             $table->string('suffix')->nullable();
 
-            $table->enum('office', [
-                'Alumni Office',
-                'CAS Faculty Office',
-                'CBA Faculty Office',
-                'CCS Faculty Office',
-                'CCJE Faculty Office',
-                'CHTM Faculty Office',
-                'CN Faculty Office',
-                'COE Faculty Office',
-                'CTE Faculty Office',
-                'Graduate School Faculty Office'
-            ]);
+            // $table->enum('office', [
+            //     'Alumni Office',
+            //     'CAS Faculty Office',
+            //     'CBA Faculty Office',
+            //     'CCS Faculty Office',
+            //     'CCJE Faculty Office',
+            //     'CHTM Faculty Office',
+            //     'CN Faculty Office',
+            //     'COE Faculty Office',
+            //     'CTE Faculty Office',
+            //     'Graduate School Faculty Office'
+            // ]);
+
+            $table->foreignId('office')
+                ->references('id')
+                ->on('departments');
 
             $table->string('email_address')->unique();
             $table->string('phone_number');
@@ -47,7 +51,7 @@ return new class extends Migration
 
             $table->boolean('is_super')
                 ->default(false);
-            
+
             $table->boolean('is_verified')->default(false);
         });
     }

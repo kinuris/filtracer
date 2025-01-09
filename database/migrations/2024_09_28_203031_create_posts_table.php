@@ -28,6 +28,9 @@ return new class extends Migration
                 ->on('users')
                 ->onDelete('cascade')
                 ->onUpdate('cascade');
+            
+            $table->enum('status', ['Pending', 'Denied', 'Approved'])
+                ->default('Pending');
 
             $table->timestamps();
         });
