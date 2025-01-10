@@ -343,7 +343,7 @@ class SuperAdminController extends Controller
         $posts = Post::query()
             ->where('status', '=', $statusSelect)
             ->latest()
-            ->get();
+            ->paginate(6);
 
         return view('superadmin.post-request')->with('posts', $posts);
     }

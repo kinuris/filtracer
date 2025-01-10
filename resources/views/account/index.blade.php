@@ -114,6 +114,7 @@
                 @endforeach
             </tbody>
         </table>
+
         <div class="bg-white rounded-b-lg p-3">
             {{ $users->appends(request()->except(['verify_modal']))->links('vendor.pagination.tailwind') }}
         </div>

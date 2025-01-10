@@ -48,7 +48,19 @@
                 <div class="flex">
                     <img class="w-10 h-10 rounded-full object-cover" src="{{ $post->creator->image() }}" alt="Poster Profile">
                     <div class="flex flex-col ml-3">
+                        @if (request('category') == 'Your Posts')
+                        <p>{{ $post->creator->name }} - 
+                            <span class="
+                                @if($post->status == 'Denied') text-red-500 
+                                @elseif($post->status == 'Approved') text-green-500 
+                                @elseif($post->status == 'Pending') text-yellow-500 
+                                @endif">
+                                {{ $post->status }}
+                            </span>
+                        </p>
+                        @else
                         <p>{{ $post->creator->name }}</p>
+                        @endif
                         <div class="flex place-items-center">
                             <p class="text-xs text-gray-400">{{ $post->creator->role === 'Admin' ? ($post->creator->admin()->is_super ? 'Superadmin' : 'Admin' ) : 'Alumni'  }}</p>
                             @if ($post->post_category === 'Event')

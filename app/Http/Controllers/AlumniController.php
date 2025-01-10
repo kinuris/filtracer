@@ -466,6 +466,7 @@ class AlumniController extends Controller
         } else if ($category === 'Announcements') {
             $posts = $posts->where('post_category', 'Announcement');
         } else if ($category === 'Your Posts') {
+            $posts = Post::query();
             $posts = $posts->where('user_id', Auth::user()->id);
         } else if ($category === 'Saved Posts') {
             $posts = User::query()
