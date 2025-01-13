@@ -194,6 +194,7 @@
                 'Communication Skills',
                 'Teamwork and Collaboration',
                 'Leadership Skills',
+                'Marketing Skills',
                 'Adaptability and Problem-Solving',
                 'Time Management',
                 'Work Ethic',

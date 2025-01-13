@@ -25,15 +25,15 @@
                 <p class="text-gray-400 mt-4">Email Address</p>
                 <p>{{ $user->getPersonalBio()->email_address }}</p>
 
-                <p class="text-gray-400 mt-4">Phone Number</p>
-                <p>{{ $user->getPersonalBio()->phone_number }}</p>
-
                 <p class="text-gray-400 mt-4">Degree</p>
                 <p>{{ $user->getEducationalBio()->degree_type }} in {{ $user->getEducationalBio()->getCourse()->name }}</p>
 
                 <p class="text-gray-400 mt-4">Alumni Batch</p>
                 @php($bio = $user->getEducationalBio())
                 <p>S.Y. {{ $bio->start }} - {{ $bio->end }}</p>
+
+                <p class="text-gray-400 mt-4">Date Joined</p>
+                <p>{{ $user->created_at->format('M. d, Y') }}</p>
             </div>
         </div>
 
@@ -49,8 +49,8 @@
                             <p class="text-gray-400">First Name</p>
                             <p>{{ $personal->first_name }}</p>
 
-                            <p class="text-gray-400 mt-4">Date Joined</p>
-                            <p>{{ $personal->created_at->format('d/m/Y') }}</p>
+                            <p class="text-gray-400 mt-4">Suffix</p>
+                            <p>{{ is_null($personal->suffix) ? 'N/A' : $personal->suffix }}</p>
 
                             <p class="text-gray-400 mt-4">Gender</p>
                             <p>{{ $personal->gender }}</p>
@@ -131,7 +131,7 @@
                 </div>
             </div>
 
-            <div class="shadow rounded-lg mt-3 mb-16">
+            <div class="shadow rounded-lg mt-3">
                 <div class="bg-white py-4 flex flex-col px-6 border-b rounded-lg">
                     <p class="text-lg font-bold pb-2">Professional Information</p>
                     @php ($prof = $user->getProfessionalBio())
@@ -171,6 +171,43 @@
                     @else
                     <p>(No professional bio)</p>
                     @endif
+                </div>
+            </div>
+
+            <div class="shadow rounded-lg mt-3">
+                <div class="bg-white py-4 flex flex-col px-6 border-b rounded-lg">
+                    <p class="text-lg font-bold pb-2">Job Search Methods</p>
+                    @php ($methods = $user->getProfessionalBio()->methods)
+                    <div class="flex gap-2">
+                        @foreach ($methods as $method)
+                        <p class="p-2 bg-gray-200 rounded">{{ $method->method}}</p>
+                        @endforeach
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex w-full gap-3 mt-3 mb-16">
+                <div class="shadow rounded-lg flex-1 w-1/2">
+                    <div class="bg-white py-4 flex flex-col px-6 border-b rounded-lg h-full">
+                        <p class="text-lg font-bold pb-2">Soft Skills</p>
+                        @php ($methods = $user->getProfessionalBio()->softSkills)
+                        <div class="flex gap-2 flex-wrap">
+                            @foreach ($methods as $method)
+                            <p class="p-2 bg-gray-200 rounded">{{ $method->skill }}</p>
+                            @endforeach
+                        </div>
+                    </div>
+                </div>
+                <div class="shadow rounded-lg flex-1 w-1/2">
+                    <div class="bg-white py-4 flex flex-col px-6 border-b rounded-lg">
+                        <p class="text-lg font-bold pb-2">Hard Skills</p>
+                        @php ($methods = $user->getProfessionalBio()->hardSkills)
+                        <div class="flex gap-2 flex-wrap">
+                            @foreach ($methods as $method)
+                            <p class="p-2 bg-gray-200 rounded">{{ $method->skill }}</p>
+                            @endforeach
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

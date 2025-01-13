@@ -8,7 +8,18 @@
         <div class="gap-2 p-2 flex flex-col">
             @foreach ($prof->attachments as $attachment)
             <div class="bg-gray-100 border p-2 rounded-lg">
-                <p class="text-sm font-semibold text-slate-600">{{ $attachment->name }}</p>
+                <div class="flex justify-between">
+                    <p class="text-sm font-semibold text-slate-600">{{ $attachment->name }}</p>
+                    <form method="POST" action="" onsubmit="return confirm('Are you sure you want to delete this attachment?');">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="text-sm w-fit font-semibold text-red-600 flex place-items-center">
+                            <span class="material-symbols-outlined text-red-600">
+                                delete
+                            </span>
+                        </button>
+                    </form>
+                </div>
                 <a class="text-sm w-fit font-semibold text-slate-600 flex place-items-center mt-4" href="{{ asset('storage/professional/attachments/' . $attachment->link) }}" target="_blank">
                     <span class="material-symbols-outlined text-gray-400">
                         file_open
