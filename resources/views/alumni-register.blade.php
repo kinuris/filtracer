@@ -135,7 +135,7 @@
                         <a href="{{ url()->previous() }}" class="bg-[#147DC8] rounded-lg text-white flex-1 py-2 text-center mr-2">Back</a>
                         @endif
                         <button class="g-recaptcha bg-[#147DC8] rounded-lg text-white py-2 flex-1"
-                            data-sitekey="6Lcd9TEqAAAAAHY7KfIvIqaRPwuyrg0uEeGd8zkb"
+                            data-sitekey="6LcjGN0qAAAAAGYxpw-G6r_328og3MoP3NPrc8wS"
                             data-callback='onSubmit'
                             data-action='submit'>
                             Next

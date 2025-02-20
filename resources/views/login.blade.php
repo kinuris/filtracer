@@ -28,7 +28,7 @@
 
                 <p class="text-gray-300 text-center text-sm my-4">Protected by reCaptcha v3</p>
                 <button class="g-recaptcha bg-[#147DC8] rounded-lg text-white py-2"
-                    data-sitekey="6Lcd9TEqAAAAAHY7KfIvIqaRPwuyrg0uEeGd8zkb"
+                    data-sitekey="6LcjGN0qAAAAAGYxpw-G6r_328og3MoP3NPrc8wS"
                     data-callback='onSubmit'
                     data-action='submit'>
                     Login
