@@ -83,6 +83,10 @@ Route::controller(AlumniController::class)
         Route::get('/alumni/setup/profilepic', 'setupProfilepicView');
         Route::post('/alumni/setup/profilepic/{alumni}', 'setupProfilepic');
 
+        Route::get('/settings', 'settingsView');
+        Route::get('/settings/alumni/password', 'settingsPasswordView');
+        Route::post('/settings/alumni/password/{alumni}', 'settingsPassword');
+
         Route::middleware('compset')->group(function () {
             Route::get('/alumni', 'dashboardView');
             Route::get('/alumni/profile', 'alumniProfileView');
@@ -144,6 +148,9 @@ Route::controller(AdminController::class)
         Route::get('/admin/profile', 'myProfileView');
         Route::get('/admin/useraccount/verify/{user}', 'verifyUser');
         Route::get('/admin/useraccount/unverify/{user}', 'unverifyUser');
+
+        Route::get('/admin/post/approve/{post}', 'approvePost');
+        Route::get('/admin/post/reject/{post}', 'rejectPost');
 
         Route::get('/audit', 'auditView');
 

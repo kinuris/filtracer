@@ -74,7 +74,7 @@
 
                 <div class="flex place-items-center">
                     <img class="h-4 mr-3" src="{{ asset('assets/alumni_job.svg') }}" alt="Job">
-                    <p class="text-gray-400 text-sm">{{ $user->getProfessionalBio()->job_title }}</p>
+                    <p class="text-gray-400 text-sm">{{ $user->getProfessionalBio()->employment_status }}</p>
                 </div>
                 <div class="flex mt-1 ml-[1px] place-items-center">
                     <img class="h-4 mr-3" src="{{ asset('assets/alumni_location.svg') }}" alt="Job">

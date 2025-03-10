@@ -27,6 +27,20 @@ class AdminController extends Controller
         return view('department.index');
     }
 
+    public function rejectPost(Post $post)
+    {
+        $post->update(['status' => 'Rejected']);
+
+        return redirect('/admin')->with('message', 'Post rejected successfully');
+    }
+
+    public function approvePost(Post $post)
+    {
+        $post->update(['status' => 'Approved']);
+
+        return redirect('/admin')->with('message', 'Post approved successfully');
+    }
+
     public function userView(User $user)
     {
         return view('alumni.view')
@@ -476,7 +490,7 @@ class AdminController extends Controller
         } else if ($category === 'Announcements') {
             $posts = $posts->where('post_category', 'Announcement');
         } else if ($category === 'Your Posts') {
-            $posts = Post::query(); 
+            $posts = Post::query();
             $posts = $posts->where('user_id', Auth::user()->id);
         } else if ($category === 'Saved Posts') {
             $posts = User::query()

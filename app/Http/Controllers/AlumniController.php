@@ -32,6 +32,36 @@ class AlumniController extends Controller
             ->with('user', $user);
     }
 
+    public function settingsPasswordView()
+    {
+        return view('alumni.settings.password');
+    }
+
+    public function settingsPassword(Request $request, User $alumni)
+    {
+        $validated = $request->validate([
+            'current_password' => ['required'],
+            'new_password' => ['required', 'min:8'],
+            'confirm_new_password' => ['required', 'same:new_password'],
+        ]);
+
+        if (!password_verify($validated['current_password'], $alumni->password)) {
+            return back()->with('error', 'Old password is incorrect');
+        }
+
+        $alumni->update([
+            'password' => bcrypt($validated['new_password']),
+        ]);
+
+        return back()->with('message', 'Password updated successfully');
+
+    }
+
+    public function settingsView()
+    {
+        return view('alumni.settings.index');
+    }
+
     public function updateProfileView()
     {
         $user = Auth::user();
