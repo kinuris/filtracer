@@ -132,11 +132,11 @@ if ($department && $course) {
             <div id="printableStat" class="border border-black w-full p-4 rounded-lg">
                 <div class="flex justify-between">
                     @if ($department && $course)
-                    <h1 class="font-light text-blue-500"><span class="mx-1 italic font-bold">{{ $category }}</span> of <span class="italic font-bold mx-1">{{ $department->name }}</span> in <span class="italic font-bold mx-1">{{ $course->name }}</span></h1>
+                    <h1 class="font-light text-blue-500"><span class="mx-1 italic font-bold">{{ $category }}</span> <span class="text-xl">|</span> <span class="italic font-bold mx-1">{{ $department->name }}</span> <span class="text-xl">|</span> <span class="italic font-bold mx-1">{{ $course->name }}</span></h1>
                     @elseif ($department)
-                    <h1 class="font-light text-blue-500"><span class="mx-1 italic font-bold">{{ $category }}</span> of <span class="italic font-bold mx-1">{{ $department->name }}</span> in <span class="italic font-bold mx-1">All Courses</span></h1>
+                    <h1 class="font-light text-blue-500"><span class="mx-1 italic font-bold">{{ $category }}</span> <span class="text-xl">|</span> <span class="italic font-bold mx-1">{{ $department->name }}</span> <span class="text-xl">|</span> <span class="italic font-bold mx-1">All Courses</span></h1>
                     @else
-                    <h1 class="font-light text-blue-500"><span class="mx-1 italic font-bold">{{ $category }}</span> of <span class="italic font-bold mx-1">All Departments</span> in <span class="italic font-bold mx-1">All Courses</span></h1>
+                    <h1 class="font-light text-blue-500"><span class="mx-1 italic font-bold">{{ $category }}</span> <span class="text-xl">|</span> <span class="italic font-bold mx-1">All Departments</span> <span class="text-xl">|</span> <span class="italic font-bold mx-1">All Courses</span></h1>
                     @endif
 
                     <div><i class="text-[10px]">Generated at:</i> {{ date_create()->format('Y-m-d H:i:s') }}</div>
