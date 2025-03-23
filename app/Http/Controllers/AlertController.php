@@ -13,6 +13,15 @@ class AlertController extends Controller
         return view('alerts.snippets.user-alert');
     }
 
+    public function genMessages() {
+        $id = Auth::user()->id;
+
+        return UserAlert::query()->where('user_id', '=', $id)
+            ->where('is_read', false)
+            ->where('title', 'like', '%message%')
+            ->count();
+    }
+
     public function completeAlert(UserAlert $alert)
     {
         $alert->update(['is_read' => true]);

@@ -19,6 +19,9 @@
     <div class="flex w-screen">
         @if (request()->path() !== 'admin/chat')
         <a href="/admin/chat" class="fixed rounded-full bottom-0 z-50 right-0 mb-6 mr-6 shadow-lg bg-blue-600 transition-transform hover:scale-110">
+            <div class="w-5 h-5 flex place-items-center justify-center bg-red-500 absolute -top-1 -left-1 rounded-full">
+                <p class="text-white text-xs text-center font-semibold" id="chatAlerts"></p>
+            </div>
             <img class="w-8 m-3" src="{{ asset('assets/chat.svg') }}" alt="Chat">
         </a>
         @endif
@@ -288,12 +291,14 @@
     </script>
     <script>
         const alertContainer = document.querySelector('#alertContainer');
+        const chatAlerts = document.querySelector('#chatAlerts');
 
         (function() {
             async function repeat() {
-                const alerts = await fetch('/alert/gen');
+                const [alerts, message] = await Promise.all([fetch('/alert/gen'), fetch('/alert/messages')]);
 
                 alertContainer.innerHTML = await alerts.text();
+                chatAlerts.textContent = await message.text();
             }
 
             repeat();

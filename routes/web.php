@@ -134,6 +134,7 @@ Route::controller(AlertController::class)
     ->group(function () {
         Route::get('/alert/complete/{alert}', 'completeAlert');
         Route::get('/alert/gen', 'genAlerts');
+        Route::get('/alert/messages', 'genMessages');
         Route::get('/alert/seenall', 'seenAll');
     });
 
