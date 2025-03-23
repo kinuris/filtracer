@@ -167,7 +167,12 @@ if ($department && $course) {
         <div class="flex-1"></div>
 
         @php ($tw = Vite::asset('resources/css/app.css'))
-        <button class="text-white bg-blue-600 p-2 px-3 rounded" onclick="printJS({ printable: 'printableStat', type: 'html', css: '{{ $tw }}' })">Print</button>
+        <button class="text-white bg-blue-600 p-2 px-3 rounded" onclick="printJS({ 
+            printable: 'printableStat', 
+            type: 'html', 
+            css: '{{ $tw }}',
+            style: '#printableStat { font-size: 10px; }'
+        })">Print</button>
     </div>
     <div class="shadow rounded-lg mt-4">
         <div class="bg-white p-4 flex place-items-center border-b rounded-lg">
@@ -188,6 +193,7 @@ if ($department && $course) {
                     <thead class="border-t border-b">
                         <th class="font-semibold py-3">ID</th>
                         <th class="font-semibold">Name</th>
+                        <th class="font-semibold">Username</th>
                         <th class="font-semibold">Student / Company ID</th>
                         <th class="font-semibold">Email</th>
                         <th class="font-semibold">Contact Number</th>
@@ -201,12 +207,12 @@ if ($department && $course) {
                             @else
                             <td>{{ ($user->partialPersonal ?? $user->getPersonalBio())->getFullnameAttribute() }}</td>
                             @endif
+                            <td>{{ $user->username }}</td>
                             @if ($user->role === 'Admin')
                             @php($admin = $user->admin())
                             <td>{{ $admin->position_id }}</td>
                             <td>{{ $admin->email_address }}</td>
                             <td>{{ $admin->phone_number }}</td>
-
                             @else
                             <td>{{ ($user->partialPersonal ?? $user->getPersonalBio())->student_id }}</td>
                             <td>{{ ($user->partialPersonal ?? $user->getPersonalBio())->email_address }}</td>
