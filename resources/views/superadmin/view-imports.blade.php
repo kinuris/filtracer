@@ -30,7 +30,12 @@
                     <tr>
                         <td class="py-3">{{ $import->id }}</td>
                         <td>{{ $import->filename }}</td>
-                        <td>{{ $import->uploader->name }}</td>
+                        <td>
+                            <div class="flex items-center justify-center gap-2">
+                                <img src="{{ $import->uploader->image() }}" alt="{{ $import->uploader->name }}" class="w-8 h-8 rounded-full object-cover">
+                                <span>{{ $import->uploader->name }}</span>
+                            </div>
+                        </td>
                         <td>{{ $import->created_at->format('M d, Y') }}</td>
                         <td>{{ number_format($import->size, 2) }} kb</td>
                         <td>

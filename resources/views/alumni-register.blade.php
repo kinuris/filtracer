@@ -24,7 +24,7 @@
                 <img class="max-w-96 border-r pr-12" src="{{ asset('assets/filtracer.svg') }}" alt="Filtracer Logo">
 
                 <div class="flex flex-col min-w-[500px] max-w-[600px] px-12">
-                    <h1 class="text-center text-xl tracking-widest">Alumni Register Form</h1>
+                    <h1 class="text-center text-xl tracking-widest">Alumni Registration Form</h1>
                     <p class="py-2 border rounded mt-6 text-center mx-8 text-gray-400 text-sm">By clicking Register and filling up your details, you agree to our <span class="text-blue-600">Website Policy</span> and our <span class="text-blue-600">Privacy Notice and Data Privacy Policy</span>.</p>
 
                     @if (!isset($step))

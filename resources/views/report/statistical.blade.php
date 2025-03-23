@@ -13,7 +13,8 @@
                 <p class="tracking-wider font-semibold mr-4">All</p>
                 <select onchange="handleChangeCategory()" class="g-gray-100 p-2 rounded border text-gray-400" name="category" id="category">
                     <optgroup label="All">
-                        <option value="All Users">Alumni</option>
+                        <option @if (request('category')=='All Entities' ) selected @endif value="All Entities">All Users</option>
+                        <option @if (request('category')=='All Users' ) selected @endif value="All Users">Alumni</option>
                     </optgroup>
                     <optgroup label="Employment">
                         <!-- <option value="Registered Users">Registered Users</option> -->
@@ -79,7 +80,12 @@
                 @foreach ($users as $user)
                 <tr class="border-b text-gray-500">
                     <td class="text-blue-900 py-3 px-8 font-thin">{{ $user->id }}</td>
-                    <td>{{ $user->name }}</td>
+                    <td>
+                        {{ $user->partialPersonal->first_name }}
+                        {{ $user->partialPersonal->middle_name ? substr($user->partialPersonal->middle_name, 0, 1) . '. ' : '' }}
+                        {{ $user->partialPersonal->last_name }}
+                        {{ $user->partialPersonal->suffix ? $user->partialPersonal->suffix : '' }}
+                    </td>
                     <td>{{ $user->partialPersonal->student_id }}</td>
                     <td>{{ $user->partialPersonal->email_address }}</td>
                     <td>{{ $user->partialPersonal->phone_number }}</td>

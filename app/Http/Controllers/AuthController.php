@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\SendSMSAsyncJob;
 use App\Models\Admin;
+use App\Models\BoundAccount;
 use App\Models\Department;
 use App\Models\PartialPersonalRecord;
 use App\Models\PersonalRecord;
 use App\Models\User;
+use App\Models\UserPasswordReset;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
@@ -23,6 +26,79 @@ class AuthController extends Controller
         Auth::logout();
 
         return redirect('/login')->with('success', 'You have been logged out.');
+    }
+
+    public function switchAccount(Request $request, User $user)
+    {
+        $isAdmin = Auth::user()->role === 'Admin';
+        $exists = BoundAccount::query()
+            ->where($isAdmin ? 'admin_id' : 'alumni_id', Auth::user()->id)
+            ->where($isAdmin ? 'alumni_id' : 'admin_id', $user->id)
+            ->exists();
+
+        if (!$exists) {
+            return redirect()->back()->with('message', 'Invalid account switch.');
+        }
+
+        Auth::logout();
+
+        Auth::loginUsingId($user->id);
+
+        return redirect('/');
+    }
+
+    public function forgetPassword(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'username' => ['required', 'exists:users,username']
+        ]);
+
+        if ($validator->fails()) {
+            return redirect()->back()
+                ->withErrors($validator)
+                ->with('message', 'Invalid username');
+        }
+
+        $user = User::query()
+            ->where('username', $request->post('username'))
+            ->first();
+
+        // Check if user has reset their password within the last week
+        $oneWeekAgo = now()->subDays(7);
+        $recentReset = UserPasswordReset::where('user_id', $user->id)
+            ->where('created_at', '>=', $oneWeekAgo)
+            ->first();
+
+        if ($recentReset) {
+            return redirect()->back()
+                ->with('message', 'You have already requested a password reset recently.' . "\nYou still have " . $recentReset->created_at->addDays(7)->diffForHumans(now()) . ' before you can request another one.');
+        }
+
+        $random = substr(str_shuffle('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'), 0, 6);
+        if ($user->role === 'Admin') {
+            $number = $user->admin()->philSMSNum();
+        } else {
+            $number = $user->personalBio->philSMSNum();
+        }
+
+        $user->password = bcrypt($random);
+        $user->save();
+
+        SendSMSAsyncJob::dispatch(
+            $number,
+            "🔑 Password Inquiry Request\nYou requested your FilTracer login credentials. Your password is: " . $random . ". Keep it secure and do not share it with anyone."
+        );
+
+        $maskedNumber = '+' . substr($number, 0, 4) . '*****' . substr($number, -3);
+
+        $reset = new UserPasswordReset();
+
+        $reset->user_id = $user->id;
+
+        $reset->save();
+
+        return back()
+            ->with('reset_number', $maskedNumber);
     }
 
     public function login(Request $request)

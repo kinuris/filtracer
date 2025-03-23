@@ -43,112 +43,98 @@
 
     <div class="grid grid-cols-2 gap-4">
         @foreach ($posts as $post)
-        <div class="shadow rounded-lg mt-4">
-            <div class="bg-white py-4 flex flex-col px-6 border-b rounded-lg h-full">
-                <div class="flex">
-                    <img class="w-10 h-10 rounded-full object-cover" src="{{ $post->creator->image() }}" alt="Poster Profile">
-                    <div class="flex flex-col ml-3">
-                        @if (request('category') == 'Your Posts')
-                        <p>{{ $post->creator->name }} - 
-                            <span class="
-                                @if($post->status == 'Denied') text-red-500 
-                                @elseif($post->status == 'Approved') text-green-500 
-                                @elseif($post->status == 'Pending') text-yellow-500 
-                                @endif">
-                                {{ $post->status }}
-                            </span>
-                        </p>
-                        @else
-                        <p>{{ $post->creator->name }}</p>
-                        @endif
-                        <div class="flex place-items-center">
-                            <p class="text-xs text-gray-400">{{ $post->creator->role === 'Admin' ? ($post->creator->admin()->is_super ? 'Superadmin' : 'Admin' ) : 'Alumni'  }}</p>
-                            @if ($post->post_category === 'Event')
-                            <img src="{{ asset('assets/calendar.svg') }}" class="inline w-3 h-3 ml-1" alt="Event Post">
-                            @elseif ($post->post_category === 'Job Opening')
-                            <img src="{{ asset('assets/job_opening.svg') }}" class="inline w-3 h-3 ml-1" alt="Job Opening Post">
-                            @elseif ($post->post_category === 'Announcement')
-                            <img src="{{ asset('assets/announcement.svg') }}" class="inline w-3 h-3 ml-1" alt="Announcement Post">
-                            @endif
-                        </div>
-                    </div>
-
-                    <div class="group relative ml-auto my-auto">
-                        <img src="{{ asset('assets/option.svg') }}" alt="Option">
-
-                        <div class="w-48 right-0 absolute hidden group-hover:block font-light text-sm bg-white shadow-lg rounded-lg overflow-hidden">
-                            <a href="/post/pin/toggle/{{ $post->id }}" class="pl-4 flex p-2 group hover:bg-gray-100 cursor-pointer">
-                                @if ($post->isPinnedBy(auth()->user()))
-                                <img class="w-5" src="{{ asset('assets/post_unpin.svg') }}" alt="Pin Post">
-                                <button class="text-left w-full block px-4 py-2 hover:bg-gray-100">Unpin Post</button>
-                                @else
-                                <img class="w-5" src="{{ asset('assets/post_pin.svg') }}" alt="Pin Post">
-                                <button class="text-left w-full block px-4 py-2 hover:bg-gray-100">Pin Post</button>
-                                @endif
-                            </a>
-
-                            <a href="/post/save/toggle/{{ $post->id }}" class="pl-4 flex place-items-center p-2 group hover:bg-gray-100 cursor-pointer">
-                                <img class="h-4 w-5" src="{{ asset('assets/post_save.svg') }}" alt="Save Post">
-                                @if ($post->isSavedBy(auth()->user()))
-                                <button class="text-left w-full block px-4 py-2 hover:bg-gray-100">Unsave Post</button>
-                                @else
-                                <button class="text-left w-full block px-4 py-2 hover:bg-gray-100">Save Post</button>
-                                @endif
-                            </a>
-
-                            @if ($post->creator->id === Auth::user()->id)
-                            <div class="pl-4 flex p-2 group place-items-center hover:bg-gray-100 cursor-pointer post-edit-btn" data-post-id="{{ $post->id }}">
-                                <img class="h-4 w-5" src="{{ asset('assets/post_edit.svg') }}" alt="Edit Post">
-                                <button class="text-left w-full block px-4 py-2 hover:bg-gray-100">Edit Post</button>
-                            </div>
-                            <a href="/post/delete/{{ $post->id }}" class="pl-4 flex p-2 group place-items-center hover:bg-gray-100 cursor-pointer">
-                                <img class="h-4 w-5" src="{{ asset('assets/post_delete.svg') }}" alt="Delete Post">
-                                <button class="text-left w-full block px-4 py-2 hover:bg-gray-100">Delete Post</button>
-                            </a>
-                            @endif
-                        </div>
-                    </div>
+        <div class="shadow-md rounded-lg mt-4 hover:shadow-lg transition-shadow duration-300">
+            <div class="bg-white p-6 rounded-lg h-full flex flex-col">
+            <div class="flex items-center mb-4">
+                <img class="w-12 h-12 rounded-full object-cover border-2 border-gray-200" src="{{ $post->creator->image() }}" alt="Profile">
+                <div class="ml-3">
+                <p class="font-medium">{{ $post->creator->name }}
+                    @if (request('category') == 'Your Posts')
+                    <span class="ml-2 px-2 py-0.5 text-xs rounded-full font-medium
+                    @if($post->status == 'Denied') bg-red-100 text-red-700 
+                    @elseif($post->status == 'Approved') bg-green-100 text-green-700 
+                    @elseif($post->status == 'Pending') bg-yellow-100 text-yellow-700 
+                    @endif">
+                    {{ $post->status }}
+                    </span>
+                    @endif
+                </p>
+                <div class="flex items-center text-xs text-gray-500">
+                    <span>{{ $post->creator->role === 'Admin' ? ($post->creator->admin()->is_super ? 'Superadmin' : 'Admin' ) : 'Alumni' }}</span>
+                    @if ($post->post_category === 'Event')
+                    <img src="{{ asset('assets/calendar.svg') }}" class="ml-2 w-4 h-4" alt="Event">
+                    @elseif ($post->post_category === 'Job Opening')
+                    <img src="{{ asset('assets/job_opening.svg') }}" class="ml-2 w-4 h-4" alt="Job Opening">
+                    @elseif ($post->post_category === 'Announcement')
+                    <img src="{{ asset('assets/announcement.svg') }}" class="ml-2 w-4 h-4" alt="Announcement">
+                    @endif
+                    <span class="ml-2 text-gray-400">· {{ $post->created_at->diffForHumans() }}</span>
+                </div>
                 </div>
 
-                @if ($post->attached_image !== null)
-                <img class="mt-3" src="{{ $post->image() }}" alt="Attachment">
-                @endif
+                <div class="group relative ml-auto">
+                <button class="p-2 rounded-full hover:bg-gray-100 transition-colors">
+                    <img src="{{ asset('assets/option.svg') }}" alt="Options" class="w-5 h-5">
+                </button>
 
-                <p class="text-lg font-bold mt-3">{{ $post->title }}</p>
-                <p class="text-sm text-gray-400 break-words">{{ $post->content }}</p>
-
-                @if ($post->source !== null)
-                <p class="text-sm mt-3">Source:</p>
-                <a class="text-sm underline text-blue-500" target="_blank" href="{{ $post->source }}">{{ $post->source }}</a>
-                @endif
-
-                @if ($post->post_category !== 'Announcement')
-                <p class="text-sm mt-3">Status: <span class="text-gray-400 font-light">{{ $post->post_status }}</span></p>
-                @endif
-
-                <p class="text-sm mt-3">Posted on: <span class="text-gray-400 font-light">{{ $post->created_at->format('F j, Y \a\t g:i a') }}</span></p>
-                <div class="flex-1"></div>
-
-                <div class="flex mt-3">
-                    <a href="/post/pin/toggle/{{ $post->id }}" class="flex-1 pl-4 flex group bg-blue-600 cursor-pointer rounded-lg">
-                        @if ($post->isPinnedBy(auth()->user()))
-                        <img class="w-5" src="{{ asset('assets/post_unpin.svg') }}" alt="Pin Post">
-                        <button class="text-left w-full block px-4 py-2 text-white">Unpin Post</button>
-                        @else
-                        <img class="w-5" src="{{ asset('assets/post_pin.svg') }}" alt="Pin Post">
-                        <button class="text-left w-full block px-4 py-2 text-white">Pin Post</button>
-                        @endif
+                <div class="w-52 right-0 absolute hidden group-hover:block bg-white shadow-xl rounded-lg overflow-hidden z-10 border border-gray-100">
+                    <a href="/post/pin/toggle/{{ $post->id }}" class="flex items-center p-3 hover:bg-gray-50 transition-colors">
+                    <img class="w-5 h-5" src="{{ asset($post->isPinnedBy(auth()->user()) ? 'assets/post_unpin.svg' : 'assets/post_pin.svg') }}" alt="Pin">
+                    <span class="ml-3">{{ $post->isPinnedBy(auth()->user()) ? 'Unpin Post' : 'Pin Post' }}</span>
                     </a>
-                    <div class="mx-1"></div>
-                    <a href="/post/save/toggle/{{ $post->id }}" class="flex-1 pl-4 flex group bg-blue-600 cursor-pointer rounded-lg place-items-center">
-                        <img class="h-4 w-5" src="{{ asset('assets/post_save.svg') }}" alt="Save Post">
-                        @if ($post->isSavedBy(auth()->user()))
-                        <button class="text-left w-full block px-4 py-2 text-white">Unsave Post</button>
-                        @else
-                        <button class="text-left w-full block px-4 py-2 text-white">Save Post</button>
-                        @endif
+
+                    <a href="/post/save/toggle/{{ $post->id }}" class="flex items-center p-3 hover:bg-gray-50 transition-colors">
+                    <img class="w-5 h-5" src="{{ asset('assets/post_save.svg') }}" alt="Save">
+                    <span class="ml-3">{{ $post->isSavedBy(auth()->user()) ? 'Unsave Post' : 'Save Post' }}</span>
                     </a>
+
+                    @if ($post->creator->id === Auth::user()->id)
+                    <hr class="border-gray-100">
+                    <div class="flex items-center p-3 hover:bg-gray-50 transition-colors cursor-pointer post-edit-btn" data-post-id="{{ $post->id }}">
+                    <img class="w-5 h-5" src="{{ asset('assets/post_edit.svg') }}" alt="Edit">
+                    <span class="ml-3">Edit Post</span>
+                    </div>
+                    <a href="/post/delete/{{ $post->id }}" class="flex items-center p-3 hover:bg-gray-50 transition-colors text-red-600">
+                    <img class="w-5 h-5" src="{{ asset('assets/post_delete.svg') }}" alt="Delete">
+                    <span class="ml-3">Delete Post</span>
+                    </a>
+                    @endif
                 </div>
+                </div>
+            </div>
+
+            <h2 class="text-xl font-bold mb-2">{{ $post->title }}</h2>
+            <p class="text-gray-700 mb-4 leading-relaxed">{{ $post->content }}</p>
+
+            @if ($post->attached_image !== null)
+            <div class="mb-4 rounded-lg overflow-hidden">
+                <img class="w-full object-cover" src="{{ $post->image() }}" alt="Attachment">
+            </div>
+            @endif
+
+            @if ($post->source !== null)
+            <div class="mb-4 bg-gray-50 p-3 rounded-lg">
+                <p class="text-sm text-gray-500">Source:</p>
+                <a class="text-blue-600 hover:underline text-sm break-all" target="_blank" href="{{ $post->source }}">{{ $post->source }}</a>
+            </div>
+            @endif
+
+            @if ($post->post_category !== 'Announcement')
+            <p class="text-sm mb-2">Status: <span class="font-medium">{{ $post->post_status }}</span></p>
+            @endif
+
+            <p class="text-xs text-gray-400 mb-4">Posted on {{ $post->created_at->format('F j, Y \a\t g:i a') }}</p>
+            
+            <div class="mt-auto flex gap-2">
+                <a href="/post/pin/toggle/{{ $post->id }}" class="flex-1 flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg transition-colors">
+                <img class="w-4 h-4" src="{{ asset('assets/post_pin.svg') }}" alt="Pin">
+                <span>{{ $post->isPinnedBy(auth()->user()) ? 'Unpin' : 'Pin' }}</span>
+                </a>
+                <a href="/post/save/toggle/{{ $post->id }}" class="flex-1 flex items-center justify-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-800 py-2 px-4 rounded-lg transition-colors">
+                <img class="w-4 h-4" src="{{ asset('assets/post_save.svg') }}" alt="Save">
+                <span>{{ $post->isSavedBy(auth()->user()) ? 'Unsave' : 'Save' }}</span>
+                </a>
+            </div>
             </div>
         </div>
         @endforeach

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\SendSMSAsyncJob;
 use App\Models\Admin;
 use App\Models\AdminGenerated;
 use App\Models\Department;
@@ -12,11 +13,12 @@ use App\Models\PersonalRecord;
 use App\Models\Post;
 use App\Models\User;
 use App\Models\UserAlert;
-use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+
+use Exception;
 
 class SuperAdminController extends Controller
 {
@@ -47,6 +49,32 @@ class SuperAdminController extends Controller
     public function createAccountView()
     {
         return view('superadmin.create-account');
+    }
+
+    public function sendSmsCredentials(Request $request) {
+        $request->validate([
+            'import_history_id' => ['required', 'exists:import_histories,id'],
+        ]); 
+
+        $users = User::query()
+            ->whereRelation('importGenerated', 'import_history_id', '=', $request->import_history_id)
+            ->get();
+
+        foreach ($users as $user) {
+            $username = $user->username;
+            $password = $user->importGenerated->default_password;
+            $content = <<<TEXT
+            🔑 Login Credentials
+            Welcome! Your FilTracer admin account has been created. Use the following credentials to log in.
+            Username: $username
+            Password: $password
+            Change your password after logging in for security. Log in now: https://filtracer.com/login
+            TEXT;
+
+            SendSMSAsyncJob::dispatch($user->partialPersonal->philSMSNum(), $content);
+        }
+
+        return back()->with('message', 'SMS credentials sent successfully.');
     }
 
     public function createAccount(Request $request)
@@ -224,7 +252,7 @@ class SuperAdminController extends Controller
 
         usleep(500000);
 
-        $type = count($header) === 14 ? 'student' : (count($header) === 8 ? 'admin' : null);
+        $type = count($header) === 15 ? 'student' : (count($header) === 8 ? 'admin' : null);
         if ($type === null) {
             return response()->json(['message' => 'Wrong csv file structure', 'status' => 'wrongfs'], 400);
         }
@@ -338,7 +366,7 @@ class SuperAdminController extends Controller
 
     public function postRequestView()
     {
-        $statusSelect = request()->query('status', 'Pending');  
+        $statusSelect = request()->query('status', 'Pending');
 
         $posts = Post::query()
             ->where('status', '=', $statusSelect)

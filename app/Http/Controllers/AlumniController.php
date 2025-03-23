@@ -2,10 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\SendSMSAsyncJob;
+use App\Models\BindingRequest;
+use App\Models\BoundAccount;
 use App\Models\ChatGroup;
 use App\Models\EducationRecord;
 use App\Models\PersonalRecord;
 use App\Models\Post;
+use App\Models\PrimarySecondaryEducation;
 use App\Models\ProfessionalRecord;
 use App\Models\ProfessionalRecordAttachments;
 use App\Models\ProfessionalRecordHardSkill;
@@ -24,12 +28,54 @@ class AlumniController extends Controller
         return view('alumni.dashboard');
     }
 
+    public function denyBinding(BindingRequest $binding)
+    {
+        $binding->is_denied = true;
+        $binding->save();
+
+        return back()->with('message', 'Binding request from ' . $binding->admin->admin()->fullname . ' denied.');
+    }
+
+    public function acceptBinding(BindingRequest $binding) {
+        $bound = $binding->toBoundAccount();
+
+        return back()->with('message', 'Bound account with ' . $bound->admin->admin()->fullname . '.');
+    }
+
     public function alumniProfileView()
     {
         $user = Auth::user();
 
         return view('alumni.profile')
             ->with('user', $user);
+    }
+
+    public function updatePrimarySecondary(Request $request, PrimarySecondaryEducation $primsec, User $alumni)
+    {
+        // Basic validation for all records
+        $validated = $request->validate([
+            'type' => ['required'],
+            'school_name' => ['required'],
+            'location' => ['required'],
+            'start' => ['required'],
+            'end' => ['required'],
+        ]);
+
+        // If secondary education, validate strand
+        if ($validated['type'] === 'secondary') {
+            $strandValidation = $request->validate([
+                'strand' => ['required'],
+            ]);
+
+            $validated['strand'] = $strandValidation['strand'];
+        }
+
+        foreach ($validated as $key => $value) {
+            $primsec->$key = $value;
+        }
+        $primsec->save();
+
+        return back()->with('message', 'Education record updated successfully');
     }
 
     public function settingsPasswordView()
@@ -54,7 +100,6 @@ class AlumniController extends Controller
         ]);
 
         return back()->with('message', 'Password updated successfully');
-
     }
 
     public function settingsView()
@@ -72,6 +117,54 @@ class AlumniController extends Controller
 
     public function addEducationRecord(Request $request, User $alumni)
     {
+        $validated = $request->validate([
+            'level' => ['required'],
+        ]);
+
+        if ($validated['level'] === 'Primary') {
+            $validated = $request->validate([
+                'school' => ['required'],
+                'location' => ['required'],
+                'start' => ['required'],
+                'end' => ['required']
+            ]);
+
+            $record = new PrimarySecondaryEducation();
+
+            $record->user_id = $alumni->id;
+            $record->type = 'primary';
+            $record->school_name = $validated['school'];
+            $record->location = $validated['location'];
+            $record->start = $validated['start'];
+            $record->end = $validated['end'];
+
+            $record->save();
+
+            return back()->with('message', 'Education record added successfully!');
+        } else if ($validated['level'] === 'Secondary') {
+            $validated = $request->validate([
+                'track' => ['required'],
+                'school' => ['required'],
+                'location' => ['required'],
+                'start' => ['required'],
+                'end' => ['required']
+            ]);
+
+            $record = new PrimarySecondaryEducation();
+
+            $record->user_id = $alumni->id;
+            $record->type = 'secondary';
+            $record->strand = $validated['track'];
+            $record->school_name = $validated['school'];
+            $record->location = $validated['location'];
+            $record->start = $validated['start'];
+            $record->end = $validated['end'];
+
+            $record->save();
+
+            return back()->with('message', 'Education record added successfully!');
+        }
+
         $validated = $request->validate([
             'school' => ['required'],
             'location' => ['required'],
@@ -385,11 +478,11 @@ class AlumniController extends Controller
             return redirect('/alumni/setup/personal');
         }
 
-        if (!Auth::user()->educationalBios()->exists()) {
+        if (!User::query()->find(Auth::user()->id)->educationalBios()->exists()) {
             return redirect('/alumni/setup/educational');
         }
 
-        if (is_null(Auth::user()->getProfessionalBio())) {
+        if (is_null(User::query()->find(Auth::user()->id)->getProfessionalBio())) {
             return redirect('/alumni/setup/professional');
         }
 
@@ -424,7 +517,9 @@ class AlumniController extends Controller
             ]);
         }
 
-        return redirect('/alumni')->with('message', 'Profile picture updated successfully');
+        Auth::logout();
+
+        return redirect('/login')->with('message', 'Profile picture updated successfully');
     }
 
     public function updatePersonalProfile(Request $request, User $alumni)

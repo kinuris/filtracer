@@ -24,5 +24,10 @@ class PartialPersonalRecord extends Model
         return trim("{$this->first_name} " . ($this->middle_name ? "{$this->middle_name[0]}. " : "") . "{$this->last_name} {$this->suffix}");
     }
 
+    public function philSMSNum()
+    {
+        return '63' . substr($this->phone_number, 1);
+    }
+
     use HasFactory;
 }

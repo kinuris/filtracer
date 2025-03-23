@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\Message;
+use App\Jobs\SendSMSAsyncJob;
+use App\Models\BindingRequest;
 use App\Models\ChatGroup;
 use App\Models\Course;
 use App\Models\Department;
@@ -27,9 +30,133 @@ class AdminController extends Controller
         return view('department.index');
     }
 
+
+    public function createLink(Request $request)
+    {
+        $validated = $request->validate([
+            'alumni_id' => ['required'],
+        ]);
+
+        $bindReq = new BindingRequest();
+
+        $bindReq->alumni_id = $validated['alumni_id'];
+        $bindReq->admin_id = Auth::user()->id;
+        $bindReq->is_denied = false;
+
+        $bindReq->save();
+
+        return back()->with('message', 'Binding request created successfully');
+    }
+
+    public function deleteLink(Request $request, User $alumni)
+    {
+        $bindingReq = $alumni->hasActiveBindingRequestWith(Auth::user())->first();
+        BindingRequest::query()->where('id', '=', $bindingReq->id)->delete();
+
+        return back()->with('message', 'Successfully removed linking request');
+    }
+
+    public function linkAccount()
+    {
+        $users = User::query();
+
+        if (request('mode') === 'generated') {
+            $users = User::has('adminGenerated');
+        }
+
+        $role = request()->query('user_role', 'Alumni');
+        if ($role === 'Alumni' && request('mode') !== 'generated') {
+            $users = User::query()->where('role', '=', 'Alumni');
+        } elseif ($role === 'Alumni' && request('mode') === 'generated') {
+            $users = User::has('adminGenerated')
+                ->where('role', '=', 'Alumni')
+                ->whereHas('adminGenerated');
+        } else {
+            $users = $users->where('id', '!=', Auth::user()->id)
+                ->where('role', '=', 'Admin');
+        }
+
+        $search = request()->query('search');
+        if ($search) {
+            if ($role === 'Alumni') {
+                $users = $users->whereRelation('personalBio', 'first_name', 'LIKE', '%' . $search . '%')
+                    ->orWhereRelation('personalBio', 'middle_name', 'LIKE', '%' . $search . '%')
+                    ->orWhereRelation('personalBio', 'last_name', 'LIKE', '%' . $search . '%');
+            } else {
+                $users = $users->whereRelation('adminRelation', 'first_name', 'LIKE', '%' . $search . '%')
+                    ->orWhereRelation('adminRelation', 'middle_name', 'LIKE', '%' . $search . '%')
+                    ->orWhereRelation('adminRelation', 'last_name', 'LIKE', '%' . $search . '%');
+            }
+        }
+
+        $status = (int) request()->query('user_status', -1);
+        if ($status !== -1) {
+            if ($role === 'Alumni') {
+                $users = $users->whereHas('personalBio', function ($query) {
+                    $query->where('status', '=', request()->query('user_status'));
+                });
+            } else {
+                $users = $users->whereHas('adminRelation', function ($query) {
+                    $query->where('is_verified', '=', request()->query('user_status'));
+                });
+            }
+        }
+
+        $users = $users->paginate(6);
+
+        return view('admin.link-account')
+            ->with('users', $users)
+            ->with('status', $status);
+    }
+
+    public function updateAccountFromVerify(Request $request, User $user)
+    {
+        // Validate the request data
+        $validated = $request->validate([
+            'first_name' => ['required', 'string', 'max:255'],
+            'middle_name' => ['nullable', 'string', 'max:255'],
+            'last_name' => ['required', 'string', 'max:255'],
+            'suffix' => ['nullable', 'string', 'max:10'],
+            'username' => ['required', 'string', 'max:255', Rule::unique('users')->ignore($user->id)],
+            'email_address' => ['required', 'string', 'email', 'max:255'],
+            'phone_number' => ['required', 'string', 'max:20'],
+            'student_id' => ['required', 'string', 'max:50'],
+            'course_id' => ['required', 'exists:courses,id'],
+            'start' => ['required', 'integer', 'min:1900', 'max:' . date('Y')],
+            'end' => ['required', 'integer', 'min:1900', 'max:' . date('Y'), 'gte:start'],
+        ]);
+
+        // Update user basic information
+        $user->update([
+            'username' => $validated['username'],
+            'email' => $validated['email_address'],
+        ]);
+
+        // Update additional information for Alumni users
+        if ($user->role == 'Alumni') {
+            $user->getPersonalBio()->update([
+                'first_name' => $validated['first_name'],
+                'middle_name' => $validated['middle_name'],
+                'last_name' => $validated['last_name'],
+                'suffix' => $validated['suffix'],
+                'phone_number' => $validated['phone_number'],
+                'student_id' => $validated['student_id'],
+            ]);
+
+            // Update educational information
+            $user->getEducationalBio()->update([
+                'course_id' => $validated['course_id'],
+                'year_start' => $validated['start'],
+                'year_end' => $validated['end'],
+            ]);
+        }
+
+        return redirect('/account')->with('message', 'Account updated successfully from verification');
+    }
+
     public function rejectPost(Post $post)
     {
-        $post->update(['status' => 'Rejected']);
+        $post->update(['status' => 'Denied']);
 
         return redirect('/admin')->with('message', 'Post rejected successfully');
     }
@@ -50,7 +177,8 @@ class AdminController extends Controller
 
     public function auditView()
     {
-        $audits = Audit::query();
+        $audits = Audit::query()
+            ->latest();
 
         $search = request()->query('search');
         if ($search) {
@@ -72,7 +200,7 @@ class AdminController extends Controller
     {
         $users = User::partialSet()->where('role', '=', 'Alumni')->orderBy('created_at', 'DESC');
 
-        $users = $users->paginate(5);
+        $users = $users->paginate(7);
 
         return view('report.statistical')->with('users', $users);
     }
@@ -190,7 +318,7 @@ class AdminController extends Controller
 
         $role = request()->query('user_role', 'Alumni');
         if ($role === 'Alumni' && request('mode') !== 'generated') {
-            $users = User::compSet()->where('role', '=', 'Alumni');
+            $users = User::query()->where('role', '=', 'Alumni');
         } elseif ($role === 'Alumni' && request('mode') === 'generated') {
             $users = User::has('adminGenerated')
                 ->where('role', '=', 'Alumni')
@@ -199,7 +327,6 @@ class AdminController extends Controller
             $users = $users->where('id', '!=', Auth::user()->id)
                 ->where('role', '=', 'Admin');
         }
-
 
         $search = request()->query('search');
         if ($search) {
@@ -234,13 +361,12 @@ class AdminController extends Controller
 
     public function alumniListView(Request $request, Department $department)
     {
-        $users = User::hasBio('educational');
+        // $users = User::hasBio('educational');
+        $users = User::partialSet();
 
         $course = (int) $request->query('course');
         if ($course && $course !== -1) {
             $users = User::isCourse($request->query('course'));
-
-            dd($users->get());
         }
 
         $search = $request->query('search');
@@ -251,7 +377,7 @@ class AdminController extends Controller
         $users = $users
             ->where('department_id', '=', $department->id)
             ->where('role', '=', 'Alumni')
-            ->paginate(5);
+            ->paginate(7);
 
         $courses = $department->getCourses();
 
@@ -405,6 +531,11 @@ class AdminController extends Controller
             ]);
         }
 
+        SendSMSAsyncJob::dispatch(
+            $user->personalBio->philSMSNum(),
+            "✅ Account Verified\nCongratulations, " . $user->personalBio->first_name . "! Your FilTracer account has been verified. Log in now to connect with other users and explore opportunities. Visit: https://filtracer.com/login"
+        );
+
         return redirect('/account')->with('message', 'User VERIFIED successfully');
     }
 
@@ -427,6 +558,11 @@ class AdminController extends Controller
                 'user_id' => $admin->id
             ]);
         }
+
+        SendSMSAsyncJob::dispatch(
+            $user->personalBio->philSMSNum(),
+            "❌ Account Unverified\nWe regret to inform you that your FilTracer account has been unverified. Please contact the admin for more information."
+        );
 
         return redirect('/account')->with('message', 'User UNVERIFIED successfully');
     }
@@ -524,6 +660,7 @@ class AdminController extends Controller
 
     public function deleteDepartmentView(Department $department)
     {
+        Storage::delete('/public/departments/' . $department->logo);
         $department->delete();
 
         return redirect('/settings/department')->with('message', 'Department deleted successfully');
@@ -534,5 +671,12 @@ class AdminController extends Controller
         $user->delete();
 
         return redirect('/account')->with('message', 'User deleted successfully');
+    }
+
+    public function userDeleteDepartment(User $user)
+    {
+        $user->delete();
+
+        return back()->with('message', 'User deleted successfully');
     }
 }

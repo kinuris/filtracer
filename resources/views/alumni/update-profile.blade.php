@@ -175,6 +175,78 @@
                         </div>
                     </form>
                     @elseif ($query === 'educational')
+                    @foreach($user->primsecEducational as $primsec)
+                    <form action="/alumni/profile/update/primsec/{{ $primsec->id }}/{{ $user->id }}" method="POST">
+                        @csrf
+                        <div class="flex flex-col">
+                            <div class="flex">
+                                <div class="flex flex-col flex-1 max-w-[50%]">
+                                    <label for="type_{{ $loop->index }}">Education Level</label>
+                                    <select class="text-gray-400 border rounded-lg p-2 education-type" name="type" id="type_{{ $loop->index }}" onchange="toggleStrand({{ $loop->index }})">
+                                        <option {{ $primsec->type === 'primary' ? 'selected' : '' }} value="primary">Primary Education</option>
+                                        <option {{ $primsec->type === 'secondary' ? 'selected' : '' }} value="secondary">Secondary Education</option>
+                                    </select>
+
+                                    <label class="mt-3" for="school_name">School Name</label>
+                                    <input value="{{ $primsec->school_name }}" class="text-gray-400 border rounded-lg p-2" type="text" name="school_name">
+
+                                    <label class="mt-3" for="start">Year Started</label>
+                                    <input value="{{ $primsec->start }}" class="text-gray-400 border rounded-lg p-2" type="number" name="start">
+                                </div>
+
+                                <div class="mx-2"></div>
+
+                                <div class="flex flex-col flex-1">
+                                    <div id="strand_container_{{ $loop->index }}" class="{{ $primsec->type === 'primary' ? 'hidden' : '' }} mb-3">
+                                        <label for="strand_{{ $loop->index }}">Strand (for Senior High)</label>
+                                        <select class="text-gray-400 border rounded-lg p-2" name="strand" id="strand_{{ $loop->index }}">
+                                            <option {{ $primsec->strand === 'STEM' ? 'selected' : '' }} value="STEM">STEM</option>
+                                            <option {{ $primsec->strand === 'HUMSS' ? 'selected' : '' }} value="HUMSS">HUMSS</option>
+                                            <option {{ $primsec->strand === 'ABM' ? 'selected' : '' }} value="ABM">ABM</option>
+                                            <option {{ $primsec->strand === 'GAS' ? 'selected' : '' }} value="GAS">GAS</option>
+                                            <option {{ $primsec->strand === 'Home Economics' ? 'selected' : '' }} value="Home Economics">Home Economics</option>
+                                            <option {{ $primsec->strand === 'ICT' ? 'selected' : '' }} value="ICT">ICT</option>
+                                            <option {{ $primsec->strand === 'Industrial Arts' ? 'selected' : '' }} value="Industrial Arts">Industrial Arts</option>
+                                            <option {{ $primsec->strand === 'Agri-Fishery Arts' ? 'selected' : '' }} value="Agri-Fishery Arts">Agri-Fishery Arts</option>
+                                            <option {{ $primsec->strand === 'Sports Track' ? 'selected' : '' }} value="Sports Track">Sports Track</option>
+                                            <option {{ $primsec->strand === 'Arts and Design Track' ? 'selected' : '' }} value="Arts and Design Track">Arts and Design Track</option>
+                                        </select>
+                                    </div>
+
+                                    <label for="location">Location</label>
+                                    <input value="{{ $primsec->location }}" class="text-gray-400 border rounded-lg p-2" type="text" name="location">
+
+                                    <label class="mt-3" for="end">Year Graduated</label>
+                                    <input value="{{ $primsec->end }}" class="text-gray-400 border rounded-lg p-2" type="number" name="end">
+                                </div>
+                            </div>
+
+                            <div class="flex mt-4 justify-end">
+                                <button class="text-white bg-blue-600 py-2 px-6 rounded-lg" type="submit">Save</button>
+                            </div>
+                        </div>
+                    </form>
+                    @endforeach
+                    <script>
+                        function toggleStrand(index) {
+                            const typeSelect = document.getElementById('type_' + index);
+                            const strandContainer = document.getElementById('strand_container_' + index);
+
+                            if (typeSelect.value === 'primary') {
+                                strandContainer.classList.add('hidden');
+                            } else {
+                                strandContainer.classList.remove('hidden');
+                            }
+                        }
+
+                        // Initialize all forms on page load
+                        document.addEventListener('DOMContentLoaded', function() {
+                            const types = document.querySelectorAll('.education-type');
+                            types.forEach((select, index) => {
+                                toggleStrand(index);
+                            });
+                        });
+                    </script>
                     @foreach ($user->educationalBios as $educ)
                     <form action="/alumni/profile/update/educational/{{ $educ->id }}/{{ $user->id }}" method="POST">
                         @csrf
@@ -221,7 +293,7 @@
                             <select class="text-gray-400 border rounded-lg p-2" name="major" id="major">
                                 @php($majors = App\Models\Major::all())
                                 @foreach ($majors as $major)
-                                    <option {{ $educ->major_id === $major->id ? 'selected' : '' }} value="{{ $major->id }}">{{ $major->name }}</option> 
+                                <option {{ $educ->major_id === $major->id ? 'selected' : '' }} value="{{ $major->id }}">{{ $major->name }}</option>
                                 @endforeach
                             </select>
 

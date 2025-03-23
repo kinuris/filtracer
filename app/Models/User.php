@@ -61,9 +61,31 @@ class User extends Authenticatable
     {
         if ($this->role === 'Alumni' && $this->isCompSet()) {
             return $this->getPersonalBio()->getFullname();
+        } else if ($this->role === 'Alumni' && $this->partialSet()) {
+            return $this->partialPersonal->fullname;
         } else if ($this->role == 'Admin') {
             return $this->admin()->getFullnameAttribute();
         }
+    }
+
+    public function hasActiveBindingRequestWith(User $user)
+    {
+        return $this->hasOne(BindingRequest::class, 'alumni_id')
+            ->where('admin_id', '=', $user->id)
+            ->where('is_denied', '=', false)
+            ->get();
+    }
+
+    public function isAlumniLinkedWith(User $user)
+    {
+        return $this->hasOne(BoundAccount::class, 'alumni_id')
+            ->where('admin_id', '=', $user->id)
+            ->get();
+    }
+
+    public function primsecEducational()
+    {
+        return $this->hasMany(PrimarySecondaryEducation::class, 'user_id');
     }
 
     public function partialPersonal()
@@ -86,7 +108,8 @@ class User extends Authenticatable
         return $this->hasOne(AdminGenerated::class, 'user_id');
     }
 
-    public function importGenerated() {
+    public function importGenerated()
+    {
         return $this->hasOne(ImportGenerated::class, 'user_id');
     }
 
@@ -140,7 +163,8 @@ class User extends Authenticatable
         return User::query()->whereIn('id', $compSet);
     }
 
-    public static function partialSet() {
+    public static function partialSet()
+    {
         return User::query()->whereHas('partialPersonal');
     }
 
@@ -457,7 +481,8 @@ class User extends Authenticatable
         return $this->hasOne(PersonalRecord::class, 'user_id');
     }
 
-    public function adminRelation() {
+    public function adminRelation()
+    {
         return $this->hasOne(Admin::class, 'user_id');
     }
 

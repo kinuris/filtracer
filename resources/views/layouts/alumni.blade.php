@@ -60,6 +60,23 @@
                     Settings
                 </div>
             </a>
+
+            @php($bindings = App\Models\BindingRequest::query()
+            ->where('alumni_id', '=', Auth::user()->id)
+            ->where('is_denied', '=', false)
+            ->get())
+            @foreach($bindings as $binding)
+            <div class="mt-2 mb-3 p-4 border rounded-lg shadow-sm bg-white">
+                <div class="flex flex-col">
+                    <p class="font-medium text-gray-700 mb-2">Binding Account Request</p>
+                    <p class="text-sm text-gray-600 mb-3">From: <span class="font-semibold">{{ $binding->admin->admin()->fullname }}</span></p>
+                    <div class="flex space-x-2 mt-1">
+                        <a href="/binding/accept/{{ $binding->id }}" class="px-4 py-2 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors">Accept</a>
+                        <a href="/binding/deny/{{ $binding->id }}" class="px-4 py-2 text-sm bg-white border border-gray-300 text-gray-700 rounded hover:bg-gray-50 transition-colors">Decline</a>
+                    </div>
+                </div>
+            </div>
+            @endforeach
         </div>
 
         <div class="flex flex-col w-full max-h-screen relative">
@@ -125,8 +142,6 @@
                             </div>
                         </a>
 
-
-
                         <a href="#" class="block py-2 text-sm text-gray-700" role="menuitem" tabindex="-1" id="menu-item-3">
                             <div class="py-1 flex place-items-center" role="none">
                                 <img class="block h-4 mx-4" src="{{ asset('assets/settings.svg') }}" alt="Profile">
@@ -140,6 +155,39 @@
                                 Logout
                             </div>
                         </a>
+
+                        @php($linkedAccounts = App\Models\BoundAccount::query()->where('alumni_id', '=', Auth::user()->id)->get())
+                        <div class="relative group">
+                            <a href="/link-account" class="block py-2 text-sm text-gray-700" role="menuitem" tabindex="-1" id="menu-item-7">
+                                <div class="py-1 flex place-items-center justify-between" role="none">
+                                    <div class="flex items-center">
+                                        <img class="block h-4 mx-4" src="{{ asset('assets/switch_account.png') }}" alt="Link Account">
+                                        Link Account
+                                    </div>
+                                    @if($linkedAccounts->count() !== 0)
+                                    <span class="material-symbols-outlined text-gray-400 mr-2">chevron_right</span>
+                                    @endif
+                                </div>
+                            </a>
+                            @if($linkedAccounts->count() !== 0)
+                            <div class="absolute left-0 -translate-x-full top-0 hidden group-hover:block bg-white shadow-lg rounded-md w-48 z-20">
+                                <div class="py-1" role="none">
+                                    <p class="px-4 py-2 text-xs font-medium text-gray-500">Linked Accounts</p>
+                                    @foreach($linkedAccounts as $account)
+                                    <form action="/switch-account/{{ $account->admin->id }}" method="POST" class="block">
+                                        @csrf
+                                        <button type="submit" class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem" tabindex="-1">
+                                            <div class="flex place-items-center">
+                                                <img class="w-5 h-5 mr-3 rounded-full" src="{{ $account->admin->image() }}" alt="{{ $account->admin->name }}">
+                                                {{ $account->admin->name }}
+                                            </div>
+                                        </button>
+                                    </form>
+                                    @endforeach
+                                </div>
+                            </div>
+                            @endif
+                        </div>
                     </div>
                 </div>
             </nav>
@@ -153,7 +201,7 @@
             @if (session('error'))
             <div class="flex absolute top-20 left-2 z-40 bg-red-50 border-l-4 border-red-500 text-red-700 shadow-lg p-4 rounded-lg place-items-center">
                 <svg class="w-6 h-6 mr-3 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                    <path fill-rule="evenodd" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 11c-.55 0-1-.45-1-1V8c0-.55.45-1 1-1s1 .45 1 1v4c0 .55-.45 1-1 1zm1 4h-2v-2h2v2z" clip-rule="evenodd"/>
+                    <path fill-rule="evenodd" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 11c-.55 0-1-.45-1-1V8c0-.55.45-1 1-1s1 .45 1 1v4c0 .55-.45 1-1 1zm1 4h-2v-2h2v2z" clip-rule="evenodd" />
                 </svg>
                 <div>
                     <h1 class="font-medium">{{ session('error') }}</h1>

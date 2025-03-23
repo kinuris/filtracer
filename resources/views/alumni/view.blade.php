@@ -3,7 +3,9 @@
 @section('title', 'Profile Details')
 
 @section('content')
+@if($user->isCompSet())
 @include('components.manage-account-modal')
+@endif
 @php($query = request()->query('type') ?? 'personal')
 <div class="bg-gray-100 w-full h-full p-8 flex flex-col max-h-[calc(100%-4rem)]">
     <h1 class="font-medium tracking-widest text-lg">Profile Details</h1>
@@ -19,12 +21,49 @@
                         <img class="w-5 ml-3" src="{{ asset('assets/chat_gray.svg') }}" alt="Chat">
                     </a> -->
                 </div>
+                @if ($user->isCompSet())
                 <p class="text-gray-400 text-sm">{{ $user->getEducationalBio()->getCourse()->name }}</p>
+                @else
+                <div class="flex gap-3">
+                    <p class="text-gray-400 text-sm">Incomplete Setup (Cannot Verify/Unverify)</p>
+                    <button type="button" onclick="document.getElementById('deleteModal{{ $user->id }}').classList.remove('hidden')" class="border-0 bg-transparent cursor-pointer p-0">
+                        <img src="{{ asset('assets/trash.svg') }}" alt="Trash">
+                    </button>
+
+                    <!-- Delete Confirmation Modal -->
+                    <div id="deleteModal{{ $user->id }}" class="hidden fixed inset-0 z-50">
+                        <div class="absolute inset-0 bg-black opacity-60 transition-opacity"></div>
+                        <div class="absolute inset-0 flex items-center justify-center p-4">
+                            <div class="bg-white rounded-lg shadow-2xl max-w-md w-full transform transition-all">
+                                <div class="border-b px-6 py-4 flex items-center">
+                                    <div class="bg-red-100 p-2 rounded-full mr-3">
+                                        <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                        </svg>
+                                    </div>
+                                    <h3 class="text-xl font-semibold text-gray-900">Confirm Deletion</h3>
+                                </div>
+                                <div class="px-6 py-4">
+                                    <p class="text-gray-600">Are you sure you want to delete this alumni record? This action cannot be undone.</p>
+                                </div>
+                                <div class="bg-gray-50 px-6 py-4 rounded-b-lg flex justify-end space-x-3">
+                                    <button onclick="document.getElementById('deleteModal{{ $user->id }}').classList.add('hidden')" class="px-4 py-2 bg-white border border-gray-300 rounded-md font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 shadow-sm">
+                                        Cancel
+                                    </button>
+                                    <a href="/user/delete/{{ $user->id }}" class="px-4 py-2 bg-red-600 border border-transparent rounded-md font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 shadow-sm">
+                                        Delete Record
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                @endif
             </div>
 
             <div class="flex-1"></div>
 
-            <a class="rounded-lg p-2 px-3 bg-blue-600 text-white" href="/profile/report/{{ $user->id }}">Generate Report</a>
+            @if($user->isCompSet())<a class="rounded-lg p-2 px-3 bg-blue-600 text-white" href="/profile/report/{{ $user->id }}">Generate Report</a>@endif
             @if (Auth::user()->admin()->is_super)
             <button class="rounded-lg p-2 px-3 bg-blue-600 text-white mx-3" id="openManageAccountModal">Manage Account</button>
             @else
@@ -35,95 +74,94 @@
     </div>
 
     <div class="shadow rounded-lg mt-4 box-border h-full max-h-full overflow-auto">
-        <div class="bg-white py-4 flex flex-col px-6 border-b rounded-lg min-h-full">
-            <div class="flex mb-4">
-                <a class="text-black font-semibold @if($query === 'personal') pb-1 border-b-2 border-blue-500 !text-blue-500 @endif" href="?type=personal">Basic Info</a>
-                <a class="text-black font-semibold mx-4 @if($query === 'educational') pb-1 border-b-2 border-blue-500 !text-blue-500 @endif" href="?type=educational">Educational Info</a>
-                <a class="text-black font-semibold @if($query === 'professional') pb-1 border-b-2 border-blue-500 !text-blue-500 @endif" href="?type=professional">Professional Info</a>
+        <div class="bg-white py-5 flex flex-col px-7 border-b rounded-lg min-h-full shadow-sm">
+            <div class="flex mb-5 border-b">
+                <a class="text-gray-700 font-semibold px-3 py-2 transition-colors duration-200 @if($query === 'personal') pb-2 border-b-2 border-blue-600 !text-blue-600 @endif" href="?type=personal">Basic Info</a>
+                <a class="text-gray-700 font-semibold px-3 py-2 transition-colors duration-200 @if($query === 'educational') pb-2 border-b-2 border-blue-600 !text-blue-600 @endif" href="?type=educational">Educational Info</a>
+                <a class="text-gray-700 font-semibold px-3 py-2 transition-colors duration-200 @if($query === 'professional') pb-2 border-b-2 border-blue-600 !text-blue-600 @endif" href="?type=professional">Professional Info</a>
             </div>
-            @if ($query === 'personal' && $user->getPersonalBio() !== null)
-            @php ($personal = $user->getPersonalBio())
-            <div class="flex flex-col h-full">
-                <div class="flex">
-                    <div class="flex flex-col justify-between flex-1 mx-2 h-fit">
-                        <p class="text-xs font-semibold mb-1.5 tracking-wider text-black">First Name</p>
-                        <p class="border p-1.5 rounded text-black bg-gray-100">{{ $personal->first_name }}</p>
-                    </div>
-
-                    <div class="flex flex-col justify-between flex-1 mx-2 h-fit">
-                        <p class="text-xs font-semibold mb-1.5 tracking-wider text-black">Middle Name</p>
-                        <p class="border p-1.5 rounded text-black bg-gray-100">{{ $personal->middle_name ?? '(None)' }}</p>
-                    </div>
-
-                    <div class="flex flex-col justify-between flex-1 mx-2 h-fit">
-                        <p class="text-xs font-semibold mb-1.5 tracking-wider text-black">Age</p>
-                        <p class="border p-1.5 rounded text-black bg-gray-100">{{ $personal->getAge() }}</p>
-                    </div>
-
-                    <div class="flex flex-col justify-between flex-1 mx-2 h-fit">
-                        <p class="text-xs font-semibold mb-1.5 tracking-wider text-black line-clamp-1" title="Permanent Address">Home Address</p>
-                        <p class="border p-1.5 rounded text-black bg-gray-100 line-clamp-1 overflow-auto">{{ $personal->permanent_address }}</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="flex mt-3">
-                <div class="flex flex-col justify-between flex-1 mx-2 h-fit">
-                    <p class="text-xs font-semibold mb-1.5 tracking-wider text-black">Last Name</p>
-                    <p class="border p-1.5 rounded text-black bg-gray-100">{{ $personal->last_name }}</p>
+            @if ($query === 'personal' && ($user->getPersonalBio() !== null || $user->partialPersonal !== null))
+            @php ($personal = $user->getPersonalBio() ?? $user->partialPersonal)
+            <div class="grid grid-cols-4 gap-4 h-full">
+                <div class="flex flex-col h-fit">
+                    <p class="text-xs font-semibold mb-1.5 tracking-wider text-gray-700">First Name</p>
+                    <p class="border p-2 rounded-md {{ empty($personal->first_name) ? 'bg-gray-100 text-gray-400 italic' : 'bg-gray-50 text-gray-800' }} shadow-inner">{{ !empty($personal->first_name) ? $personal->first_name : 'None' }}</p>
                 </div>
 
-                <div class="flex flex-col justify-between flex-1 mx-2 h-fit">
-                    <p class="text-xs font-semibold mb-1.5 tracking-wider text-black">Suffix</p>
-                    <p class="border p-1.5 rounded text-black bg-gray-100">{{ $personal->suffix ?? '(None)' }}</p>
+                <div class="flex flex-col h-fit">
+                    <p class="text-xs font-semibold mb-1.5 tracking-wider text-gray-700">Middle Name</p>
+                    <p class="border p-2 rounded-md {{ empty($personal->middle_name) ? 'bg-gray-100 text-gray-400 italic' : 'bg-gray-50 text-gray-800' }} shadow-inner">{{ !empty($personal->middle_name) ? $personal->middle_name : 'None' }}</p>
                 </div>
 
-
-                <div class="flex flex-col justify-between flex-1 mx-2 h-fit">
-                    <p class="text-xs font-semibold mb-1.5 tracking-wider text-black line-clamp-1" title="Email">Email</p>
-                    <p class="border p-1.5 rounded text-black bg-gray-100 line-clamp-1 overflow-auto">{{ $personal->email_address }}</p>
+                <div class="flex flex-col h-fit">
+                    <p class="text-xs font-semibold mb-1.5 tracking-wider text-gray-700">Last Name</p>
+                    <p class="border p-2 rounded-md {{ empty($personal->last_name) ? 'bg-gray-100 text-gray-400 italic' : 'bg-gray-50 text-gray-800' }} shadow-inner">{{ !empty($personal->last_name) ? $personal->last_name : 'None' }}</p>
                 </div>
 
-                <div class="flex flex-col justify-between flex-1 mx-2 h-fit">
-                    <p class="text-xs font-semibold mb-1.5 tracking-wider text-black line-clamp-1" title="Current Address">Current Address</p>
-                    <p class="border p-1.5 rounded text-black bg-gray-100 line-clamp-1 overflow-auto">{{ $personal->current_address }}</p>
-                </div>
-            </div>
-
-            <div class="flex mt-3">
-                <div class="flex flex-col justify-between flex-1 mx-2 h-fit">
-                    <p class="text-xs font-semibold mb-1.5 tracking-wider text-black">Student ID</p>
-                    <p class="border p-1.5 rounded text-black bg-gray-100">{{ $personal->student_id }}</p>
+                <div class="flex flex-col h-fit">
+                    <p class="text-xs font-semibold mb-1.5 tracking-wider text-gray-700">Suffix</p>
+                    <p class="border p-2 rounded-md {{ empty($personal->suffix) ? 'bg-gray-100 text-gray-400 italic' : 'bg-gray-50 text-gray-800' }} shadow-inner">{{ !empty($personal->suffix) ? $personal->suffix : 'None' }}</p>
                 </div>
 
-                <div class="flex flex-col justify-between flex-1 mx-2 h-fit">
-                    <p class="text-xs font-semibold mb-1.5 tracking-wider text-black">Username</p>
-                    <p class="border p-1.5 rounded text-black bg-gray-100">{{ $user->username }}</p>
+                <div class="flex flex-col h-fit">
+                    <p class="text-xs font-semibold mb-1.5 tracking-wider text-gray-700">Age</p>
+                    <p class="border p-2 rounded-md {{ ($user->getPersonalBio() === null || empty($personal->getAge())) ? 'bg-gray-100 text-gray-400 italic' : 'bg-gray-50 text-gray-800' }} shadow-inner">{{ ($user->getPersonalBio() !== null && !empty($personal->getAge())) ? $personal->getAge() : 'None' }}</p>
                 </div>
 
-                <div class="flex flex-col justify-between flex-1 mx-2 h-fit">
-                    <p class="text-xs font-semibold mb-1.5 tracking-wider text-black">Civil Status</p>
-                    <p class="border p-1.5 rounded text-black bg-gray-100">{{ $personal->civil_status }}</p>
+                <div class="flex flex-col h-fit">
+                    <p class="text-xs font-semibold mb-1.5 tracking-wider text-gray-700">Student ID</p>
+                    <p class="border p-2 rounded-md {{ empty($personal->student_id) ? 'bg-gray-100 text-gray-400 italic' : 'bg-gray-50 text-gray-800' }} shadow-inner">{{ !empty($personal->student_id) ? $personal->student_id : 'None' }}</p>
                 </div>
 
-                <div class="flex flex-col justify-between flex-1 mx-2 h-fit">
-                    <p class="text-xs font-semibold mb-1.5 tracking-wider text-black line-clamp-1" title="Phone Number">Phone Number</p>
-                    <p class="border p-1.5 rounded text-black bg-gray-100 line-clamp-1 overflow-auto">{{ $personal->phone_number }}</p>
+                <div class="flex flex-col h-fit">
+                    <p class="text-xs font-semibold mb-1.5 tracking-wider text-gray-700">Username</p>
+                    <p class="border p-2 rounded-md {{ empty($user->username) ? 'bg-gray-100 text-gray-400 italic' : 'bg-gray-50 text-gray-800' }} shadow-inner">{{ !empty($user->username) ? $user->username : 'None' }}</p>
                 </div>
-            </div>
 
-            <div class="flex mt-2 gap-4 px-2">
-                <div class="flex flex-col justify-between flex-1 h-fit box-border">
-                    <p class="text-xs font-semibold mb-1.5 tracking-wider text-black">Gender</p>
-                    <p class="border p-1.5 rounded text-black bg-gray-100">{{ $personal->gender }}</p>
+                <div class="flex flex-col h-fit">
+                    <p class="text-xs font-semibold mb-1.5 tracking-wider text-gray-700">Gender</p>
+                    <p class="border p-2 rounded-md {{ empty($personal->gender) ? 'bg-gray-100 text-gray-400 italic' : 'bg-gray-50 text-gray-800' }} shadow-inner">{{ !empty($personal->gender) ? $personal->gender : 'None' }}</p>
                 </div>
-                <div class="flex flex-col justify-between flex-1 h-fit box-border">
-                    <p class="text-xs font-semibold mb-1.5 tracking-wider text-black line-clamp-1" title="Social Link">Social Link</p>
-                    <p class="border p-1.5 rounded text-black bg-gray-100 line-clamp-1 overflow-auto"><a class="underline" href="{{ $personal->social_link }}">{{ $personal->social_link }}</a></p>
+
+                <div class="flex flex-col h-fit">
+                    <p class="text-xs font-semibold mb-1.5 tracking-wider text-gray-700">Date of Birth</p>
+                    <p class="border p-2 rounded-md {{ empty($personal->birthdate) ? 'bg-gray-100 text-gray-400 italic' : 'bg-gray-50 text-gray-800' }} shadow-inner">{{ !empty($personal->birthdate) ? $personal->birthdate : 'None' }}</p>
                 </div>
-                <div class="flex flex-col justify-between flex-[2] h-fit box-border">
-                    <p class="text-xs font-semibold mb-1.5 tracking-wider text-black">Date of Birth</p>
-                    <p class="border p-1.5 rounded text-black bg-gray-100">{{ $personal->birthdate }}</p>
+
+                <div class="flex flex-col h-fit">
+                    <p class="text-xs font-semibold mb-1.5 tracking-wider text-gray-700">Civil Status</p>
+                    <p class="border p-2 rounded-md {{ empty($personal->civil_status) ? 'bg-gray-100 text-gray-400 italic' : 'bg-gray-50 text-gray-800' }} shadow-inner">{{ !empty($personal->civil_status) ? $personal->civil_status : 'None' }}</p>
+                </div>
+
+                <div class="flex flex-col h-fit">
+                    <p class="text-xs font-semibold mb-1.5 tracking-wider text-gray-700">Phone Number</p>
+                    <p class="border p-2 rounded-md {{ empty($personal->phone_number) ? 'bg-gray-100 text-gray-400 italic' : 'bg-gray-50 text-gray-800' }} shadow-inner line-clamp-1 overflow-auto">{{ !empty($personal->phone_number) ? $personal->phone_number : 'None' }}</p>
+                </div>
+
+                <div class="flex flex-col h-fit">
+                    <p class="text-xs font-semibold mb-1.5 tracking-wider text-gray-700">Email</p>
+                    <p class="border p-2 rounded-md {{ empty($personal->email_address) ? 'bg-gray-100 text-gray-400 italic' : 'bg-gray-50 text-gray-800' }} shadow-inner line-clamp-1 overflow-auto">{{ !empty($personal->email_address) ? $personal->email_address : 'None' }}</p>
+                </div>
+
+                <div class="flex flex-col h-fit col-span-2">
+                    <p class="text-xs font-semibold mb-1.5 tracking-wider text-gray-700">Home Address</p>
+                    <p class="border p-2 rounded-md {{ empty($personal->permanent_address) ? 'bg-gray-100 text-gray-400 italic' : 'bg-gray-50 text-gray-800' }} shadow-inner line-clamp-1 overflow-auto">{{ !empty($personal->permanent_address) ? $personal->permanent_address : 'None' }}</p>
+                </div>
+
+                <div class="flex flex-col h-fit col-span-2">
+                    <p class="text-xs font-semibold mb-1.5 tracking-wider text-gray-700">Current Address</p>
+                    <p class="border p-2 rounded-md {{ empty($personal->current_address) ? 'bg-gray-100 text-gray-400 italic' : 'bg-gray-50 text-gray-800' }} shadow-inner line-clamp-1 overflow-auto">{{ !empty($personal->current_address) ? $personal->current_address : 'None' }}</p>
+                </div>
+
+                <div class="flex flex-col h-fit col-span-4">
+                    <p class="text-xs font-semibold mb-1.5 tracking-wider text-gray-700">Social Link</p>
+                    <p class="border p-2 rounded-md {{ empty($personal->social_link) ? 'bg-gray-100 text-gray-400 italic' : 'bg-gray-50 text-gray-800' }} shadow-inner line-clamp-1 overflow-auto">
+                        @if(!empty($personal->social_link))
+                        <a class="underline text-blue-600 hover:text-blue-800" href="{{ $personal->social_link }}">{{ $personal->social_link }}</a>
+                        @else
+                        None
+                        @endif
+                    </p>
                 </div>
             </div>
         </div>
@@ -138,36 +176,32 @@
         @php ($records = $user->educationalBios)
         <div class="flex flex-col h-full">
             @foreach($records as $educ)
-            <div class="flex">
-                <div class="flex flex-col justify-between flex-1 mx-2 h-fit">
-                    <p class="text-xs font-semibold mb-1.5 tracking-wider text-black">School</p>
-                    <p class="border p-1.5 rounded text-black bg-gray-100">{{ $educ->school }}</p>
+            <div class="mb-6 border-b pb-6 last:border-b-0 last:pb-0 last:mb-0">
+                <div class="flex mb-3 justify-between items-center">
+                    <h4 class="text-sm font-medium text-gray-700">{{ $educ->school }}</h4>
+                    <span class="text-xs text-blue-600 bg-blue-50 rounded-full px-2 py-0.5 border border-blue-100">{{ $educ->degree_type }}</span>
                 </div>
-                <div class="flex flex-col justify-between flex-1 mx-2 h-fit">
-                    <p class="text-xs font-semibold mb-1.5 tracking-wider text-black">Course</p>
-                    <p class="border p-1.5 rounded text-black bg-gray-100">{{ $educ->getCourse()->name }}</p>
-                </div>
-            </div>
 
-            <div class="flex mt-2">
-                <div class="flex flex-col justify-between flex-1 mx-2 h-fit">
-                    <p class="text-xs font-semibold mb-1.5 tracking-wider text-black">Location</p>
-                    <p class="border p-1.5 rounded text-black bg-gray-100">{{ $educ->school_location }}</p>
+                <div class="flex">
+                    <div class="flex flex-col justify-between flex-1 mx-2 h-fit">
+                        <p class="text-xs font-semibold mb-1.5 tracking-wider text-gray-700">Course</p>
+                        <p class="border p-2 rounded-md text-gray-800 bg-gray-50 shadow-inner">{{ $educ->getCourse()->name }}</p>
+                    </div>
+                    <div class="flex flex-col justify-between flex-1 mx-2 h-fit">
+                        <p class="text-xs font-semibold mb-1.5 tracking-wider text-gray-700">Location</p>
+                        <p class="border p-2 rounded-md text-gray-800 bg-gray-50 shadow-inner">{{ $educ->school_location }}</p>
+                    </div>
                 </div>
-                <div class="flex flex-col justify-between flex-1 mx-2 h-fit">
-                    <p class="text-xs font-semibold mb-1.5 tracking-wider text-black">Start Year</p>
-                    <p class="border p-1.5 rounded text-black bg-gray-100">{{ $educ->start }}</p>
-                </div>
-            </div>
 
-            <div class="flex mt-2 border-b pb-6 mb-4">
-                <div class="flex flex-col justify-between flex-1 mx-2 h-fit">
-                    <p class="text-xs font-semibold mb-1.5 tracking-wider text-black">Degree Type</p>
-                    <p class="border p-1.5 rounded text-black bg-gray-100">{{ $educ->degree_type }}</p>
-                </div>
-                <div class="flex flex-col justify-between flex-1 mx-2 h-fit">
-                    <p class="text-xs font-semibold mb-1.5 tracking-wider text-black">End Year</p>
-                    <p class="border p-1.5 rounded text-black bg-gray-100">{{ is_null($educ->end) ? 'To Present' : $educ->end }}</p>
+                <div class="flex mt-3">
+                    <div class="flex flex-col justify-between flex-1 mx-2 h-fit">
+                        <p class="text-xs font-semibold mb-1.5 tracking-wider text-gray-700">Start Year</p>
+                        <p class="border p-2 rounded-md text-gray-800 bg-gray-50 shadow-inner">{{ $educ->start }}</p>
+                    </div>
+                    <div class="flex flex-col justify-between flex-1 mx-2 h-fit">
+                        <p class="text-xs font-semibold mb-1.5 tracking-wider text-gray-700">End Year</p>
+                        <p class="border p-2 rounded-md text-gray-800 bg-gray-50 shadow-inner">{{ is_null($educ->end) ? 'Present' : $educ->end }}</p>
+                    </div>
                 </div>
             </div>
             @endforeach
@@ -181,117 +215,98 @@
         @if ($query === 'professional' && $user->getProfessionalBio() !== null)
         @php($prof = $user->getProfessionalBio())
         <div class="flex flex-col h-full">
-            <div class="flex">
-                <div class="flex flex-col justify-between flex-1 mx-2 h-fit">
-                    <p class="text-xs font-semibold mb-1.5 tracking-wider text-black">Employment Status</p>
-                    <p class="border p-1.5 rounded text-black bg-gray-100">{{ $prof->employment_status }}</p>
+            <div class="flex gap-4">
+                <div class="flex flex-col justify-between flex-1 mx-1 h-fit">
+                    <p class="text-xs font-semibold mb-1.5 tracking-wider text-gray-700">Employment Status</p>
+                    <p class="border p-2 rounded-md text-gray-800 bg-gray-50 shadow-inner">{{ $prof->employment_status }}</p>
                 </div>
-                <div class="flex flex-col justify-between flex-1 mx-2 h-fit">
-                    <p class="text-xs font-semibold mb-1.5 tracking-wider text-black">Current Job Title</p>
-                    <p class="border p-1.5 rounded text-black bg-gray-100">{{ $prof->job_title }}</p>
-                </div>
-            </div>
-
-            <div class="flex mt-2">
-                <div class="flex flex-col justify-between flex-1 mx-2 h-fit">
-                    <p class="text-xs font-semibold mb-1.5 tracking-wider text-black">Employment Type 1</p>
-                    <p class="border p-1.5 rounded text-black bg-gray-100">{{ $prof->employment_type1 }}</p>
-                </div>
-                <div class="flex flex-col justify-between flex-1 mx-2 h-fit">
-                    <p class="text-xs font-semibold mb-1.5 tracking-wider text-black">Company / Employer</p>
-                    <p class="border p-1.5 rounded text-black bg-gray-100">{{ $prof->company_name }}</p>
+                <div class="flex flex-col justify-between flex-1 mx-1 h-fit">
+                    <p class="text-xs font-semibold mb-1.5 tracking-wider text-gray-700">Current Job Title</p>
+                    <p class="border p-2 rounded-md text-gray-800 bg-gray-50 shadow-inner">{{ $prof->job_title }}</p>
                 </div>
             </div>
 
-            <div class="flex mt-2">
-                <div class="flex flex-col justify-between flex-1 mx-2 h-fit">
-                    <p class="text-xs font-semibold mb-1.5 tracking-wider text-black">Employment Type 2</p>
-                    <p class="border p-1.5 rounded text-black bg-gray-100">{{ $prof->employment_type2 }}</p>
+            <div class="flex mt-4 gap-4">
+                <div class="flex flex-col justify-between flex-1 mx-1 h-fit">
+                    <p class="text-xs font-semibold mb-1.5 tracking-wider text-gray-700">Employment Type 1</p>
+                    <p class="border p-2 rounded-md text-gray-800 bg-gray-50 shadow-inner">{{ $prof->employment_type1 }}</p>
                 </div>
-                <div class="flex flex-col justify-between flex-1 mx-2 h-fit">
-                    <p class="text-xs font-semibold mb-1.5 tracking-wider text-black">Monthly Salary Range</p>
-                    <p class="border p-1.5 rounded text-black bg-gray-100">{{ $prof->monthly_salary }} PHP</p>
-                </div>
-            </div>
-
-            <div class="flex mt-2 border-b pb-6 mb-4">
-                <div class="flex flex-col justify-between flex-1 mx-2 h-fit">
-                    <p class="text-xs font-semibold mb-1.5 tracking-wider text-black">Industry</p>
-                    <p class="border p-1.5 rounded text-black bg-gray-100">{{ $prof->industry }}</p>
-                </div>
-                <div class="flex flex-col justify-between flex-1 mx-2 h-fit">
-                    <p class="text-xs font-semibold mb-1.5 tracking-wider text-black">Location</p>
-                    <p class="border p-1.5 rounded text-black bg-gray-100">{{ $prof->work_location }}</p>
+                <div class="flex flex-col justify-between flex-1 mx-1 h-fit">
+                    <p class="text-xs font-semibold mb-1.5 tracking-wider text-gray-700">Company / Employer</p>
+                    <p class="border p-2 rounded-md text-gray-800 bg-gray-50 shadow-inner">{{ $prof->company_name }}</p>
                 </div>
             </div>
 
-            <div class="flex mt-2">
-                <div class="flex flex-col justify-between flex-1 mx-2 h-fit">
-                    <p class="text-xs font-semibold mb-1.5 tracking-wider text-black">Waiting Time</p>
-                    <p class="flex-[2] border p-1.5 rounded text-black bg-gray-100">{{ $prof->waiting_time }}</p>
+            <div class="flex mt-4 gap-4">
+                <div class="flex flex-col justify-between flex-1 mx-1 h-fit">
+                    <p class="text-xs font-semibold mb-1.5 tracking-wider text-gray-700">Employment Type 2</p>
+                    <p class="border p-2 rounded-md text-gray-800 bg-gray-50 shadow-inner">{{ $prof->employment_type2 }}</p>
                 </div>
-
-                <div class="flex justify-between place-items-center flex-1 mx-4 h-fit">
-                    <p class="flex-1 tracking-wider text-slate-700">Certification and Licenses</p>
-                    <p class="flex-[2]"></p>
+                <div class="flex flex-col justify-between flex-1 mx-1 h-fit">
+                    <p class="text-xs font-semibold mb-1.5 tracking-wider text-gray-700">Monthly Salary Range</p>
+                    <p class="border p-2 rounded-md text-gray-800 bg-gray-50 shadow-inner">{{ $prof->monthly_salary }} PHP</p>
                 </div>
             </div>
 
-            <div class="flex mt-6">
-                <div class="flex justify-between place-items-center flex-1 mx-4 h-fit">
-                    <p class="flex-1 tracking-wider text-slate-700">Job Search Method(s)</p>
-                    <div class="flex-[2]">
-                        <ul class="list-disc pl-6">
-                            @php($hardSkills = $prof->methods)
-                            @foreach ($hardSkills as $skill)
-                            <li class="text-gray-400 text-lg">{{ $skill->method }}</li>
-                            @endforeach
-                        </ul>
-                    </div>
+            <div class="flex mt-4 gap-4 border-b pb-6 mb-6">
+                <div class="flex flex-col justify-between flex-1 mx-1 h-fit">
+                    <p class="text-xs font-semibold mb-1.5 tracking-wider text-gray-700">Industry</p>
+                    <p class="border p-2 rounded-md text-gray-800 bg-gray-50 shadow-inner">{{ $prof->industry }}</p>
                 </div>
-                <div class="flex justify-between place-items-center flex-1 mx-4 h-fit">
-                    <p class="flex-1 tracking-wider text-slate-700">Attached File(s)</p>
-                    <p class="flex flex-col flex-[2]">
-                        @foreach ($prof->attachments as $attachment)
-                        <a class="text-sm underline text-blue-400" href="{{ asset('storage/professional/attachments/' . $attachment->link) }}" target="_blank">{{ $attachment->name }}</a>
+                <div class="flex flex-col justify-between flex-1 mx-1 h-fit">
+                    <p class="text-xs font-semibold mb-1.5 tracking-wider text-gray-700">Location</p>
+                    <p class="border p-2 rounded-md text-gray-800 bg-gray-50 shadow-inner">{{ $prof->work_location }}</p>
+                </div>
+            </div>
+
+            <div class="flex gap-4 mb-6">
+                <div class="flex flex-col justify-between flex-1 mx-1 h-fit">
+                    <p class="text-xs font-semibold mb-1.5 tracking-wider text-gray-700">Waiting Time</p>
+                    <p class="border p-2 rounded-md text-gray-800 bg-gray-50 shadow-inner">{{ $prof->waiting_time }}</p>
+                </div>
+                <div class="flex flex-col flex-1 mx-1"></div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-8 mb-6">
+                <div>
+                    <h3 class="text-sm font-semibold text-gray-700 mb-3">Job Search Method(s)</h3>
+                    <ul class="list-disc pl-5 space-y-1">
+                        @php($methods = $prof->methods)
+                        @foreach ($methods as $method)
+                        <li class="text-gray-700">{{ $method->method }}</li>
                         @endforeach
-                    </p>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-sm font-semibold text-gray-700 mb-3">Attachment(s)</h3>
+                    <div class="space-y-2">
+                        @foreach ($prof->attachments as $attachment)
+                        <a class="text-blue-600 hover:text-blue-800 underline block" href="{{ asset('storage/professional/attachments/' . $attachment->link) }}" target="_blank">
+                            {{ $attachment->name }}
+                        </a>
+                        @endforeach
+                    </div>
                 </div>
             </div>
 
-            <div class="flex mt-6">
-                <div class="flex justify-between place-items-center flex-1 mx-4 h-fit">
-                    <p class="flex-1 tracking-wider text-slate-700">Hard Skill(s)</p>
-                    <div class="flex-[2]">
-                        <ul class="list-disc pl-6">
-                            @php($hardSkills = $prof->hardSkills)
-                            @foreach ($hardSkills as $skill)
-                            <li class="text-gray-400 text-lg">{{ $skill->skill }}</li>
-                            @endforeach
-                        </ul>
-                    </div>
+            <div class="grid grid-cols-2 gap-8">
+                <div>
+                    <h3 class="text-sm font-semibold text-gray-700 mb-3">Hard Skill(s)</h3>
+                    <ul class="list-disc pl-5 space-y-1">
+                        @php($hardSkills = $prof->hardSkills)
+                        @foreach ($hardSkills as $skill)
+                        <li class="text-gray-700">{{ $skill->skill }}</li>
+                        @endforeach
+                    </ul>
                 </div>
-                <div class="flex justify-between place-items-center flex-1 mx-4 h-fit">
-                    <p class="flex-1 tracking-wider text-slate-700">Link Posts</p>
-                    <p class="flex-[2]"></p>
-                </div>
-            </div>
-
-            <div class="flex mt-6">
-                <div class="flex justify-between place-items-center flex-1 mx-4 h-fit">
-                    <p class="flex-1 tracking-wider text-slate-700">Soft Skill(s)</p>
-                    <div class="flex-[2]">
-                        <ul class="list-disc pl-6">
-                            @php($softSkills = $prof->softSkills)
-                            @foreach ($softSkills as $skill)
-                            <li class="text-gray-400 text-lg">{{ $skill->skill }}</li>
-                            @endforeach
-                        </ul>
-                    </div>
-                </div>
-                <div class="flex justify-between place-items-center flex-1 mx-4 h-fit">
-                    <p class="flex-1 tracking-wider text-slate-700"></p>
-                    <p class="flex-[2]"></p>
+                <div>
+                    <h3 class="text-sm font-semibold text-gray-700 mb-3">Soft Skill(s)</h3>
+                    <ul class="list-disc pl-5 space-y-1">
+                        @php($softSkills = $prof->softSkills)
+                        @foreach ($softSkills as $skill)
+                        <li class="text-gray-700">{{ $skill->skill }}</li>
+                        @endforeach
+                    </ul>
                 </div>
             </div>
         </div>

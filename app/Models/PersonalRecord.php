@@ -39,6 +39,16 @@ class PersonalRecord extends Model implements Auditable
         }
     }
 
+    public function getFullnameAttribute()
+    {
+        return $this->getFullname();
+    }
+
+    public function philSMSNum()
+    {
+        return '63' . substr($this->phone_number, 1);
+    }
+
     public function getAge()
     {
         // TODO: Change this garbage 

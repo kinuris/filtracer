@@ -40,171 +40,175 @@
         <div class="mx-2"></div>
 
         <div class="flex-[3] flex flex-col mt-6 max-h-full overflow-auto">
+            <!-- Personal Information Card -->
             <div class="shadow rounded-lg">
-                <div class="bg-white py-4 flex flex-col px-6 border-b rounded-lg">
-                    <p class="text-lg font-bold pb-2">Personal Information</p>
+                <div class="bg-white py-5 flex flex-col px-6 border-b rounded-lg">
+                    <p class="text-blue-600 text-lg font-bold pb-3 border-b border-gray-100">Personal Information</p>
                     @php ($personal = $user->getPersonalBio())
-                    <div class="flex justify-between">
-                        <div class="flex-1 flex-col">
-                            <p class="text-gray-400">First Name</p>
-                            <p>{{ $personal->first_name }}</p>
+                    <div class="flex justify-between mt-3">
+                        <div class="flex-1 flex-col pr-4">
+                            <p class="text-gray-400 text-sm">First Name</p>
+                            <p class="font-medium">{{ $personal->first_name }}</p>
 
-                            <p class="text-gray-400 mt-4">Suffix</p>
-                            <p>{{ is_null($personal->suffix) ? 'N/A' : $personal->suffix }}</p>
+                            <p class="text-gray-400 text-sm mt-4">Suffix</p>
+                            <p class="font-medium">{{ is_null($personal->suffix) ? 'N/A' : $personal->suffix }}</p>
 
-                            <p class="text-gray-400 mt-4">Gender</p>
-                            <p>{{ $personal->gender }}</p>
+                            <p class="text-gray-400 text-sm mt-4">Gender</p>
+                            <p class="font-medium">{{ $personal->gender }}</p>
 
-                            <p class="text-gray-400 mt-4">Username</p>
-                            <p>{{ $user->username }}</p>
+                            <p class="text-gray-400 text-sm mt-4">Username</p>
+                            <p class="font-medium">{{ $user->username }}</p>
 
-                            <p class="text-gray-400 mt-4">Home Address</p>
-                            <p class="mr-3">{{ $personal->permanent_address }}</p>
+                            <p class="text-gray-400 text-sm mt-4">Home Address</p>
+                            <p class="font-medium mr-3">{{ $personal->permanent_address }}</p>
+                        </div>
+
+                        <div class="flex-1 flex-col pr-4">
+                            <p class="text-gray-400 text-sm">Middle Name</p>
+                            <p class="font-medium">{{ $personal->middle_name }}</p>
+
+                            <p class="text-gray-400 text-sm mt-4">Student ID</p>
+                            <p class="font-medium">{{ $personal->student_id }}</p>
+
+                            <p class="text-gray-400 text-sm mt-4">Date of Birth</p>
+                            <p class="font-medium">{{ $personal->birthdate->format('M. d, Y') }}</p>
+
+                            <p class="text-gray-400 text-sm mt-4">Phone Number</p>
+                            <p class="font-medium">{{ $personal->phone_number }}</p>
+
+                            <p class="text-gray-400 text-sm mt-4">Current Address</p>
+                            <p class="font-medium mr-3">{{ $personal->current_address }}</p>
                         </div>
 
                         <div class="flex-1 flex-col">
-                            <p class="text-gray-400">Middle Name</p>
-                            <p>{{ $personal->middle_name }}</p>
+                            <p class="text-gray-400 text-sm">Last Name</p>
+                            <p class="font-medium">{{ $personal->last_name }}</p>
 
-                            <p class="text-gray-400 mt-4">Student ID</p>
-                            <p>{{ $personal->student_id }}</p>
+                            <p class="text-gray-400 text-sm mt-4">Age</p>
+                            <p class="font-medium">{{ $personal->getAge() }}</p>
 
-                            <p class="text-gray-400 mt-4">Date of Birth</p>
-                            <p>{{ $personal->birthdate->format('M. d, Y') }}</p>
+                            <p class="text-gray-400 text-sm mt-4">Civil Status</p>
+                            <p class="font-medium">{{ $personal->civil_status }}</p>
 
-                            <p class="text-gray-400 mt-4">Phone Number</p>
-                            <p>{{ $personal->phone_number }}</p>
+                            <p class="text-gray-400 text-sm mt-4">Email Address</p>
+                            <p class="font-medium">{{ $personal->email_address }}</p>
 
-                            <p class="text-gray-400 mt-4">Current Address</p>
-                            <p class="mr-3">{{ $personal->current_address }}</p>
-                        </div>
-
-                        <div class="flex-1 flex-col">
-                            <p class="text-gray-400">Last Name</p>
-                            <p>{{ $personal->last_name }}</p>
-
-                            <p class="text-gray-400 mt-4">Age</p>
-                            <p>{{ $personal->getAge() }}</p>
-
-                            <p class="text-gray-400 mt-4">Civil Status</p>
-                            <p>{{ $personal->civil_status }}</p>
-
-                            <p class="text-gray-400 mt-4">Email Address</p>
-                            <p>{{ $personal->email_address }}</p>
-
-                            <p class="text-gray-400 mt-4">Social Link/s</p>
-                            <a class="text-blue-500" href="{{ $personal->social_link }}">{{ $personal->social_link }}</a>
+                            <p class="text-gray-400 text-sm mt-4">Social Link/s</p>
+                            <a class="text-blue-600 hover:underline" href="{{ $personal->social_link }}">{{ $personal->social_link }}</a>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="shadow rounded-lg mt-3">
-                <div class="bg-white py-4 flex flex-col px-6 border-b rounded-lg">
-                    <p class="text-lg font-bold pb-2">Educational Information</p>
+            <!-- Educational Information Card -->
+            <div class="shadow rounded-lg mt-4">
+                <div class="bg-white py-5 flex flex-col px-6 border-b rounded-lg">
+                    <p class="text-blue-600 text-lg font-bold pb-3 border-b border-gray-100">Educational Information</p>
                     @php ($educational = $user->getEducationalBio())
-                    <div class="flex justify-between">
-                        <div class="flex-1 flex-col">
-                            <p class="text-gray-400">School</p>
-                            <p>{{ $educational->school }}</p>
+                    <div class="flex justify-between mt-3">
+                        <div class="flex-1 flex-col pr-4">
+                            <p class="text-gray-400 text-sm">School</p>
+                            <p class="font-medium">{{ $educational->school }}</p>
 
-                            <p class="text-gray-400 mt-4">Location</p>
-                            <p>{{ $educational->school_location }}</p>
+                            <p class="text-gray-400 text-sm mt-4">Location</p>
+                            <p class="font-medium">{{ $educational->school_location }}</p>
+                        </div>
+
+                        <div class="flex-1 flex-col pr-4">
+                            <p class="text-gray-400 text-sm">Course</p>
+                            <p class="font-medium">{{ $educational->getCourse()->name }}</p>
+
+                            <p class="text-gray-400 text-sm mt-4">Year Started</p>
+                            <p class="font-medium">{{ $educational->start }}</p>
                         </div>
 
                         <div class="flex-1 flex-col">
-                            <p class="text-gray-400">Course</p>
-                            <p>{{ $educational->getCourse()->name }}</p>
+                            <p class="text-gray-400 text-sm">Degree Type</p>
+                            <p class="font-medium">{{ $educational->degree_type }}</p>
 
-                            <p class="text-gray-400 mt-4">Year Started</p>
-                            <p>{{ $educational->start }}</p>
-                        </div>
-
-                        <div class="flex-1 flex-col">
-                            <p class="text-gray-400">Degree Type</p>
-                            <p>{{ $educational->degree_type }}</p>
-
-                            <p class="text-gray-400 mt-4">Year Ended</p>
-                            <p>{{ $educational->end }}</p>
+                            <p class="text-gray-400 text-sm mt-4">Year Ended</p>
+                            <p class="font-medium">{{ $educational->end }}</p>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="shadow rounded-lg mt-3">
-                <div class="bg-white py-4 flex flex-col px-6 border-b rounded-lg">
-                    <p class="text-lg font-bold pb-2">Professional Information</p>
+            <!-- Professional Information Card -->
+            <div class="shadow rounded-lg mt-4">
+                <div class="bg-white py-5 flex flex-col px-6 border-b rounded-lg">
+                    <p class="text-blue-600 text-lg font-bold pb-3 border-b border-gray-100">Professional Information</p>
                     @php ($prof = $user->getProfessionalBio())
-                    <div class="flex justify-between">
-                        <div class="flex-1 flex-col">
-                            <p class="text-gray-400">Employment Status</p>
-                            <p>{{ $prof->employment_status }}</p>
+                    <div class="flex justify-between mt-3">
+                        <div class="flex-1 flex-col pr-4">
+                            <p class="text-gray-400 text-sm">Employment Status</p>
+                            <p class="font-medium">{{ $prof->employment_status }}</p>
 
-                            <p class="text-gray-400 mt-4">Current Job Title</p>
-                            <p>{{ $prof->job_title }}</p>
+                            <p class="text-gray-400 text-sm mt-4">Current Job Title</p>
+                            <p class="font-medium">{{ $prof->job_title }}</p>
 
-                            <p class="text-gray-400 mt-4">Monthly Salary Range</p>
-                            <p>{{ $prof->monthly_salary }} PHP</p>
+                            <p class="text-gray-400 text-sm mt-4">Monthly Salary Range</p>
+                            <p class="font-medium">{{ $prof->monthly_salary }} PHP</p>
+                        </div>
+
+                        <div class="flex-1 flex-col pr-4">
+                            <p class="text-gray-400 text-sm">Employment Type</p>
+                            <p class="font-medium">{{ $prof->employment_type1 }}; {{ $prof->employment_type2 }}</p>
+
+                            <p class="text-gray-400 text-sm mt-4">Company / Employer</p>
+                            <p class="font-medium">{{ $prof->company_name }}</p>
+
+                            <p class="text-gray-400 text-sm mt-4">Waiting Time</p>
+                            <p class="font-medium">{{ $prof->waiting_time }}</p>
                         </div>
 
                         <div class="flex-1 flex-col">
-                            <p class="text-gray-400">Employment Type</p>
-                            <p>{{ $prof->employment_type1 }}; {{ $prof->employment_type2 }}</p>
+                            <p class="text-gray-400 text-sm">Industry</p>
+                            <p class="font-medium">{{ $prof->industry }}</p>
 
-                            <p class="text-gray-400 mt-4">Company / Employer</p>
-                            <p>{{ $prof->company_name }}</p>
-
-                            <p class="text-gray-400 mt-4">Waiting Time</p>
-                            <p>{{ $prof->waiting_time }}</p>
-                        </div>
-
-                        <div class="flex-1 flex-col">
-                            <p class="text-gray-400">Industry</p>
-                            <p>{{ $prof->industry }}</p>
-
-                            <p class="text-gray-400 mt-4">Location</p>
-                            <p>{{ $prof->work_location }}</p>
+                            <p class="text-gray-400 text-sm mt-4">Location</p>
+                            <p class="font-medium">{{ $prof->work_location }}</p>
                         </div>
                     </div>
                     @if ($prof)
-
                     @else
                     <p>(No professional bio)</p>
                     @endif
                 </div>
             </div>
 
-            <div class="shadow rounded-lg mt-3">
-                <div class="bg-white py-4 flex flex-col px-6 border-b rounded-lg">
-                    <p class="text-lg font-bold pb-2">Job Search Methods</p>
+            <!-- Job Search Methods Card -->
+            <div class="shadow rounded-lg mt-4">
+                <div class="bg-white py-5 flex flex-col px-6 border-b rounded-lg">
+                    <p class="text-blue-600 text-lg font-bold pb-3 border-b border-gray-100">Job Search Methods</p>
                     @php ($methods = $user->getProfessionalBio()->methods)
-                    <div class="flex gap-2">
+                    <div class="flex flex-wrap gap-2 mt-3">
                         @foreach ($methods as $method)
-                        <p class="p-2 bg-gray-200 rounded">{{ $method->method}}</p>
+                        <span class="px-3 py-1.5 bg-blue-50 text-blue-600 rounded-full text-sm">{{ $method->method }}</span>
                         @endforeach
                     </div>
                 </div>
             </div>
 
-            <div class="flex w-full gap-3 mt-3 mb-16">
-                <div class="shadow rounded-lg flex-1 w-1/2">
-                    <div class="bg-white py-4 flex flex-col px-6 border-b rounded-lg h-full">
-                        <p class="text-lg font-bold pb-2">Soft Skills</p>
+            <!-- Skills Cards -->
+            <div class="flex w-full gap-4 mt-4 mb-16">
+                <div class="shadow rounded-lg flex-1">
+                    <div class="bg-white py-5 flex flex-col px-6 border-b rounded-lg h-full">
+                        <p class="text-blue-600 text-lg font-bold pb-3 border-b border-gray-100">Soft Skills</p>
                         @php ($methods = $user->getProfessionalBio()->softSkills)
-                        <div class="flex gap-2 flex-wrap">
+                        <div class="flex flex-wrap gap-2 mt-3">
                             @foreach ($methods as $method)
-                            <p class="p-2 bg-gray-200 rounded">{{ $method->skill }}</p>
+                            <span class="px-3 py-1.5 bg-blue-50 text-blue-600 rounded-full text-sm">{{ $method->skill }}</span>
                             @endforeach
                         </div>
                     </div>
                 </div>
-                <div class="shadow rounded-lg flex-1 w-1/2">
-                    <div class="bg-white py-4 flex flex-col px-6 border-b rounded-lg">
-                        <p class="text-lg font-bold pb-2">Hard Skills</p>
+                <div class="shadow rounded-lg flex-1">
+                    <div class="bg-white py-5 flex flex-col px-6 border-b rounded-lg h-full">
+                        <p class="text-blue-600 text-lg font-bold pb-3 border-b border-gray-100">Hard Skills</p>
                         @php ($methods = $user->getProfessionalBio()->hardSkills)
-                        <div class="flex gap-2 flex-wrap">
+                        <div class="flex flex-wrap gap-2 mt-3">
                             @foreach ($methods as $method)
-                            <p class="p-2 bg-gray-200 rounded">{{ $method->skill }}</p>
+                            <span class="px-3 py-1.5 bg-blue-50 text-blue-600 rounded-full text-sm">{{ $method->skill }}</span>
                             @endforeach
                         </div>
                     </div>

@@ -6,6 +6,7 @@ use App\Http\Controllers\AlumniController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BackupController;
 use App\Http\Controllers\ChatController;
+use App\Http\Controllers\MessageController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\SuperAdminController;
 use App\Models\Department;
@@ -35,37 +36,42 @@ Route::get('/fullurl/{path}', function ($path) {
         $url = $url . '?' . $queryParams;
     }
 
-    return redirect($url); 
+    return redirect($url);
 });
 
 Route::get('/department/courses/{dept}', function (Department $dept) {
     return response()->json(['courses' => $dept->getCourses()]);
 });
 
-Route::get('/login', [AuthController::class, 'loginView'])
-    ->middleware('guest')
-    ->name('login');
+Route::controller(AuthController::class)
+    ->group(function () {
+        // Guest routes
+        Route::middleware('guest')->group(function () {
+            Route::get('/login', 'loginView')->name('login');
+            Route::post('/login', 'login');
 
-Route::post('/login', [AuthController::class, 'login'])
-    ->middleware('guest');
+            Route::get('/register/admin', 'registerAdminView');
+            Route::post('/register/admin', 'registerAdmin');
 
-Route::get('/logout', [AuthController::class, 'logout'])
-    ->middleware('auth');
+            Route::get('/register/alumni', 'registerAlumniView');
+            Route::post('/register/alumni', 'registerAlumni');
 
-Route::get('/register/admin', [AuthController::class, 'registerAdminView'])
-    ->middleware('guest');
+            Route::post('/forgot-password', 'forgetPassword');
+        });
 
-Route::post('/register/admin', [AuthController::class, 'registerAdmin'])
-    ->middleware('guest');
+        // Auth routes
+        Route::middleware('auth')->group(function () {
+            Route::post('/switch-account/{user}', 'switchAccount');
 
-Route::post('/register/admin', [AuthController::class, 'registerAdmin'])
-    ->middleware('guest');
+            Route::get('/logout', 'logout');
+        });
+    });
 
-Route::get('/register/alumni', [AuthController::class, 'registerAlumniView'])
-    ->middleware('guest');
 
-Route::post('/register/alumni', [AuthController::class, 'registerAlumni'])
-    ->middleware('guest');
+Route::controller(MessageController::class)
+    ->group(function () {
+        Route::get('/message/send', 'sendMessage');
+    });
 
 Route::controller(AlumniController::class)
     ->middleware('role:Alumni')
@@ -90,6 +96,8 @@ Route::controller(AlumniController::class)
         Route::middleware('compset')->group(function () {
             Route::get('/alumni', 'dashboardView');
             Route::get('/alumni/profile', 'alumniProfileView');
+            Route::get('/binding/deny/{binding}', 'denyBinding');
+            Route::get('/binding/accept/{binding}', 'acceptBinding');
 
             Route::get('/alumni/profile/update', 'updateProfileView');
             Route::post('/alumni/profile/update/personal/{alumni}', 'updatePersonalProfile');
@@ -97,6 +105,8 @@ Route::controller(AlumniController::class)
 
             Route::post('/alumni/profile/add/educational/{alumni}', 'addEducationRecord');
             Route::post('/alumni/profile/update/educational/{educ}/{alumni}', 'updateEducationRecord');
+
+            Route::post('/alumni/profile/update/primsec/{primsec}/{alumni}', 'updatePrimarySecondary');
 
             Route::post('/profbio/create/{alumni}', 'createProfBio');
             Route::post('/profbio/update/{alumni}', 'updateProfBio');
@@ -132,12 +142,16 @@ Route::controller(AdminController::class)
     ->group(function () {
         Route::get('/admin', 'dashboardView');
         Route::get('/department', 'departmentView');
+        Route::get('/link-account', 'linkAccount')->name('link.index');
+        Route::post('/link-create', 'createLink')->name('link.create');
+        Route::delete('/link-delete/{alumni}', 'deleteLink')->name('link.delete');
 
         Route::get('/profile/report/{alumni}', 'profileReportView');
 
         Route::get('/department/{department}', 'alumniListView');
         Route::get('/user/view/{user}', 'userView');
         Route::get('/user/delete/{user}', 'userDelete');
+        Route::get('/user/delete/{user}/department', 'userDeleteDepartment');
 
         Route::get('/report/graphical', 'reportsGraphicalView');
 
@@ -183,6 +197,8 @@ Route::controller(AdminController::class)
         Route::get('/settings/major/delete/{major}', 'deleteMajorView');
         Route::get('/settings/course/delete/{course}', 'deleteCourseView');
         Route::get('/settings/department/delete/{department}', 'deleteDepartmentView');
+
+        Route::post('/admin/useraccount/update/{user}', 'updateAccountFromVerify');
     });
 
 Route::controller(ChatController::class)
@@ -211,6 +227,8 @@ Route::controller(SuperAdminController::class)
         Route::get('/account/create-bulk', 'createBulkView');
         Route::post('/account/import', 'accountImport');
 
+        Route::post('/account/send-sms-credentials', 'sendSmsCredentials');
+
         Route::get('/account/imports', 'viewImports');
         Route::post('/post/delete/{post}', 'deletePost');
 
@@ -223,9 +241,13 @@ Route::controller(SuperAdminController::class)
 Route::controller(BackupController::class)
     ->middleware('role:Superadmin')
     ->group(function () {
-        Route::get('/backup', 'index');
+        Route::get('/backup', 'index')->name('backup.index');
 
         Route::post('/backup/download/{backup}', 'downloadBackup');
         Route::post('/backup/start', 'startBackup');
 
+        Route::post('/backup/upload', 'uploadBackup');
+
+        Route::delete('/backup/delete/{backup}', 'deleteBackup');
+        Route::post('/backup/restore/{backup}', 'fromBackup');
     });

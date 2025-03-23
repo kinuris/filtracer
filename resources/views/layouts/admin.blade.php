@@ -174,6 +174,39 @@
                                 Logout
                             </div>
                         </a>
+
+                        @php($linkedAccounts = App\Models\BoundAccount::query()->where('admin_id', '=', Auth::user()->id)->get())
+                        <div class="relative group">
+                            <a href="/link-account" class="block py-2 text-sm text-gray-700" role="menuitem" tabindex="-1" id="menu-item-7">
+                                <div class="py-1 flex place-items-center justify-between" role="none">
+                                    <div class="flex items-center">
+                                        <img class="block h-4 mx-4" src="{{ asset('assets/switch_account.png') }}" alt="Link Account">
+                                        Link Account
+                                    </div>
+                                    @if($linkedAccounts->count() !== 0)
+                                    <span class="material-symbols-outlined text-gray-400 mr-2">chevron_right</span>
+                                    @endif
+                                </div>
+                            </a>
+                            @if($linkedAccounts->count() !== 0)
+                            <div class="absolute left-0 -translate-x-full top-0 hidden group-hover:block bg-white shadow-lg rounded-md w-48 z-20">
+                                <div class="py-1" role="none">
+                                    <p class="px-4 py-2 text-xs font-medium text-gray-500">Linked Accounts</p>
+                                    @foreach($linkedAccounts as $account)
+                                    <form action="/switch-account/{{ $account->alumni->id }}" method="POST" class="block">
+                                        @csrf
+                                        <button type="submit" class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem" tabindex="-1">
+                                            <div class="flex place-items-center">
+                                                <img class="w-5 h-5 mr-3 rounded-full" src="{{ $account->alumni->image() }}" alt="{{ $account->alumni->name }}">
+                                                {{ $account->alumni->name }}
+                                            </div>
+                                        </button>
+                                    </form>
+                                    @endforeach
+                                </div>
+                            </div>
+                            @endif
+                        </div>
                     </div>
                 </div>
             </nav>
@@ -211,14 +244,33 @@
         function putIntoNames(arr) {
             namesContainer.innerHTML = '';
 
+            if (arr.length === 0) {
+                const emptyState = document.createElement('div');
+                emptyState.classList.add('text-center', 'py-4', 'text-gray-500');
+                emptyState.textContent = 'No results found';
+                namesContainer.appendChild(emptyState);
+                return;
+            }
+
             arr.forEach((element) => {
                 const a = document.createElement('a');
-                const li = document.createElement('li');
+                const li = document.createElement('div');
+                const nameSpan = document.createElement('span');
+                const iconSpan = document.createElement('span');
 
-                a.setAttribute('href', <?php echo (Auth::user()->role == 'Admin' ? '"/admin/chat"' : '"/alumni/chat"') ?> + '?initiate=' + element.value);
-                li.classList.add('list-none', 'px-2', 'py-4', 'hover:bg-gray-100');
+                a.href = '/user/view/' + element.value;
+                a.classList.add('block', 'transition-colors');
 
-                li.innerHTML = element.label;
+                li.classList.add('px-3', 'py-2', 'rounded', 'hover:bg-gray-100', 'flex', 'justify-between', 'items-center');
+
+                nameSpan.classList.add('font-medium');
+                nameSpan.textContent = element.label;
+
+                iconSpan.classList.add('material-symbols-outlined', 'text-gray-400', 'text-sm');
+                iconSpan.textContent = 'arrow_forward';
+
+                li.appendChild(nameSpan);
+                li.appendChild(iconSpan);
                 a.appendChild(li);
                 namesContainer.appendChild(a);
             });

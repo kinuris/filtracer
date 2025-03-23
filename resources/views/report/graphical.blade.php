@@ -26,7 +26,7 @@
 
             <p class="text-md mr-3">By</p>
             @php($subCategory = request('subcategory') ?? 'Department')
-            <select class="border p-2 pr-32 rounded-lg text-gray-400 mr-8" name="subcategory" id="subcategory">
+            <select class="border p-2 pr-32 rounded-lg text-gray-400 mr-2" name="subcategory" id="subcategory">
                 <option {{ $subCategory == 'Department' ? 'selected' : '' }} value="Department">Department</option>
                 <option {{ $subCategory == 'Batch' ? 'selected' : '' }} value="Batch">Batch</option>
                 <option {{ $subCategory == 'Course' ? 'selected' : '' }} value="Course">Course</option>
@@ -34,6 +34,14 @@
                 <option {{ $subCategory == 'Jobs' ? 'selected' : '' }} value="Jobs">Jobs</option>
                 @endif
             </select>
+
+            <div class="relative inline-block group">
+                <span class="inline-flex items-center justify-center w-5 h-5 bg-blue-500 rounded-full text-xs font-bold text-white cursor-help hover:bg-blue-600">i</span>
+                <div class="absolute z-10 invisible group-hover:visible bg-gray-800 text-white text-xs p-3 rounded-md w-72 bottom-full left-1/2 transform -translate-x-1/2 -translate-y-2 shadow-lg">
+                    All category options besides <span class="font-bold text-yellow-300">All Users</span> only count accounts that have completed setup. <br><br> The subcategory options <span class="font-bold text-yellow-300">Batch</span>, <span class="font-bold text-yellow-300">Course</span> and <span class="font-bold text-yellow-300">Jobs</span> may have less people because they only count accounts with <span class="font-bold underline">complete setup</span>
+                    <div class="absolute top-full left-1/2 transform -translate-x-1/2 border-6 border-transparent border-t-gray-800"></div>
+                </div>
+            </div>
 
             <div class="flex-1"></div>
 
@@ -94,10 +102,31 @@
     use App\Models\Department;
     use App\Models\User;
 
-    $groups = User::groupBy($subCategory);
+    // $groups = User::groupBy($subCategory);
+    $users = User::partialSet()->get()->merge(User::compSet()->get());
+    $groups = $users
+        ->filter(function ($user) use ($subCategory, $category) {
+            if ($subCategory === 'Department' && $category === 'All Users') {
+                return true;
+            }
+
+            return $user->isCompSet();
+        })
+        ->groupBy(function ($user) use ($subCategory) {
+            switch ($subCategory) {
+                case 'Department':
+                    return $user->department->name;
+                case 'Batch':
+                    return $user->getEducationalBio()->end;
+                case 'Course':
+                    return $user->course->name;
+                case 'Jobs':
+                    return $user->getProfessionalBio()->job_title;
+            }
+        })->all();
+
     $xAxis = array_keys($groups);
     $yAxis = array_map(fn($group) => User::countFromGroup($category, $group), $groups);
-
 
     $depts = Department::allValid();
     ?>

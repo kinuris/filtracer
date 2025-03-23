@@ -14,6 +14,13 @@ if ($department && $course) {
         ->whereRelation('course', 'courses.id', '=', $course->id);
 
     switch ($category) {
+        case "All Entities":
+            // Merge all partialSet() (non-Admin) users with Admin users
+            $users = App\Models\User::partialSet()
+                ->where('role', '!=', 'Admin')
+                ->get()
+                ->merge(App\Models\User::where('role', '=', 'Admin')->get());
+            break;
         case "All Users":
             break;
         case "Registered Users":
@@ -38,6 +45,13 @@ if ($department && $course) {
     $query = App\Models\User::partialSet()->where('role', '!=', 'Admin')->whereRelation('department', 'departments.id', '=', $department->id);
 
     switch ($category) {
+        case "All Entities":
+            // Merge all partialSet() (non-Admin) users with Admin users
+            $users = App\Models\User::partialSet()
+                ->where('role', '!=', 'Admin')
+                ->get()
+                ->merge(App\Models\User::where('role', '=', 'Admin')->get());
+            break;
         case "All Users":
             break;
         case "Registered Users":
@@ -59,6 +73,13 @@ if ($department && $course) {
     $users = $query->get();
 } else {
     switch ($category) {
+        case "All Entities":
+            // Merge all partialSet() (non-Admin) users with Admin users
+            $users = App\Models\User::partialSet()
+                ->where('role', '!=', 'Admin')
+                ->get()
+                ->merge(App\Models\User::where('role', '=', 'Admin')->get());
+            break;
         case "All Users":
             $users = App\Models\User::partialSet()
                 ->where('role', '!=', 'Admin')
@@ -72,9 +93,30 @@ if ($department && $course) {
         case "Self-Employed Alumni":
         case "Student Alumni":
         case "Retired Alumni":
-            $users = App\Models\User::partialSet()
+            switch($category) {
+                case "Working Student":
+                    $category = "Working Student";
+                    break;
+                case "Employed Alumni":
+                    $category = "Employed";
+                    break;
+                case "Unemployed Alumni":
+                    $category = "Unemployed";
+                    break;
+                case "Self-Employed Alumni":
+                    $category = "Self-employed";
+                    break;
+                case "Student Alumni":
+                    $category = "Student";
+                    break;
+                case "Retired Alumni":
+                    $category = "Retired";
+                    break;
+            }
+
+            $users = App\Models\User::compSet()
                 ->where('role', '!=', 'Admin')
-                ->whereRelation('professionalRecords', 'employment_status', '=', str_replace(' ', '', $category))
+                ->whereRelation('professionalRecords', 'employment_status', '=', $category)
                 ->get();
             break;
         case "Verified Alumni":
@@ -141,6 +183,7 @@ if ($department && $course) {
 
                     <div><i class="text-[10px]">Generated at:</i> {{ date_create()->format('Y-m-d H:i:s') }}</div>
                 </div>
+
                 <table class="w-full text-center mt-4">
                     <thead class="border-t border-b">
                         <th class="font-semibold py-3">ID</th>
@@ -156,7 +199,7 @@ if ($department && $course) {
                             @if ($user->role === 'Admin')
                             <td>{{ $user->admin()->getFullnameAttribute() }}</td>
                             @else
-                            <td>{{ $user->partialPersonal->getFullnameAttribute() }}</td>
+                            <td>{{ ($user->partialPersonal ?? $user->getPersonalBio())->getFullnameAttribute() }}</td>
                             @endif
                             @if ($user->role === 'Admin')
                             @php($admin = $user->admin())
@@ -165,9 +208,9 @@ if ($department && $course) {
                             <td>{{ $admin->phone_number }}</td>
 
                             @else
-                            <td>{{ $user->partialPersonal->student_id }}</td>
-                            <td>{{ $user->partialPersonal->email_address }}</td>
-                            <td>{{ $user->partialPersonal->phone_number }}</td>
+                            <td>{{ ($user->partialPersonal ?? $user->getPersonalBio())->student_id }}</td>
+                            <td>{{ ($user->partialPersonal ?? $user->getPersonalBio())->email_address }}</td>
+                            <td>{{ ($user->partialPersonal ?? $user->getPersonalBio())->phone_number }}</td>
                             @endif
                         </tr>
                         @endforeach

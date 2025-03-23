@@ -24,11 +24,18 @@ class Admin extends Model
         'is_verified',
     ];
 
-    public function getFullnameAttribute() {
+    public function philSMSNum()
+    {
+        return '63' . substr($this->phone_number, 1);
+    }
+
+    public function getFullnameAttribute()
+    {
         return $this->first_name . ' ' . ($this->middle_name ? strtoupper(substr($this->middle_name, 0, 1)) . '. ' : '') . $this->last_name . ' ' . $this->suffix;
     }
 
-    public function officeRelation() {
+    public function officeRelation()
+    {
         return $this->belongsTo(Department::class, 'office', 'id');
     }
 
