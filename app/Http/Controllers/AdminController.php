@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Helpers\Message;
 use App\Jobs\SendSMSAsyncJob;
 use App\Models\BindingRequest;
 use App\Models\ChatGroup;
@@ -30,6 +29,26 @@ class AdminController extends Controller
         return view('department.index');
     }
 
+    public function sendSMSIndividual(User $user)
+    {
+        $username = $user->username;
+        $password = $user->adminGenerated->default_password;
+
+        $content = <<<TEXT
+            🔑 Login Credentials
+            Welcome! Your FilTracer admin account has been created. Use the following credentials to log in.
+            Username: $username
+            Password: $password
+            Change your password after logging in for security. Log in now: https://filtracer.com/login
+            TEXT;
+
+        SendSMSAsyncJob::dispatch(
+            $user->partialPersonal->philSMSNum(),
+            $content,
+        );
+
+        return back()->with('message', 'Sent the SMS to ' . $user->name);
+    }
 
     public function createLink(Request $request)
     {

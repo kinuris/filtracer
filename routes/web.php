@@ -199,6 +199,7 @@ Route::controller(AdminController::class)
         Route::get('/settings/department/delete/{department}', 'deleteDepartmentView');
 
         Route::post('/admin/useraccount/update/{user}', 'updateAccountFromVerify');
+        Route::post('/admin/sms/{user}', 'sendSMSIndividual')->name('sendsms.individual');
     });
 
 Route::controller(ChatController::class)
