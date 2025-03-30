@@ -12,7 +12,7 @@
             @if (Auth::user()->admin()->is_super)
             @php($courses = \App\Models\Course::query()->get())
             @else
-            @php($courses = \App\Models\Course::query()->where('department_id', '=', Auth::user()->admin()->office)->get())
+            @php($courses = \App\Models\Course::query()->where('department_id', '=', Auth::user()->department_id)->get())
             @endif
             <div class="flex flex-col mt-3">
                 <label for="course">Course</label>

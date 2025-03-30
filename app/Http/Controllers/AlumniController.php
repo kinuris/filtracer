@@ -33,13 +33,20 @@ class AlumniController extends Controller
         $binding->is_denied = true;
         $binding->save();
 
-        return back()->with('message', 'Binding request from ' . $binding->admin->admin()->fullname . ' denied.');
+        $adminName = $binding->admin->admin()->fullname;
+
+        return back()
+            ->with('message', 'Binding request from ' . $adminName . ' denied.')
+            ->with('subtitle', 'The admin will be notified that you have rejected their request to connect.');
     }
 
-    public function acceptBinding(BindingRequest $binding) {
+    public function acceptBinding(BindingRequest $binding)
+    {
         $bound = $binding->toBoundAccount();
 
-        return back()->with('message', 'Bound account with ' . $bound->admin->admin()->fullname . '.');
+        return back()
+            ->with('message', 'Successfully connected with ' . $bound->admin->admin()->fullname)
+            ->with('subtitle', 'You can now communicate and share information with this admin.');
     }
 
     public function alumniProfileView()
@@ -75,7 +82,9 @@ class AlumniController extends Controller
         }
         $primsec->save();
 
-        return back()->with('message', 'Education record updated successfully');
+        return back()
+            ->with('message', 'Education record updated successfully')
+            ->with('subtitle', 'Your educational information has been saved to your profile.');
     }
 
     public function settingsPasswordView()
@@ -99,7 +108,9 @@ class AlumniController extends Controller
             'password' => bcrypt($validated['new_password']),
         ]);
 
-        return back()->with('message', 'Password updated successfully');
+        return back()
+            ->with('message', 'Password updated successfully')
+            ->with('subtitle', 'Your account is now secured with your new password.');
     }
 
     public function settingsView()
@@ -140,7 +151,9 @@ class AlumniController extends Controller
 
             $record->save();
 
-            return back()->with('message', 'Education record added successfully!');
+            return back()
+                ->with('message', 'Education record added successfully!')
+                ->with('subtitle', 'Your primary education information has been saved to your profile.');
         } else if ($validated['level'] === 'Secondary') {
             $validated = $request->validate([
                 'track' => ['required'],
@@ -162,7 +175,9 @@ class AlumniController extends Controller
 
             $record->save();
 
-            return back()->with('message', 'Education record added successfully!');
+            return back()
+                ->with('message', 'Education record added successfully!')
+                ->with('subtitle', 'Your secondary education information has been saved to your profile.');
         }
 
         $validated = $request->validate([
@@ -182,7 +197,9 @@ class AlumniController extends Controller
 
         EducationRecord::query()->create($validated);
 
-        return back()->with('message', 'Education record added successfully!');
+        return back()
+            ->with('message', 'Education record added successfully!')
+            ->with('subtitle', 'Your tertiary education information has been saved to your profile.');
     }
 
     public function updateEducationRecord(Request $request, EducationRecord $educ, User $alumni)
@@ -204,7 +221,9 @@ class AlumniController extends Controller
 
         $educ->update($validated);
 
-        return back()->with('message', 'Education record updated successfully!');
+        return back()
+            ->with('message', 'Education record updated successfully!')
+            ->with('subtitle', 'Your tertiary education information has been updated in your profile.');
     }
 
     public function uploadProfilePicture(Request $request, User $alumni)
@@ -224,7 +243,9 @@ class AlumniController extends Controller
             'profile_picture' => $filename,
         ]);
 
-        return redirect('/alumni/profile/update')->with('message', 'Profile picture uploaded successfully!');
+        return redirect('/alumni/profile/update')
+            ->with('message', 'Profile picture uploaded successfully!')
+            ->with('subtitle', 'Your new profile picture has been saved and is now visible to others.');
     }
 
     public function createProfBio(Request $request, User $alumni)
@@ -273,7 +294,9 @@ class AlumniController extends Controller
             ]);
         }
 
-        return back()->with('message', 'Professional record created successfully');
+        return back()
+            ->with('message', 'Professional record created successfully')
+            ->with('subtitle', 'Your professional information has been saved to your profile.');
     }
 
     public function updateProfBio(Request $request, User $alumni)
@@ -342,7 +365,9 @@ class AlumniController extends Controller
             ]);
         }
 
-        return back()->with('message', 'Professional record updated successfully');
+        return back()
+            ->with('message', 'Professional record updated successfully')
+            ->with('subtitle', 'Your professional information has been updated in your profile.');
     }
 
     public function setupPersonal(Request $request, User $alumni)
@@ -368,7 +393,9 @@ class AlumniController extends Controller
 
         PersonalRecord::query()->create($validated);
 
-        return redirect('/alumni/setup/educational')->with('message', 'Personal record created successfully');
+        return redirect('/alumni/setup/educational')
+            ->with('message', 'Personal record created successfully')
+            ->with('subtitle', 'Your personal information has been saved. Now let\'s set up your education details.');
     }
 
     public function setupEducationalView()
@@ -391,19 +418,21 @@ class AlumniController extends Controller
             'location' => ['required'],
             'degree_type' => ['required'],
             'course' => ['required'],
-            'major' => ['required'],
+            'major' => ['nullable'],
             'start' => ['required'],
             'end' => ['nullable'],
         ]);
 
         $validated['school_location'] = $validated['location'];
         $validated['course_id'] = $validated['course'];
-        $validated['major_id'] = $validated['major'];
+        $validated['major_id'] =  isset($validated['major']) ? $validated['major'] : null;
         $validated['user_id'] = $alumni->id;
 
         EducationRecord::query()->create($validated);
 
-        return redirect('/alumni/setup/professional')->with('message', 'Educational record created successfully');
+        return redirect('/alumni/setup/professional')
+            ->with('message', 'Educational record created successfully')
+            ->with('subtitle', 'Your educational information has been saved. Now let\'s set up your professional details.');
     }
 
     public function setupProfessionalView()
@@ -469,7 +498,9 @@ class AlumniController extends Controller
             ]);
         }
 
-        return redirect('/alumni/setup/profilepic')->with('message', 'Professional record created successfully');
+        return redirect('/alumni/setup/profilepic')
+            ->with('message', 'Professional record created successfully')
+            ->with('subtitle', 'Your professional information has been saved. Finally, let\'s add your profile picture.');
     }
 
     public function setupProfilepicView()
@@ -519,7 +550,9 @@ class AlumniController extends Controller
 
         Auth::logout();
 
-        return redirect('/login')->with('message', 'Profile picture updated successfully');
+        return redirect('/login')
+            ->with('message', 'Profile setup completed successfully')
+            ->with('subtitle', 'Your alumni profile is now complete. You can login to access your account.');
     }
 
     public function updatePersonalProfile(Request $request, User $alumni)
@@ -543,7 +576,9 @@ class AlumniController extends Controller
         $alumni->update($validated);
         $alumni->personalBio->update($validated);
 
-        return back()->with('message', 'Personal profile updated successfully');
+        return back()
+            ->with('message', 'Personal profile updated successfully')
+            ->with('subtitle', 'Your personal information has been updated in your profile.');
     }
 
     public function setupView()

@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('chat_associations', function (Blueprint $table) {
-            $table->enum('status', ['pending', 'accepted'])->default('accepted');
+            $table->enum('status', ['pending', 'accepted'])->default('pending');
         });
     }
 

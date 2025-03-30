@@ -79,24 +79,9 @@
                             <input class="border rounded-lg bg-gray-50 font-light text-sm p-2 min-w-72" placeholder="Search..." type="text" name="search">
                         </form>
 
-                        @foreach (auth()->user()->chatGroups()->get() as $group)
-                        <a href="/alumni/chat?initiate={{ $group->initiateLink() }}" class="flex place-items-center p-2 hover:bg-gray-100">
-                            <img class="w-12 h-12 object-cover rounded-full shadow mr-3.5" src="{{ $group->image() }}" alt="Group">
-                            <div class="flex flex-col">
-                                <p class="text-sm font-normal">{{ $group->name }}</p>
-                                @php($first = $group->messages()->latest()->first())
-                                @if(!is_null($first))
-                                @if ($first->isImage())
-                                <p class="text-xs font-light text-gray-400 line-clamp-1 max-w-48">{{ $first && $first->sender->id == auth()->user()->id ? 'You: ' : ''}} Sent an image</p>
-                                @elseif ($first->isFile())
-                                <p class="text-xs font-light text-gray-400 line-clamp-1 max-w-48">{{ $first && $first->sender->id == auth()->user()->id ? 'You: ' : ''}} Sent a file</p>
-                                @else
-                                <p class="text-xs font-light text-gray-400 line-clamp-1 max-w-48">{{ $first && $first->sender->id == auth()->user()->id ? 'You: ' : ''}}{{ $first ? $first->content : 'No Messages Yet' }}</p>
-                                @endif
-                                @endif
-                            </div>
-                        </a>
-                        @endforeach
+                        <div id="messageHeadersContainer">
+
+                        </div>
                     </div>
                     <div class="border-l px-6 py-3 h-full min-h-[calc(100vh-14.1rem)] max-h-[calc(100vh-14.1rem)] overflow-scroll">
                         @if (!$selected)
@@ -133,6 +118,84 @@
 
 @section('script')
 <script>
+    const messageHeadersContainer = document.getElementById('messageHeadersContainer');
+
+    // Initial fetch for headers
+    (async function loadHeaders() {
+        const headersRes = await fetch('/chat/headers');
+        if (headersRes.status === 200) {
+            messageHeadersContainer.innerHTML = await headersRes.text();
+        }
+
+        // Set interval for headers
+        setInterval(async () => {
+            const headersRes = await fetch('/chat/headers');
+            if (headersRes.status === 200) {
+                messageHeadersContainer.innerHTML = await headersRes.text();
+
+                // Track read messages with localStorage
+                const lastReadMessages = JSON.parse(localStorage.getItem('lastReadMessages') || '{}');
+
+                // Apply read/unread styling to all message headers
+                const messageHeaders = messageHeadersContainer.querySelectorAll('[data-latest]');
+                messageHeaders.forEach(header => {
+                    const latest = header.getAttribute('data-latest');
+                    let chatId = '';
+                    
+                    // Get the link (either the header itself or a child)
+                    let link = header.tagName === 'A' ? header : header.querySelector('a');
+                    if (link && link.href && link.href.includes('initiate=')) {
+                        chatId = link.href.split('initiate=')[1];
+                    }
+                    
+                    if (chatId) {
+                        // Check if message is unread (no record or timestamp changed)
+                        const isUnread = !lastReadMessages[chatId] || lastReadMessages[chatId] !== latest;
+                        
+                        // Apply appropriate styling
+                        header.classList.toggle('bg-blue-50', isUnread);
+                        const preview = header.querySelector('p.text-xs');
+                        if (preview) {
+                            preview.classList.toggle('text-gray-400', !isUnread);
+                            preview.classList.toggle('font-medium', isUnread);
+                            preview.classList.toggle('text-blue-600', isUnread);
+                        }
+                    }
+                });
+
+                // If we haven't added a click handler yet, add one with event delegation
+                if (!messageHeadersContainer._hasClickListener) {
+                    messageHeadersContainer.addEventListener('click', event => {
+                        const header = event.target.closest('[data-latest]');
+                        if (header) {
+                            const latest = header.getAttribute('data-latest');
+                            let chatId = '';
+                            
+                            let link = header.tagName === 'A' ? header : header.querySelector('a');
+                            if (link && link.href && link.href.includes('initiate=')) {
+                                chatId = link.href.split('initiate=')[1];
+                                
+                                // Mark as read in storage
+                                lastReadMessages[chatId] = latest;
+                                localStorage.setItem('lastReadMessages', JSON.stringify(lastReadMessages));
+                                
+                                // Update styling
+                                header.classList.remove('bg-blue-50');
+                                const preview = header.querySelector('p.text-xs');
+                                if (preview) {
+                                    preview.classList.add('text-gray-400');
+                                    preview.classList.remove('font-medium', 'text-blue-600');
+                                }
+                            }
+                        }
+                    });
+                    messageHeadersContainer._hasClickListener = true;
+                }
+            }
+        }, 1000);
+    })();
+</script>
+<script>
     const groupImagePreviewSelector = document.getElementById('groupImagePreviewSelector');
     const groupImagePreview = document.getElementById('groupImagePreview');
 
@@ -147,38 +210,46 @@
     const renameGroupModal = document.getElementById('renameGroupModal');
     const closeRenameGroupModal = document.getElementById('closeRenameGroupModal');
 
-    openRenameGroupModal.addEventListener('click', () => {
-        renameGroupModal.classList.remove('hidden');
-    });
+    if (openRenameGroupModal) {
+        openRenameGroupModal.addEventListener('click', () => {
+            renameGroupModal.classList.remove('hidden');
+        });
+    }
 
-    closeRenameGroupModal.addEventListener('click', () => {
-        renameGroupModal.classList.add('hidden');
-    });
-
-    renameGroupModal.addEventListener('click', (e) => {
-        if (e.target === renameGroupModal) {
+    if (closeRenameGroupModal) {
+        closeRenameGroupModal.addEventListener('click', () => {
             renameGroupModal.classList.add('hidden');
-        }
-    })
+        });
+    }
+
+    if (renameGroupModal) {
+        renameGroupModal.addEventListener('click', (e) => {
+            if (e.target === renameGroupModal) {
+                renameGroupModal.classList.add('hidden');
+            }
+        })
+    }
 </script>
 <script>
     const openChatMembersModal = document.getElementById('openChatMembersModal');
     const chatMembersModal = document.getElementById('chatMembersModal');
     const closeChatMembersModal = document.getElementById('closeChatMembersModal');
 
-    openChatMembersModal.addEventListener('click', () => {
-        chatMembersModal.classList.remove('hidden');
-    });
+    if (openChatMembersModal && chatMembersModal && closeChatMembersModal) {
+        openChatMembersModal.addEventListener('click', () => {
+            chatMembersModal.classList.remove('hidden');
+        });
 
-    closeChatMembersModal.addEventListener('click', () => {
-        chatMembersModal.classList.add('hidden');
-    });
-
-    chatMembersModal.addEventListener('click', (e) => {
-        if (e.target === chatMembersModal) {
+        closeChatMembersModal.addEventListener('click', () => {
             chatMembersModal.classList.add('hidden');
-        }
-    })
+        });
+
+        chatMembersModal.addEventListener('click', (e) => {
+            if (e.target === chatMembersModal) {
+                chatMembersModal.classList.add('hidden');
+            }
+        });
+    }
 </script>
 <script>
     const messages = document.getElementById('messages');
@@ -264,38 +335,42 @@
     const closeSeeFilesModal = document.getElementById('closeSeeFilesModal');
     const openSeeFilesModal = document.getElementById('openSeeFilesModal');
 
-    openSeeFilesModal.addEventListener('click', () => {
-        seeFilesModal.classList.remove('hidden');
-    });
+    if (openSeeFilesModal && seeFilesModal && closeSeeFilesModal) {
+        openSeeFilesModal.addEventListener('click', () => {
+            seeFilesModal.classList.remove('hidden');
+        });
 
-    closeSeeFilesModal.addEventListener('click', () => {
-        seeFilesModal.classList.add('hidden');
-    });
-
-    seeFilesModal.addEventListener('click', (e) => {
-        if (e.target === seeFilesModal) {
+        closeSeeFilesModal.addEventListener('click', () => {
             seeFilesModal.classList.add('hidden');
-        }
-    })
+        });
+
+        seeFilesModal.addEventListener('click', (e) => {
+            if (e.target === seeFilesModal) {
+                seeFilesModal.classList.add('hidden');
+            }
+        });
+    }
 </script>
 <script>
     const seeImagesModal = document.getElementById('seeImagesModal');
     const closeSeeImagesModal = document.getElementById('closeSeeImagesModal');
     const openSeeImagesModal = document.getElementById('openSeeImagesModal');
 
-    openSeeImagesModal.addEventListener('click', () => {
-        seeImagesModal.classList.remove('hidden');
-    });
+    if (openSeeImagesModal && seeImagesModal && closeSeeImagesModal) {
+        openSeeImagesModal.addEventListener('click', () => {
+            seeImagesModal.classList.remove('hidden');
+        });
 
-    closeSeeImagesModal.addEventListener('click', () => {
-        seeImagesModal.classList.add('hidden');
-    });
-
-    seeImagesModal.addEventListener('click', (e) => {
-        if (e.target === seeImagesModal) {
+        closeSeeImagesModal.addEventListener('click', () => {
             seeImagesModal.classList.add('hidden');
-        }
-    })
+        });
+
+        seeImagesModal.addEventListener('click', (e) => {
+            if (e.target === seeImagesModal) {
+                seeImagesModal.classList.add('hidden');
+            }
+        });
+    }
 </script>
 <script>
     const attachment = document.getElementById('attachment');
@@ -312,7 +387,7 @@
         formData.append('room_id', '<?php echo isset($selected->internal_id) ? $selected->internal_id : ($selected ? $selected->id : 'null') ?>');
 
         const response = await fetch('/chat/send', {
-            method: 'POST', 
+            method: 'POST',
             headers: {
                 'X-CSRF-TOKEN': <?php echo '"' . csrf_token() . '"' ?>,
             },
@@ -339,6 +414,8 @@
         }
     })
 </script>
+
+
 <script>
     (async function repeat() {
         const response = await fetch(`/chat/getgroup/<?php echo urlencode(isset($selected->internal_id) ? $selected->internal_id : ($selected ? $selected->id : 'null')) ?>`);
@@ -347,7 +424,6 @@
         async function sync() {
             const htmlRes = await fetch(`/chat/messages/${group}`);
             if (htmlRes.status !== 200) return;
-
             messages.innerHTML = await htmlRes.text();
         }
 
@@ -356,7 +432,7 @@
         if (group !== -1) {
             setInterval(sync, 1000);
         }
-    })()
+    })();
 </script>
 @else
 <script>
@@ -409,7 +485,7 @@
     new Choices(receivers, {
         choices: [
             <?php
-            foreach (User::compSet()->get() as $user) {
+            foreach (User::compSet()->get()->merge(User::query()->where('role', '=', 'Admin')->get()) as $user) {
                 if ($user->id !== Auth::user()->id) {
                     echo '{ value: ' . $user->id . ', ' . 'label: "' .  $user->name . '"'  . '},';
                 }

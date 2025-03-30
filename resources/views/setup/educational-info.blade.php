@@ -86,13 +86,15 @@
                     </div>
                 </div>
 
+                @php($majors = App\Models\Major::all())
+                @if(count($majors) > 0)
                 <label class="mt-3" for="major">Major</label>
                 <select class="text-gray-400 border rounded-lg p-2" name="major" id="major">
-                    @php($majors = App\Models\Major::all())
                     @foreach ($majors as $major)
                     <option value="{{ $major->id }}">{{ $major->name }}</option>
                     @endforeach
                 </select>
+                @endif
 
                 <div class="flex mt-4 justify-end">
                     <button class="text-white bg-blue-600 p-2 rounded" type="submit">Save & Next</button>

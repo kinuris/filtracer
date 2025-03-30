@@ -25,7 +25,10 @@ class BackupController extends Controller
 
         $backup->delete();
 
-        return redirect()->route('backup.index');
+        return redirect()
+            ->route('backup.index')
+            ->with('message', 'Backup deleted successfully')
+            ->with('subtitle', 'The backup file has been permanently removed');
     }
 
     public function startBackup()
@@ -48,11 +51,23 @@ class BackupController extends Controller
             $sql .= "$createTable;\n\n";
 
             $rows = DB::table($tableName)->get();
-            foreach ($rows as $row) {
-                $rowArray = (array)$row;
-                $columns = implode('`, `', array_keys($rowArray));
-                $values = implode("', '", array_map('addslashes', array_values($rowArray)));
-                $sql .= "INSERT INTO `$tableName` (`$columns`) VALUES ('$values');\n";
+            if ($rows->count() > 0) {
+                foreach ($rows as $row) {
+                    $rowArray = (array)$row;
+                    $columns = implode('`, `', array_keys($rowArray));
+                    
+                    $values = [];
+                    foreach ($rowArray as $value) {
+                        if (is_null($value)) {
+                            $values[] = 'NULL';
+                        } else {
+                            $values[] = "'" . addslashes($value) . "'";
+                        }
+                    }
+                    
+                    $valueString = implode(', ', $values);
+                    $sql .= "INSERT INTO `$tableName` (`$columns`) VALUES ($valueString);\n";
+                }
             }
             $sql .= "\n";
         }
@@ -187,7 +202,8 @@ class BackupController extends Controller
         }
     }
 
-    public function uploadBackup(Request $request) {
+    public function uploadBackup(Request $request)
+    {
         $validator = Validator::make($request->all(), [
             'backup_file' => 'required|file|mimes:zip',
         ]);
@@ -276,7 +292,7 @@ class BackupController extends Controller
                     copy($file->getRealPath(), $targetPath);
                 }
             }
-            
+
             // Create a database record for the backup
             DatabaseSnapshot::create([
                 'sql' => $sqlContent,

@@ -109,29 +109,41 @@ class AuthController extends Controller
         ]);
 
         if (!Auth::attempt($validated)) {
-            return redirect('/login')->with('message', 'Invalid Credentials');
+            return redirect('/login')
+                ->with('failed_message', 'Invalid Credentials')
+                ->with('failed_subtitle', 'Incorrent username or password. Please try again.');
         }
 
         $admin = User::query()->find(Auth::user()->id)->admin();
         if ($admin && !$admin->is_verified && !$admin->is_super) {
             Auth::logout();
-            return redirect('/login')->with('message', 'Your officer account is not yet approved or has been disabled by an Admin');
+            return redirect('/login')
+                ->with('failed_message', 'Access Denied')
+                ->with('failed_subtitle', 'Your officer account is not yet approved or has been disabled by an Admin.');
         }
 
         if ($admin) {
-            return redirect('/admin')->with('message', 'Welcome Superadmin');
+            return redirect('/admin')
+                ->with('message', $admin->is_super ? 'Welcome Super Administrator!' : 'Welcome Administrator!')
+                ->with('subtitle', 'You have successfully logged into your admin account.');
         }
 
         if (is_null(Auth::user()->personalBio)) {
-            return redirect('/alumni/setup')->with('message', 'Setup your account!');
+            return redirect('/alumni/setup')
+                ->with('message', 'Welcome! Let\'s Set Up Your Account')
+                ->with('subtitle', 'Please complete your profile information to continue.');
         }
 
         if (Auth::user()->personalBio->status == 0) {
             Auth::logout();
-            return redirect('/login')->with('message', 'Your account is not yet approved or has been disabled by an Admin.');
+            return redirect('/login')
+                ->with('failed_message', 'Access Denied')
+                ->with('failed_subtitle', 'Your account is not yet approved or has been disabled by an Admin.');
         }
 
-        return redirect('/alumni')->with('message', 'Login Successful');
+        return redirect('/alumni')
+            ->with('message', 'Congratulations!')
+            ->with('subtitle', 'You logged in sucessfully.');
     }
 
     public function registerAdminView()
@@ -242,7 +254,9 @@ class AuthController extends Controller
                 'user_id' => $user->id,
             ], $validated));
 
-            return redirect('/login')->with('message', 'Registration Successful');
+            return redirect('/login')
+                ->with('message', 'Registration Successful')
+                ->with('subtitle', 'Your admin account has been created. Please wait for verification before you can log in.');
         }
     }
 
@@ -332,6 +346,8 @@ class AuthController extends Controller
             'student_id' => $validated['student_id'],
         ]);
 
-        return redirect('/login')->with('message', 'Registration Successful');
+        return redirect('/login')
+            ->with('message', 'Registration Successful')
+            ->with('subtitle', 'Your alumni account has been created. Please complete your profile after logging in.');
     }
 }

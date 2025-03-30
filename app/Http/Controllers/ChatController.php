@@ -12,10 +12,25 @@ use Illuminate\Support\Facades\Auth;
 
 class ChatController extends Controller
 {
+    public function fetchHeaders()
+    {
+        return view('chat.snippets.message-headers');
+    }
 
     public function fetchChatMessages(ChatGroup $group)
     {
         return view('chat.snippets.messages')->with('group', $group);
+    }
+
+    public function acceptAssociation(ChatAssociation $assoc)
+    {
+        $assoc->update([
+            'status' => 'accepted'
+        ]);
+
+        return back()
+            ->with('message', 'Request accepted!')
+            ->with('subtitle', 'You can now chat with this user');
     }
 
     public function renameGroup(string $roomId)
@@ -53,10 +68,17 @@ class ChatController extends Controller
         }
 
         $sender = User::query()->find(Auth::user()->id);
+        $message = 'Group renamed from "' . $previousName . '" to "' . $group->name . '"';
+        $subtitle = 'Group details have been updated successfully';
+
         if ($sender->role == 'Admin') {
-            return redirect('/admin/chat')->with('message', 'Renamed Group');
+            return redirect('/admin/chat')
+                ->with('message', $message)
+                ->with('subtitle', $subtitle);
         } else {
-            return redirect('/alumni/chat')->with('message', 'Renamed Group');
+            return redirect('/alumni/chat')
+                ->with('message', $message)
+                ->with('subtitle', $subtitle);
         }
     }
 
@@ -80,10 +102,17 @@ class ChatController extends Controller
             ]);
         }
 
+        $message = 'Removed ' . $user->name . ' from ' . $group->name;
+        $subtitle = 'User has been successfully removed from the group';
+
         if (Auth::user()->role === 'Admin') {
-            return redirect('/admin/chat')->with('message', 'Removed ' . $user->name . ' from ' . $group->name);
+            return redirect('/admin/chat')
+                ->with('message', $message)
+                ->with('subtitle', $subtitle);
         } else {
-            return redirect('/alumni/chat')->with('message', 'Removed ' . $user->name . ' from ' . $group->name);
+            return redirect('/alumni/chat')
+                ->with('message', $message)
+                ->with('subtitle', $subtitle);
         }
     }
 
@@ -115,7 +144,9 @@ class ChatController extends Controller
             ]);
         }
 
-        return back()->with('message', 'Members added successfully!');
+        return back()
+            ->with('message', 'Members added successfully!')
+            ->with('subtitle', 'New members have been added to the group chat');
     }
 
     public function leaveGroup(string $roomId)
@@ -132,10 +163,28 @@ class ChatController extends Controller
             ->where('user_id', '=', Auth::user()->id)
             ->delete();
 
+        $message = 'You have left the group "' . $group->name . '"';
+        $subtitle = 'You will no longer receive messages from this group';
+
+        foreach ($group->users()->get() as $usr) {
+            if ($usr->id !== Auth::user()->id) {
+                UserAlert::query()->create([
+                    'title' => Auth::user()->name . ' left ' . $group->name,
+                    'action' => (User::find($usr->id)->role == 'Admin' ? '/admin/chat' : '/alumni/chat') . '?initiate=' . urlencode($group->internal_id),
+                    'content' => 'User ' . Auth::user()->name . ' has left the group chat',
+                    'user_id' => $usr->id,
+                ]);
+            }
+        }
+
         if ($sender->role == 'Admin') {
-            return redirect('/admin/chat')->with('message', 'Left Group');
+            return redirect('/admin/chat')
+                ->with('message', $message)
+                ->with('subtitle', $subtitle);
         } else {
-            return redirect('/alumni/chat')->with('message', 'Left Group');
+            return redirect('/alumni/chat')
+                ->with('message', $message)
+                ->with('subtitle', $subtitle);
         }
     }
 
@@ -188,7 +237,8 @@ class ChatController extends Controller
 
         ChatAssociation::query()->create([
             'user_id' => $request->post('creator'),
-            'chat_group_id' => $group->id
+            'chat_group_id' => $group->id,
+            'status' => 'accepted'
         ]);
 
         foreach ($request->post('receivers') as $receiver) {
@@ -297,6 +347,7 @@ class ChatController extends Controller
                 ChatAssociation::query()->create([
                     'chat_group_id' => $group->id,
                     'user_id' => $user->id,
+                    'status' => 'accepted'
                 ]);
 
                 ChatAssociation::query()->create([

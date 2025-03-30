@@ -33,7 +33,24 @@
                     <td>
                         <div class="flex justify-center place-items-center">
                             <a class="mr-3" href="/settings/department/edit/{{ $department->id }}"><img src="{{ asset('assets/settings_blue.svg') }}" alt="View"></a>
-                            <a href="/settings/department/delete/{{ $department->id }}"><img src="{{ asset('assets/trash.svg') }}" alt="Trash"></a>
+                            <button type="button" onclick="confirmDelete({{ $department->id }})" class="cursor-pointer"><img src="{{ asset('assets/trash.svg') }}" alt="Trash"></button>
+                            
+                           <!-- Delete Confirmation Modal for {{ $department->id }} -->
+                            <div id="deleteModal-{{ $department->id }}" class="fixed inset-0 bg-black bg-opacity-50 hidden flex justify-center items-center z-50">
+                                <div class="bg-white rounded-lg shadow-xl p-6 max-w-md mx-auto transform transition-all">
+                                    <div class="flex items-center mb-4">
+                                        <svg class="w-6 h-6 text-red-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                                        </svg>
+                                        <h3 class="text-lg font-semibold text-gray-900">Confirm Deletion</h3>
+                                    </div>
+                                    <p class="text-gray-600 mb-6">Are you sure you want to delete <span class="font-medium text-gray-800">"{{ $department->name }}"</span>? This action cannot be undone.</p>
+                                    <div class="flex justify-end space-x-3">
+                                        <button onclick="closeDeleteModal({{ $department->id }})" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-400">Cancel</button>
+                                        <a href="/settings/department/delete/{{ $department->id }}" class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors focus:outline-none focus:ring-2 focus:ring-red-500">Delete Department</a>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </td>
                 </tr>
@@ -48,6 +65,21 @@
 @endsection
 
 @section('script')
+<script>
+    function confirmDelete(departmentId) {
+        const modal = document.getElementById(`deleteModal-${departmentId}`);
+        if (modal) {
+            modal.classList.remove('hidden');
+        }
+    }
+
+    function closeDeleteModal(departmentId) {
+        const modal = document.getElementById(`deleteModal-${departmentId}`);
+        if (modal) {
+            modal.classList.add('hidden');
+        }
+    }
+</script>
 <script>
     const upload = document.getElementById('logo');
     const preview = document.getElementById('preview');

@@ -60,7 +60,7 @@ class PostController extends Controller
         $post = Post::query()->create($validated);
 
         if (User::find(Auth::user()->id)->admin() !== null) {
-           $post->update(['status' => 'Approved']); 
+            $post->update(['status' => 'Approved']);
         }
 
         foreach (User::query()->where('role', '=', 'Admin')->get() as $admin) {
@@ -73,9 +73,13 @@ class PostController extends Controller
         }
 
         if (Auth::user()->role == 'Admin') {
-            return redirect('/admin/post')->with('message', 'Post created successfully');
+            return redirect('/admin/post')
+                ->with('message', 'Post created successfully')
+                ->with('subtitle', 'The post has been submitted and is now live on the system.');
         } else {
-            return redirect('/alumni/post')->with('message', 'Post created successfully');
+            return redirect('/alumni/post')
+                ->with('message', 'Post created successfully')
+                ->with('subtitle', 'Your post has been submitted and is awaiting approval.');
         }
     }
 
@@ -96,7 +100,17 @@ class PostController extends Controller
             ]);
         }
 
-        return back()->with('message', 'Pinned post toggled successfully');
+        $message = $pinned
+            ? 'Post has been unpinned'
+            : 'Post has been pinned';
+
+        $subtitle = $pinned
+            ? 'The post will no longer appear at the top of your list'
+            : 'The post will now appear at the top of your list';
+
+        return back()
+            ->with('message', $message)
+            ->with('subtitle', $subtitle);
     }
 
     public function toggleSavePost(Post $post)
@@ -113,7 +127,17 @@ class PostController extends Controller
             ]);
         }
 
-        return back()->with('message', 'Saved post toggled successfully');
+        $message = $saved
+            ? 'Post has been removed from your saved items'
+            : 'Post has been added to your saved items';
+
+        $subtitle = $saved
+            ? 'You can no longer find this post in your saved posts section'
+            : 'You can now find this post in your saved posts section';
+
+        return back()
+            ->with('message', $message)
+            ->with('subtitle', $subtitle);
     }
 
     /**
@@ -152,11 +176,14 @@ class PostController extends Controller
         }
 
         $post->update($validated);
-
         if (Auth::user()->role == 'Admin') {
-            return redirect('/admin/post')->with('message', 'Post updated successfully');
+            return redirect('/admin/post')
+                ->with('message', 'Post updated successfully')
+                ->with('subtitle', 'The post has been updated with your changes.');
         } else {
-            return redirect('/alumni/post')->with('message', 'Post updated successfully');
+            return redirect('/alumni/post')
+                ->with('message', 'Post updated successfully')
+                ->with('subtitle', 'Your changes have been saved successfully.');
         }
     }
 
@@ -166,15 +193,21 @@ class PostController extends Controller
     public function destroy(Post $post)
     {
         if ($post->creator->id != Auth::user()->id) {
-            return redirect('/admin/post')->with('message', 'You are not authorized to delete this post');
+            return redirect('/admin/post')
+                ->with('message', 'You are not authorized to delete this post')
+                ->with('subtitle', 'Only the creator of this post can delete it.');
         }
 
         $post->delete();
 
         if (Auth::user()->role == 'Admin') {
-            return redirect('/admin/post')->with('message', 'Post deleted successfully');
+            return redirect('/admin/post')
+                ->with('message', 'Post deleted successfully')
+                ->with('subtitle', 'The post has been permanently removed.');
         } else {
-            return redirect('/alumni/post')->with('message', 'Post deleted successfully');
+            return redirect('/alumni/post')
+                ->with('message', 'Post deleted successfully')
+                ->with('subtitle', 'Your post has been removed from the system.');
         }
     }
 }

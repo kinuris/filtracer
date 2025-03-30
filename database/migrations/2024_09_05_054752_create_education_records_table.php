@@ -61,6 +61,13 @@ return new class extends Migration
                 ->onDelete('cascade')
                 ->onUpdate('cascade');
 
+            // $table->unsignedBigInteger('major_id')
+            //     ->nullable();
+
+            // $table->foreign('major_id')
+            //     ->references('id')
+            //     ->on('majors');
+
             $table->year('start');
             $table->year('end')->nullable();
 

@@ -214,7 +214,9 @@ Route::controller(AdminController::class)
 
 Route::controller(ChatController::class)
     ->group(function () {
+        Route::get('/chat/headers', 'fetchHeaders');
         Route::get('/chat/messages/{group}', 'fetchChatMessages');
+
         Route::get('/chat/getgroup/{roomId}', 'getGroup');
         Route::get('/chat/group/remove/{groupId}/{user}', 'removeUserFromGroup');
 
@@ -222,6 +224,7 @@ Route::controller(ChatController::class)
         Route::post('/chat/rename/{roomId}', 'renameGroup');
 
         Route::post('/chat/add/{roomId}', 'addMembers');
+        Route::post('/chat/accept/{assoc}', 'acceptAssociation')->name('chat.accept');
 
         Route::post('/chat/makegroup', 'makeGroup');
         Route::post('/chat/send', 'send');

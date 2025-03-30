@@ -45,7 +45,7 @@ class User extends Authenticatable
         return !empty($groups);
     }
 
-    public function chatGroupWith(User $user)
+    public function chatGroupWith(User $user): ChatGroup | null
     {
         $groups = array();
         foreach ($this->chatGroups()->get() as $group) {

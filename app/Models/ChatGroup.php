@@ -67,6 +67,11 @@ class ChatGroup extends Model
         return fake()->imageUrl();
     }
 
+    public function associations()
+    {
+        return $this->hasMany(ChatAssociation::class, 'chat_group_id');
+    }
+
     public function users()
     {
         return $this->hasManyThrough(User::class, ChatAssociation::class, 'chat_group_id', 'id', 'id', 'user_id');

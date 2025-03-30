@@ -113,7 +113,10 @@ class AdminController extends Controller
             $content,
         );
 
-        return back()->with('message', 'Sent the SMS to ' . $user->name);
+        return back()->with([
+            'message' => 'SMS sent successfully!',
+            'subtitle' => 'Login credentials have been sent to ' . $user->name . '.'
+        ]);
     }
 
     public function createLink(Request $request)
@@ -130,7 +133,10 @@ class AdminController extends Controller
 
         $bindReq->save();
 
-        return back()->with('message', 'Binding request created successfully');
+        return back()->with([
+            'message' => 'Binding request created successfully',
+            'subtitle' => 'A linking request has been sent to the alumni.'
+        ]);
     }
 
     public function deleteLink(Request $request, User $alumni)
@@ -138,7 +144,10 @@ class AdminController extends Controller
         $bindingReq = $alumni->hasActiveBindingRequestWith(Auth::user())->first();
         BindingRequest::query()->where('id', '=', $bindingReq->id)->delete();
 
-        return back()->with('message', 'Successfully removed linking request');
+        return back()->with([
+            'message' => 'Successfully removed linking request',
+            'subtitle' => 'The connection request with this alumni has been deleted.'
+        ]);
     }
 
     public function linkAccount()
@@ -236,21 +245,30 @@ class AdminController extends Controller
             ]);
         }
 
-        return redirect('/account')->with('message', 'Account updated successfully from verification');
+        return back()->with([
+            'message' => 'Account updated successfully from verification',
+            'subtitle' => 'The user profile has been updated with the verified information'
+        ]);
     }
 
     public function rejectPost(Post $post)
     {
         $post->update(['status' => 'Denied']);
 
-        return redirect('/admin')->with('message', 'Post rejected successfully');
+        return redirect('/admin')->with([
+            'message' => 'Post rejected successfully',
+            'subtitle' => 'The post has been marked as denied and will not be visible to users'
+        ]);
     }
 
     public function approvePost(Post $post)
     {
         $post->update(['status' => 'Approved']);
 
-        return redirect('/admin')->with('message', 'Post approved successfully');
+        return redirect('/admin')->with([
+            'message' => 'Post approved successfully',
+            'subtitle' => 'The post is now visible to all users'
+        ]);
     }
 
     public function userView(User $user)
@@ -326,7 +344,10 @@ class AdminController extends Controller
         }
 
 
-        return redirect('/settings/account')->with('message', 'Profile picture uploaded successfully!');
+        return redirect('/settings/account')->with([
+            'message' => 'Profile picture uploaded successfully!',
+            'subtitle' => 'Your new profile picture has been applied to your account'
+        ]);
     }
 
     public function myProfileView()
@@ -509,7 +530,10 @@ class AdminController extends Controller
 
         Department::query()->create($validated);
 
-        return redirect('/settings/department')->with('message', 'Department created successfully');
+        return redirect('/settings/department')->with([
+            'message' => 'Department created successfully',
+            'subtitle' => 'The new department has been added to the system'
+        ]);
     }
 
     public function editMajor(Request $request, Major $major)
@@ -527,7 +551,10 @@ class AdminController extends Controller
 
         $major->update($validated);
 
-        return redirect('/settings/major')->with('message', 'Major updated successfully');
+        return redirect('/settings/major')->with([
+            'message' => 'Major updated successfully',
+            'subtitle' => 'The changes to the major have been saved'
+        ]);
     }
 
     public function editCourse(Request $request, Course $course)
@@ -541,7 +568,10 @@ class AdminController extends Controller
 
         $course->update($validated);
 
-        return redirect('/settings/course')->with('message', 'Course updated successfully');
+        return redirect('/settings/course')->with([
+            'message' => 'Course updated successfully',
+            'subtitle' => 'The changes to the course have been saved'
+        ]);
     }
 
     public function accountEdit(Request $request, User $user)
@@ -565,7 +595,10 @@ class AdminController extends Controller
         $user->update($validated);
         $user->admin()->update($validated);
 
-        return redirect('/settings/account')->with('message', 'Account updated successfully');
+        return redirect('/settings/account')->with([
+            'message' => 'Account updated successfully',
+            'subtitle' => 'Your account information has been updated'
+        ]);
     }
 
     public function updateDepartment(Request $request, Department $department)
@@ -597,7 +630,10 @@ class AdminController extends Controller
 
         $department->update($validated);
 
-        return redirect('/settings/department')->with('message', 'Department updated successfully');
+        return redirect('/settings/department')->with([
+            'message' => 'Department updated successfully',
+            'subtitle' => 'The department information has been updated'
+        ]);
     }
 
     public function delelteDepartment(Department $department)
@@ -605,7 +641,10 @@ class AdminController extends Controller
         Storage::delete('/public/departments/' . $department->logo);
         $department->delete();
 
-        return redirect('/settings/department')->with('message', 'Department deleted successfully');
+        return redirect('/settings/department')->with([
+            'message' => 'Department deleted successfully',
+            'subtitle' => 'The department and all its associated data have been removed'
+        ]);
     }
 
     public function verifyUser(User $user)
@@ -633,7 +672,10 @@ class AdminController extends Controller
             "✅ Account Verified\nCongratulations, " . $user->personalBio->first_name . "! Your FilTracer account has been verified. Log in now to connect with other users and explore opportunities. Visit: https://filtracer.com/login"
         );
 
-        return redirect('/account')->with('message', 'User VERIFIED successfully');
+        return redirect('/account')->with([
+            'message' => 'Account verified!',
+            'subtitle' => 'The user can now access all system features'
+        ]);
     }
 
     public function unverifyUser(User $user)
@@ -661,7 +703,10 @@ class AdminController extends Controller
             "❌ Account Unverified\nWe regret to inform you that your FilTracer account has been unverified. Please contact the admin for more information."
         );
 
-        return redirect('/account')->with('message', 'User UNVERIFIED successfully');
+        return redirect('/account')->with([
+            'message' => 'Account unverified!',
+            'subtitle' => 'The user will have limited access to system features'
+        ]);
     }
 
     public function createCourse(Request $request)
@@ -675,7 +720,10 @@ class AdminController extends Controller
 
         Course::query()->create($validated);
 
-        return redirect('/settings/course')->with('message', 'Course created successfully');
+        return redirect('/settings/course')->with([
+            'message' => 'Course created successfully',
+            'subtitle' => 'The new course has been added to the system'
+        ]);
     }
 
     public function chatView()
@@ -707,7 +755,10 @@ class AdminController extends Controller
 
         Major::query()->create($validated);
 
-        return redirect('/settings/major')->with('message', 'Major created successfully');
+        return redirect('/settings/major')->with([
+            'message' => 'Major created successfully',
+            'subtitle' => 'The new major has been added to the system'
+        ]);
     }
 
     public function postView()
@@ -745,14 +796,20 @@ class AdminController extends Controller
     {
         $major->delete();
 
-        return redirect('/settings/major')->with('message', 'Major deleted successfully');
+        return redirect('/settings/major')->with([
+            'message' => 'Major deleted successfully',
+            'subtitle' => 'The major and its associated data have been removed'
+        ]);
     }
 
     public function deleteCourseView(Course $course)
     {
         $course->delete();
 
-        return redirect('/settings/course')->with('message', 'Course deleted successfully');
+        return redirect('/settings/course')->with([
+            'message' => 'Course deleted successfully',
+            'subtitle' => 'The course and its associated data have been removed'
+        ]);
     }
 
     public function deleteDepartmentView(Department $department)
@@ -760,20 +817,29 @@ class AdminController extends Controller
         Storage::delete('/public/departments/' . $department->logo);
         $department->delete();
 
-        return redirect('/settings/department')->with('message', 'Department deleted successfully');
+        return redirect('/settings/department')->with([
+            'message' => 'Department deleted successfully',
+            'subtitle' => 'The department and all its related data have been removed from the system'
+        ]);
     }
 
     public function userDelete(User $user)
     {
         $user->delete();
 
-        return redirect('/account')->with('message', 'User deleted successfully');
+        return redirect('/account')->with([
+            'message' => 'Account deleted!',
+            'subtitle' => 'The user account and all associated data have been removed'
+        ]);
     }
 
     public function userDeleteDepartment(User $user)
     {
         $user->delete();
 
-        return back()->with('message', 'User deleted successfully');
+        return back()->with([
+            'message' => 'User deleted successfully',
+            'subtitle' => 'The user account and all associated data have been removed'
+        ]);
     }
 }

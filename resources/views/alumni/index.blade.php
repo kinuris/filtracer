@@ -3,7 +3,7 @@
 @section('title', 'Alumni List')
 
 @section('content')
-<div class="bg-gray-100 w-full max-h-screen overflow-auto p-8">
+<div class="bg-gray-100 w-full max-h-screen min-h-[calc(100vh-64px)] overflow-auto p-8">
     <h1 class="font-medium tracking-widest text-lg">Alumni List</h1>
     <p class="text-gray-400 text-xs mb-2">Department / <span class="text-blue-500">{{ $dept->name }}</span></p>
 

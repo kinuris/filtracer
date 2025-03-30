@@ -68,10 +68,79 @@
     </div>
 
     @if (session('message'))
-    <div class="flex absolute top-5 left-5 z-40 bg-white shadow-lg p-4 rounded-lg place-items-center">
-        <img class="w-8 mr-3" src="{{ asset('assets/success.svg') }}" alt="Success">
-        <h1>{{ session('message') }}</h1>
+    <div class="flex absolute top-5 left-5 w-80 z-40 bg-white shadow-md p-4 rounded-lg flex-col border-l-4 border-green-500 animate-fade-in">
+        <div class="flex w-full place-items-center">
+            <img class="w-6 mr-3" src="{{ asset('assets/success.svg') }}" alt="Success">
+            <h1 class="text-sm font-semibold text-gray-800">{{ session('message') }}</h1>
+        </div>
+        @if(session('subtitle'))
+        <p class="text-xs text-gray-600 mt-1.5 ml-9">{{ session('subtitle') }}</p>
+        @endif
+        <div class="absolute top-2 right-2">
+            <button onclick="this.parentElement.parentElement.style.display='none'" class="text-gray-400 hover:text-gray-600">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+        <div class="w-full bg-gray-100 h-1 mt-3 rounded-full overflow-hidden">
+            <div class="bg-green-500 h-full success-timer"></div>
+        </div>
     </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const successTimer = document.querySelector('.success-timer');
+            if (successTimer) {
+                successTimer.style.width = '100%';
+                successTimer.style.transition = 'width 5s linear';
+                setTimeout(() => {
+                    successTimer.style.width = '0%';
+                }, 100);
+                setTimeout(() => {
+                    const alert = successTimer.closest('.animate-fade-in');
+                    if (alert) alert.style.display = 'none';
+                }, 5100);
+            }
+        });
+    </script>
+    @endif
+
+    @if (session('failed_message'))
+    <div class="flex absolute top-5 left-5 w-80 z-40 bg-white shadow-md p-4 rounded-lg flex-col border-l-4 border-red-500 animate-fade-in">
+        <div class="flex w-full place-items-center">
+            <img class="w-6 mr-3" src="{{ asset('assets/failed.svg') }}" alt="Failed">
+            <h1 class="text-sm font-semibold text-gray-800">{{ session('failed_message') }}</h1>
+        </div>
+        @if(session('failed_subtitle'))
+        <p class="text-xs text-gray-600 mt-1.5 ml-9">{{ session('failed_subtitle') }}</p>
+        @endif
+        <div class="absolute top-2 right-2">
+            <button onclick="this.parentElement.parentElement.style.display='none'" class="text-gray-400 hover:text-gray-600">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+        <div class="w-full bg-gray-100 h-1 mt-3 rounded-full overflow-hidden">
+            <div class="bg-red-500 h-full failed-timer"></div>
+        </div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const failedTimer = document.querySelector('.failed-timer');
+            if (failedTimer) {
+                failedTimer.style.width = '100%';
+                failedTimer.style.transition = 'width 5s linear';
+                setTimeout(() => {
+                    failedTimer.style.width = '0%';
+                }, 100);
+                setTimeout(() => {
+                    const alert = failedTimer.closest('.animate-fade-in');
+                    if (alert) alert.style.display = 'none';
+                }, 5100);
+            }
+        });
+    </script>
     @endif
 
     <script src="https://www.google.com/recaptcha/api.js"></script>
