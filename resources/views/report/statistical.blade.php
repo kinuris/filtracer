@@ -81,14 +81,14 @@
                 <tr class="border-b text-gray-500">
                     <td class="text-blue-900 py-3 px-8 font-thin">{{ $user->id }}</td>
                     <td>
-                        {{ $user->partialPersonal->first_name }}
-                        {{ $user->partialPersonal->middle_name ? substr($user->partialPersonal->middle_name, 0, 1) . '. ' : '' }}
-                        {{ $user->partialPersonal->last_name }}
-                        {{ $user->partialPersonal->suffix ? $user->partialPersonal->suffix : '' }}
+                        {{ ($user->personalBio ? $user->personalBio->first_name : $user->partialPersonal->first_name) }}
+                        {{ ($user->personalBio ? ($user->personalBio->middle_name ? substr($user->personalBio->middle_name, 0, 1) . '. ' : '') : ($user->partialPersonal->middle_name ? substr($user->partialPersonal->middle_name, 0, 1) . '. ' : '')) }}
+                        {{ ($user->personalBio ? $user->personalBio->last_name : $user->partialPersonal->last_name) }}
+                        {{ ($user->personalBio ? ($user->personalBio->suffix ? $user->personalBio->suffix : '') : ($user->partialPersonal->suffix ? $user->partialPersonal->suffix : '')) }}
                     </td>
-                    <td>{{ $user->partialPersonal->student_id }}</td>
-                    <td>{{ $user->partialPersonal->email_address }}</td>
-                    <td>{{ $user->partialPersonal->phone_number }}</td>
+                    <td>{{ $user->personalBio ? $user->personalBio->student_id : $user->partialPersonal->student_id }}</td>
+                    <td>{{ $user->personalBio ? $user->personalBio->email_address : $user->partialPersonal->email_address }}</td>
+                    <td>{{ $user->personalBio ? $user->personalBio->phone_number : $user->partialPersonal->phone_number }}</td>
                     <td>
                         <a class="bg-blue-600 text-white p-2 rounded-md" href="/user/view/{{ $user->id }}">See Profile</a>
                     </td>

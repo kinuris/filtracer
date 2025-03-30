@@ -35,12 +35,21 @@
                 </div>
             </a>
 
-            <!-- <a href="/department">
+            @if (Auth::user()->admin()->is_super)
+            <a href="/department">
                 <div class="hover:bg-gray-100 font-medium tracking-wide hover:text-blue-500 rounded-lg p-3 flex place-items-center">
                     <img class="w-7 mr-4" src="{{ asset('assets/departments.svg') }}" alt="Dashboard">
                     Departments
                 </div>
-            </a> -->
+            </a>
+            @else
+            <a href="/profiles">
+                <div class="hover:bg-gray-100 font-medium tracking-wide hover:text-blue-500 rounded-lg p-3 flex place-items-center">
+                    <img class="w-7 mr-4" src="{{ asset('assets/departments.svg') }}" alt="Dashboard">
+                    Profiles
+                </div>
+            </a>
+            @endif
 
             <a href="/account">
                 <div class="hover:bg-gray-100 font-medium tracking-wide hover:text-blue-500 rounded-lg p-3 flex place-items-center">

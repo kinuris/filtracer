@@ -138,18 +138,33 @@ Route::controller(AlertController::class)
         Route::get('/alert/seenall', 'seenAll');
     });
 
+
+Route::controller(AdminController::class)
+    ->middleware('role:Superadmin')
+    ->group(function () {
+        Route::get('/department', 'departmentView');
+        Route::get('/department/{department}', 'alumniListView');
+
+        Route::get('/settings/department', 'departmentSettingsView');
+        Route::get('/settings/department/edit/{department}', 'editDepartmentView');
+        Route::post('/settings/department/update/{department}', 'updateDepartment');
+
+        Route::post('/settings/department/create', 'createDepartment');
+    });
+
 Route::controller(AdminController::class)
     ->middleware('role:Admin')
     ->group(function () {
         Route::get('/admin', 'dashboardView');
-        Route::get('/department', 'departmentView');
         Route::get('/link-account', 'linkAccount')->name('link.index');
         Route::post('/link-create', 'createLink')->name('link.create');
         Route::delete('/link-delete/{alumni}', 'deleteLink')->name('link.delete');
 
         Route::get('/profile/report/{alumni}', 'profileReportView');
 
-        Route::get('/department/{department}', 'alumniListView');
+        Route::get('/profiles', 'alumniProfilesView')->name('profiles.index');
+        Route::get('/profiles/{course}', 'alumniCoursesView')->name('profiles.courses');
+
         Route::get('/user/view/{user}', 'userView');
         Route::get('/user/delete/{user}', 'userDelete');
         Route::get('/user/delete/{user}/department', 'userDeleteDepartment');
@@ -174,12 +189,6 @@ Route::controller(AdminController::class)
         Route::get('/admin/chat', 'chatView');
 
         Route::get('/admin/post', 'postView');
-
-        Route::get('/settings/department', 'departmentSettingsView');
-        Route::get('/settings/department/edit/{department}', 'editDepartmentView');
-        Route::post('/settings/department/update/{department}', 'updateDepartment');
-
-        Route::post('/settings/department/create', 'createDepartment');
 
         Route::get('/settings/account', 'accountsSettingsView');
         Route::post('/settings/account/edit/{user}', 'accountEdit');

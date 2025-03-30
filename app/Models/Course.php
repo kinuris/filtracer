@@ -10,14 +10,17 @@ class Course extends Model
     protected $table = 'courses';
     protected $fillable = [
         'name',
-        'department_id'
+        'department_id',
+        'image_link',
     ];
 
-    public function educations() {
+    public function educations()
+    {
         return $this->hasMany(EducationRecord::class, 'course_id');
     }
 
-    public function department() {
+    public function department()
+    {
         return $this->belongsTo(Department::class, 'department_id');
     }
 

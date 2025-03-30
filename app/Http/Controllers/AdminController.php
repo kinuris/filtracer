@@ -29,6 +29,72 @@ class AdminController extends Controller
         return view('department.index');
     }
 
+    public function alumniCoursesView(Course $course)
+    {
+        $users = User::query();
+
+        if (request('mode') === 'generated') {
+            $users = User::has('adminGenerated');
+        }
+
+        $role = request()->query('user_role', 'Alumni');
+        if ($role === 'Alumni' && request('mode') !== 'generated') {
+            $users = User::query()->where('role', '=', 'Alumni');
+        } elseif ($role === 'Alumni' && request('mode') === 'generated') {
+            $users = User::has('adminGenerated')
+                ->where('role', '=', 'Alumni')
+                ->whereHas('adminGenerated');
+        } else {
+            $users = $users->where('id', '!=', Auth::user()->id)
+                ->where('role', '=', 'Admin');
+        }
+
+        $search = request()->query('search');
+        if ($search) {
+            $relationName = $role === 'Alumni' ? 'personalBio' : 'adminRelation';
+            $searchPattern = '%' . $search . '%';
+
+            $users = $users->where(function ($query) use ($relationName, $searchPattern) {
+                $query->whereRelation($relationName, 'first_name', 'LIKE', $searchPattern)
+                    ->orWhereRelation($relationName, 'middle_name', 'LIKE', $searchPattern)
+                    ->orWhereRelation($relationName, 'last_name', 'LIKE', $searchPattern);
+            });
+        }
+
+        $currentUser = Auth::user();
+        if (!User::query()->find($currentUser->id)->admin()->is_super) {
+            $users = $users->where('department_id', '=', $currentUser->department_id);
+        }
+
+        $status = (int) request()->query('user_status', -1);
+        if ($status !== -1) {
+            if ($role === 'Alumni') {
+                $users = $users->whereHas('personalBio', function ($query) {
+                    $query->where('status', '=', request()->query('user_status'));
+                });
+            } else {
+                $users = $users->whereHas('adminRelation', function ($query) {
+                    $query->where('is_verified', '=', request()->query('user_status'));
+                });
+            }
+        }
+
+        $users = $users->whereRelation('educationalBios', 'course_id', '=', $course->id);
+        $users = $users->paginate(6);
+
+        return view('alumni.course')
+            ->with('users', $users);
+    }
+
+    public function alumniProfilesView()
+    {
+        $courses = Course::query()
+            ->where('department_id', '=', Auth::user()->department_id)
+            ->get();
+
+        return view('alumni.profiles')->with('courses', $courses);
+    }
+
     public function sendSMSIndividual(User $user)
     {
         $username = $user->username;
@@ -217,7 +283,10 @@ class AdminController extends Controller
 
     public function reportsStatisticalView()
     {
-        $users = User::partialSet()->where('role', '=', 'Alumni')->orderBy('created_at', 'DESC');
+        $users = User::compSet()
+            ->orWhereHas('partialPersonal')
+            ->where('role', '=', 'Alumni')
+            ->orderBy('created_at', 'DESC');
 
         $users = $users->paginate(7);
 
@@ -292,6 +361,11 @@ class AdminController extends Controller
     public function coursesSettingsView()
     {
         $courses = Course::query();
+        $user = User::query()->find(Auth::user()->id);
+
+        if (!$user->admin()->is_super) {
+            $courses = $courses->where('department_id', '=', $user->department_id);
+        }
 
         $search = request()->query('search');
         if ($search) {
@@ -349,15 +423,19 @@ class AdminController extends Controller
 
         $search = request()->query('search');
         if ($search) {
-            if ($role === 'Alumni') {
-                $users = $users->whereRelation('personalBio', 'first_name', 'LIKE', '%' . $search . '%')
-                    ->orWhereRelation('personalBio', 'middle_name', 'LIKE', '%' . $search . '%')
-                    ->orWhereRelation('personalBio', 'last_name', 'LIKE', '%' . $search . '%');
-            } else {
-                $users = $users->whereRelation('adminRelation', 'first_name', 'LIKE', '%' . $search . '%')
-                    ->orWhereRelation('adminRelation', 'middle_name', 'LIKE', '%' . $search . '%')
-                    ->orWhereRelation('adminRelation', 'last_name', 'LIKE', '%' . $search . '%');
-            }
+            $relationName = $role === 'Alumni' ? 'personalBio' : 'adminRelation';
+            $searchPattern = '%' . $search . '%';
+
+            $users = $users->where(function ($query) use ($relationName, $searchPattern) {
+                $query->whereRelation($relationName, 'first_name', 'LIKE', $searchPattern)
+                    ->orWhereRelation($relationName, 'middle_name', 'LIKE', $searchPattern)
+                    ->orWhereRelation($relationName, 'last_name', 'LIKE', $searchPattern);
+            });
+        }
+
+        $currentUser = Auth::user();
+        if (!User::query()->find($currentUser->id)->admin()->is_super) {
+            $users = $users->where('department_id', '=', $currentUser->department_id);
         }
 
         $status = (int) request()->query('user_status', -1);

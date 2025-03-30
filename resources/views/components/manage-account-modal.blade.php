@@ -58,7 +58,7 @@
             <div class="flex gap-4 mt-4">
                 <div class="flex-1">
                     <label for="major" class="block text-sm font-medium text-gray-700">Major</label>
-                    <input readonly type="text" value="{{ $educational->major->name }}" name="major" id="major" class="bg-gray-200 border block w-full border-gray-400 rounded-md p-1.5">
+                    <input readonly type="text" value="{{ $educational->major ? $educational->major->name : 'N/A' }}" name="major" id="major" class="bg-gray-200 border block w-full border-gray-400 rounded-md p-1.5">
                 </div>
             </div>
 

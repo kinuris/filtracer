@@ -3,7 +3,7 @@
 @section('title', 'Departments')
 
 @section('content')
-<div class="bg-gray-100 w-full h-full p-8">
+<div class="bg-gray-100 w-full max-h-screen overflow-auto p-8">
     <h1 class="font-medium tracking-widest text-lg mb-4">Departments</h1>
     @php($depts = App\Models\Department::allValid())
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">

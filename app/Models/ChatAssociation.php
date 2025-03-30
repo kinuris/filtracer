@@ -11,6 +11,7 @@ class ChatAssociation extends Model
     protected $fillable = [
         'chat_group_id',
         'user_id',
+        'status',
     ];
 
     use HasFactory;

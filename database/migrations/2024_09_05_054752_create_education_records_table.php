@@ -55,6 +55,7 @@ return new class extends Migration
                 ->onUpdate('cascade');
 
             $table->foreignId('major_id')
+                ->nullable()
                 ->references('id')
                 ->on('majors')
                 ->onDelete('cascade')

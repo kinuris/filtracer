@@ -9,14 +9,22 @@ $course = App\Models\Course::find(request('courses') ?? -1);
 $category = request('category');
 
 if ($department && $course) {
-    $query = App\Models\User::partialSet()
+    $query = App\Models\User::query()
+        ->whereIn(
+            'id',
+            App\Models\User::compSet()
+                ->orWhereHas('partialPersonal')
+                ->get()
+                ->pluck('id')
+        )
         ->where('role', '!=', 'Admin')
         ->whereRelation('course', 'courses.id', '=', $course->id);
 
     switch ($category) {
         case "All Entities":
             // Merge all partialSet() (non-Admin) users with Admin users
-            $users = App\Models\User::partialSet()
+            $users = App\Models\User::compSet()
+                ->orWhereHas('partialPersonal')
                 ->where('role', '!=', 'Admin')
                 ->get()
                 ->merge(App\Models\User::where('role', '=', 'Admin')->get());
@@ -42,12 +50,22 @@ if ($department && $course) {
 
     $users = $query->get();
 } else if ($department) {
-    $query = App\Models\User::partialSet()->where('role', '!=', 'Admin')->whereRelation('department', 'departments.id', '=', $department->id);
+    $query = App\Models\User::query()
+        ->whereIn(
+            'id',
+            App\Models\User::compSet()
+                ->orWhereHas('partialPersonal')
+                ->get()
+                ->pluck('id')
+        )
+        ->where('role', '!=', 'Admin')
+        ->whereRelation('department', 'departments.id', '=', $department->id);
 
     switch ($category) {
         case "All Entities":
             // Merge all partialSet() (non-Admin) users with Admin users
-            $users = App\Models\User::partialSet()
+            $users = App\Models\User::compSet()
+                ->orWhereHas('partialPersonals')
                 ->where('role', '!=', 'Admin')
                 ->get()
                 ->merge(App\Models\User::where('role', '=', 'Admin')->get());
@@ -75,13 +93,15 @@ if ($department && $course) {
     switch ($category) {
         case "All Entities":
             // Merge all partialSet() (non-Admin) users with Admin users
-            $users = App\Models\User::partialSet()
+            $users = App\Models\User::compSet()
+                ->orWhereHas('partialPersonal')
                 ->where('role', '!=', 'Admin')
                 ->get()
                 ->merge(App\Models\User::where('role', '=', 'Admin')->get());
             break;
         case "All Users":
-            $users = App\Models\User::partialSet()
+            $users = App\Models\User::compSet()
+                ->orWhereHas('partialPersonal')
                 ->where('role', '!=', 'Admin')
                 ->get();
             break;
@@ -93,7 +113,7 @@ if ($department && $course) {
         case "Self-Employed Alumni":
         case "Student Alumni":
         case "Retired Alumni":
-            switch($category) {
+            switch ($category) {
                 case "Working Student":
                     $category = "Working Student";
                     break;
@@ -145,7 +165,7 @@ if ($department && $course) {
                         $query->where('role', '!=', 'Admin')
                             ->where(function ($query) {
                                 $query->whereDoesntHave('personalRecords')
-                                      ->orWhereRelation('personalRecords', 'status', '=', 0);
+                                    ->orWhereRelation('personalRecords', 'status', '=', 0);
                             });
                     }
                 })

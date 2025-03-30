@@ -24,22 +24,22 @@ class DatabaseSeeder extends Seeder
             'logo' => 'ccs.png',
         ]);
 
-        Department::query()->create([
+        $ccs = Department::query()->create([
             'name' => 'College of Computer Studies',
             'logo' => 'ccs.png',
         ]);
 
-        Department::query()->create([
+        $cba = Department::query()->create([
             'name' => 'College of Business and Accountancy',
             'logo' => 'cba.png',
         ]);
 
-        Department::query()->create([
+        $cas = Department::query()->create([
             'name' => 'College of Arts and Sciences',
             'logo' => 'cas.png',
         ]);
 
-        Department::query()->create([
+        $cte = Department::query()->create([
             'name' => 'College of Teacher Education',
             'logo' => 'cte.png',
         ]);
@@ -49,24 +49,164 @@ class DatabaseSeeder extends Seeder
             'logo' => 'coe.png',
         ]);
 
-        foreach (Department::allValid() as $dept) {
-            for ($i = 0; $i < fake()->numberBetween(3, 10); $i++) {
-                Course::query()->create([
-                    'department_id' => $dept->id,
-                    'name' => fake()->firstName(),
-                ]);
-            }
-        }
+        Department::query()->create([
+            'name' => 'College of Criminal Justice Education',
+            'logo' => 'ccje.png',
+        ]);
 
-        foreach (Course::all() as $course) {
-            for ($i = 0; $i < fake()->numberBetween(3, 10); $i++) {
-                Major::query()->create([
-                    'name' => fake()->firstName(),
-                    'course_id' => $course->id,
-                    'description' => fake()->sentence(),
-                ]);
-            }
-        }
+        $chtm = Department::query()->create([
+            'name' => 'College of Hospitality and Tourism Management',
+            'logo' => 'chtm.png',
+        ]);
+
+        Department::query()->create([
+            'name' => 'College of Nursing',
+            'logo' => 'cn.png',
+        ]);
+
+        Department::query()->create([
+            'name' => 'Graduate School',
+            'logo' => 'gradsch.png',
+        ]);
+
+        Course::query()->create([
+            'department_id' => $cas->id,
+            'name' => 'Bachelor of Arts',
+            'image_link' => 'cas/bachelor-of-arts.png',
+        ]);
+
+        Course::query()->create([
+            'department_id' => $cas->id,
+            'name' => 'Bachelor of Science in Biology',
+            'image_link' => 'cas/biology.png',
+        ]);
+
+        Course::query()->create([
+            'department_id' => $cas->id,
+            'name' => 'Bachelor of Science in Psychology',
+            'image_link' => 'cas/psychology.png',
+        ]);
+
+        Course::query()->create([
+            'department_id' => $cas->id,
+            'name' => 'Bachelor of Science in Social Work',
+            'image_link' => 'cas/social-work.png',
+        ]);
+
+        Course::query()->create([
+            'department_id' => $cba->id,
+            'name' => 'Bachelor of Science in Accountancy',
+            'image_link' => 'cba/accountancy.png',
+        ]);
+
+        Course::query()->create([
+            'department_id' => $cba->id,
+            'name' => 'Bachelor of Science in Business Administration',
+            'image_link' => 'cba/business-administration.png',
+        ]);
+
+        Course::query()->create([
+            'department_id' => $cba->id,
+            'name' => 'Bachelor of Science in Entrepreneurship',
+            'image_link' => 'cba/entrepreneurship.png',
+        ]);
+
+        Course::query()->create([
+            'department_id' => $ccs->id,
+            'name' => 'Bachelor of Science in Computer Science',
+            'image_link' => 'ccs/computer-science.png',
+        ]);
+
+        Course::query()->create([
+            'department_id' => $ccs->id,
+            'name' => 'Bachelor of Science in Information Technology',
+            'image_link' => 'ccs/information-technology.png',
+        ]);
+
+        Course::query()->create([
+            'department_id' => $chtm->id,
+            'name' => 'Bachelor of Science in Hospitality Management',
+            'image_link' => 'chtm/hospitality-management.png',
+        ]);
+
+        Course::query()->create([
+            'department_id' => $chtm->id,
+            'name' => 'Bachelor of Science in Tourism Management',
+            'image_link' => 'chtm/tourism-management.png',
+        ]);
+
+        Course::query()->create([
+            'department_id' => $cte->id,
+            'name' => 'Bachelor of Culture and Arts Education',
+            'image_link' => 'cte/culture-and-arts.png',
+        ]);
+
+        Course::query()->create([
+            'department_id' => $cte->id,
+            'name' => 'Diploma in Early Childhood Education',
+            'image_link' => 'cte/diplomate-in-early-childhood.png',
+        ]);
+
+        Course::query()->create([
+            'department_id' => $cte->id,
+            'name' => 'Bachelor of Early Childhood Education',
+            'image_link' => 'cte/early-childhood.png',
+        ]);
+
+        Course::query()->create([
+            'department_id' => $cte->id,
+            'name' => 'Bachelor of Elementary Education',
+            'image_link' => 'cte/elementary.png',
+        ]);
+
+        // Course::query()->create([
+        //     'department_id' => $cte->id,
+        //     'name' => 'Bachelor of Physical Education',
+        //     'image_link' => 'cte/physical-education.png',
+        // ]);
+
+        Course::query()->create([
+            'department_id' => $cte->id,
+            'name' => 'Bachelor in Physical Education',
+            'image_link' => 'cte/physical.png',
+        ]);
+
+        Course::query()->create([
+            'department_id' => $cte->id,
+            'name' => 'Bachelor of Secondary Education',
+            'image_link' => 'cte/secondary.png',
+        ]);
+
+        Course::query()->create([
+            'department_id' => $cte->id,
+            'name' => 'Bachelor of Special Needs Education',
+            'image_link' => 'cte/special-needs.png',
+        ]);
+
+        Course::query()->create([
+            'department_id' => $cte->id,
+            'name' => 'Teacher Education Certificate',
+            'image_link' => 'cte/teacher-education-certificate.png',
+        ]);
+
+        // foreach (Department::allValid() as $dept) {
+        //     for ($i = 0; $i < fake()->numberBetween(3, 10); $i++) {
+        //         Course::query()->create([
+        //             'department_id' => $dept->id,
+        //             'name' => fake()->firstName(),
+        //         ]);
+        //     }
+        // }
+
+        // foreach (Course::all() as $course) {
+        //     for ($i = 0; $i < fake()->numberBetween(3, 10); $i++) {
+        //         Major::query()->create([
+        //             'name' => fake()->firstName(),
+        //             'course_id' => $course->id,
+        //             'description' => fake()->sentence(),
+        //         ]);
+        //     }
+        // }
 
         // User::factory(10)->create();
         User::query()->create([
@@ -93,6 +233,47 @@ class DatabaseSeeder extends Seeder
             'role' => 'Alumni',
         ]);
 
+        // Create 5 sample users under the CTE department
+        User::query()->create([
+            'name' => 'Maria Santos',
+            'username' => 'maria_santos',
+            'password' => bcrypt('password'),
+            'department_id' => $cte->id,
+            'role' => 'Alumni',
+        ]);
+
+        User::query()->create([
+            'name' => 'Juan Dela Cruz',
+            'username' => 'juan_delacruz',
+            'password' => bcrypt('password'),
+            'department_id' => $cte->id,
+            'role' => 'Alumni',
+        ]);
+
+        User::query()->create([
+            'name' => 'Elena Reyes',
+            'username' => 'elena_reyes',
+            'password' => bcrypt('password'),
+            'department_id' => $cte->id,
+            'role' => 'Alumni',
+        ]);
+
+        User::query()->create([
+            'name' => 'Pedro Lim',
+            'username' => 'pedro_lim',
+            'password' => bcrypt('password'),
+            'department_id' => $cte->id,
+            'role' => 'Alumni',
+        ]);
+
+        User::query()->create([
+            'name' => 'Sofia Garcia',
+            'username' => 'sofia_garcia',
+            'password' => bcrypt('password'),
+            'department_id' => $cte->id,
+            'role' => 'Alumni',
+        ]);
+
         $admins = User::allAdmin();
         foreach ($admins as $admin) {
             Admin::query()->create([
@@ -103,7 +284,7 @@ class DatabaseSeeder extends Seeder
                 'office' => Department::allValid()->random()->id,
                 'email_address' => fake()->email(),
                 'phone_number' => fake()->phoneNumber(),
-                'profile_picture' => null,
+                'profile_picture' => $admin->username === 'superadmin' ? 'superadmin-profile.png' : 'admin-profile.png',
                 'is_verified' => $admin->username === 'admin',
                 'is_super' => $admin->username === 'superadmin',
             ]);
@@ -111,7 +292,8 @@ class DatabaseSeeder extends Seeder
 
 
         foreach (User::noBio('educational')->get() as $user) {
-            $major = Major::query()->whereRelation('departmentThroughCourse', 'departments.id', '=', $user->department_id)->get()->random();
+            $majorCollection = Major::query()->whereRelation('departmentThroughCourse', 'departments.id', '=', $user->department_id)->get();
+            $major = $majorCollection->isNotEmpty() ? $majorCollection->random() : Major::query()->inRandomOrder()->first();
             $year = fake()->year();
 
             EducationRecord::query()->create([
@@ -142,8 +324,10 @@ class DatabaseSeeder extends Seeder
                     'Masteral',
                     'Doctoral',
                 ]),
-                'major_id' => $major->id,
-                'course_id' => $major->course->id,
+                'major_id' => is_null($major) ? null :  $major->id,
+                'course_id' => Course::where('department_id', '=', $user->department_id)->exists() 
+                    ? Course::where('department_id', '=', $user->department_id)->inRandomOrder()->first()->id
+                    : Course::inRandomOrder()->first()->id,
                 'start' => $year,
                 'end' => $year + 4,
             ]);
@@ -174,7 +358,7 @@ class DatabaseSeeder extends Seeder
                 'phone_number' => fake()->phoneNumber(),
                 'social_link' => fake()->url(),
                 'status' => fake()->randomElement([0, 1]),
-                'profile_picture' => fake()->imageUrl(),
+                'profile_picture' => 'alumni-profile.png',
             ]);
         }
 
