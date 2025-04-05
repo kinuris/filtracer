@@ -61,7 +61,7 @@
     @php
     $association = $group->associations->where('user_id', '=', Auth::user()->id)->first()
     @endphp
-    <div class="flex place-items-center p-2 hover:bg-gray-100" data-latest="{{ $group->latestMessage->created_at }}">
+    <div class="flex place-items-center p-2 hover:bg-gray-100" data-latest="{{ $group->latestMessage ? $group->latestMessage->created_at : '' }}">
         <a class="flex place-items-center" href="{{ $baseUrl }}?initiate={{ $group->initiateLink() }}">
             <img class="w-12 h-12 object-cover rounded-full shadow mr-3.5" src="{{ $group->image() }}" alt="Group">
             <div class="flex flex-col">

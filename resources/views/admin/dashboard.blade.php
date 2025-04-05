@@ -140,7 +140,17 @@ $viewPost = App\Models\Post::find(request('view'));
     <div class="flex">
         <div class="shadow rounded-lg mt-4 mr-4 flex-1 h-full max-h-full overflow-auto">
             <div class="bg-white py-4 flex flex-col px-6 border-b rounded-lg min-h-full">
-                <h1 class="font-medium text-lg h-12">Registered Alumni by Higher Education Department</h1>
+                <div class="flex items-center h-12">
+                    <h1 class="font-medium text-lg">Registered Alumni by Higher Education Department</h1>
+                    <div class="relative ml-2 group cursor-help">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500 hover:text-gray-700" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                        </svg>
+                        <div class="absolute hidden group-hover:block bg-gray-800 text-white text-xs rounded py-1 px-2 left-0 -bottom-10 mb-1 w-56 z-10">
+                            This graph displays all registered alumni across departments, including both complete and incomplete profiles.
+                        </div>
+                    </div>
+                </div>
                 <canvas id="summary"></canvas>
             </div>
         </div>
