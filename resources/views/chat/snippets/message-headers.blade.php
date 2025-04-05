@@ -29,7 +29,9 @@
     @php
     $associations = $group->associations
     @endphp
-    <a href="{{ $baseUrl }}?initiate={{ $group->initiateLink() }}" data-latest="{{ $group->latestMessage->created_at }}" class="flex place-items-center p-2 hover:bg-gray-100">
+    <a href="{{ $baseUrl }}?initiate={{ $group->initiateLink() }}" 
+       data-latest="{{ $group->latestMessage ? $group->latestMessage->created_at : '' }}" 
+       class="flex place-items-center p-2 hover:bg-gray-100">
         <img class="w-12 h-12 object-cover rounded-full shadow mr-3.5" src="{{ $group->image() }}" alt="Group">
         <div class="flex flex-col">
             <p class="text-sm font-normal">{{ $group->name }}</p>
