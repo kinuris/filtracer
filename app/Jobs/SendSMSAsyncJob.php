@@ -3,11 +3,10 @@
 namespace App\Jobs;
 
 use App\Helpers\Message;
+use Exception;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Foundation\Queue\Queueable;
-use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Log;
 
 class SendSMSAsyncJob implements ShouldQueue
 {
@@ -30,11 +29,24 @@ class SendSMSAsyncJob implements ShouldQueue
      */
     public function handle(): void
     {
+        if (!preg_match('/^639\d{9}$/', $this->number)) {
+            Log::warning('Invalid phone number format: ' . $this->number);
+
+            return;
+        }
+
         $message = Message::make();
 
         $message->setMessage($this->message);
         $message->setFullPhoneNumber($this->number);
 
-        $message->send();
+        Log::info('Sending SMS to ' . $this->number . ': ' . $this->message);
+
+        try {
+            $response = $message->send();
+            Log::info('SMS response: ' . json_encode($response));
+        } catch (Exception $e) {
+            Log::info('Failed to send SMS to ' . $this->number . ': ' . $e->getMessage());
+        }
     }
 }

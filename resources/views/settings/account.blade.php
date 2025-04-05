@@ -45,6 +45,7 @@
                                 <p class="mb-1 font-thin">Company ID</p>
                                 <input value="{{ $user->admin()->position_id }}" class="w-full text-gray-500 font-thin border rounded-md p-2 bg-gray-50" type="text" name="position" id="position">
                             </div>
+                            @if (!Auth::user()->admin()->is_super)
                             <div class="flex-1 ml-2">
                                 <p class="mb-1 font-thin">Office</p>
                                 <select class="w-full text-gray-500 font-thin border rounded-md p-2 bg-gray-50" name="department" id="department">
@@ -54,6 +55,7 @@
                                     @endforeach
                                 </select>
                             </div>
+                            @endif
                         </div>
 
                         <div class="mt-3">

@@ -404,7 +404,7 @@ class User extends Authenticatable
         $bio = $this->getPersonalBio();
 
         if (is_null($bio)) {
-            return fake()->imageUrl();
+            return asset('storage/user/images/alumni-profile.png');
         }
 
         if (str_contains($bio->profile_picture, 'https://')) {

@@ -68,7 +68,7 @@
 
                 <div>
                     <p>Office</p>
-                    <p class="bg-gray-100 p-2 border rounded text-gray-500">{{ $user->admin()->office }}</p>
+                    <p class="bg-gray-100 p-2 border rounded text-gray-500">{{ $user->admin()->officeRelation->name }}</p>
                 </div>
                 @endif
             </div>
@@ -76,9 +76,12 @@
             <div class="mt-4 flex">
                 <button type="button" id="closeVerifyModal" class="mr-2 px-4 py-2 bg-white text-blue-500 border border-blue-500 rounded">Cancel</button>
                 <a class="bg-blue-500 text-white px-4 py-2 rounded mr-2" href="/admin/useraccount/verify/{{ $user->id }}">Verify</a>
+                @php($user = App\Models\User::query()->find($id))
+                @if ($user->role !== 'Admin')
                 <button type="button" id="editButton" class="bg-blue-500 text-white px-4 py-2 rounded cursor-pointer">
                     Edit
                 </button>
+                @endif
             </div>
         </div>
 
@@ -86,6 +89,7 @@
         <form id="editMode" class="hidden" action="/admin/useraccount/update/{{ $user->id }}" method="POST">
             @csrf
             <div class="grid grid-cols-2 gap-3">
+                @if ($user->role != 'Admin')
                 <div>
                     <label>First Name</label>
                     <input name="first_name" class="w-full p-2 border rounded" value="{{ $user->getPersonalBio()->first_name }}">
@@ -105,6 +109,27 @@
                     <label>Suffix</label>
                     <input name="suffix" class="w-full p-2 border rounded" value="{{ $user->getPersonalBio()->suffix }}">
                 </div>
+                @else
+                <div>
+                    <label>First Name</label>
+                    <input name="first_name" class="w-full p-2 border rounded" value="{{ $user->admin()->first_name }}">
+                </div>
+
+                <div>
+                    <label>Middle Name</label>
+                    <input name="middle_name" class="w-full p-2 border rounded" value="{{ $user->admin()->middle_name }}">
+                </div>
+
+                <div>
+                    <label>Last Name</label>
+                    <input name="last_name" class="w-full p-2 border rounded" value="{{ $user->admin()->last_name }}">
+                </div>
+
+                <div>
+                    <label>Suffix</label>
+                    <input name="suffix" class="w-full p-2 border rounded" value="{{ $user->admin()->suffix }}">
+                </div>
+                @endif
 
                 <div>
                     <label>Username</label>

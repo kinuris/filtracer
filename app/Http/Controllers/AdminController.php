@@ -666,13 +666,20 @@ class AdminController extends Controller
                 'user_id' => $admin->id
             ]);
         }
-
         SendSMSAsyncJob::dispatch(
-            $user->personalBio->philSMSNum(),
-            "✅ Account Verified\nCongratulations, " . $user->personalBio->first_name . "! Your FilTracer account has been verified. Log in now to connect with other users and explore opportunities. Visit: https://filtracer.com/login"
+            $user->role === 'Admin' ? $user->admin()->philSMSNum() : $user->personalBio->philSMSNum(),
+            "✅ Account Verified\nCongratulations, " . ($user->role === 'Admin' ? $user->admin()->first_name : $user->personalBio->first_name) . "! Your FilTracer account has been verified. Log in now to connect with other users and explore opportunities. Visit: https://filtracer.com/login"
         );
 
-        return redirect('/account')->with([
+        $previousUrl = url()->previous();
+        $parsedUrl = parse_url($previousUrl);
+        if (isset($parsedUrl['query'])) {
+            parse_str($parsedUrl['query'], $queries);
+            unset($queries['verify_modal']);
+            $previousUrl = $parsedUrl['path'] . '?' . http_build_query($queries);
+        }
+
+        return redirect($previousUrl)->with([
             'message' => 'Account verified!',
             'subtitle' => 'The user can now access all system features'
         ]);
@@ -699,11 +706,19 @@ class AdminController extends Controller
         }
 
         SendSMSAsyncJob::dispatch(
-            $user->personalBio->philSMSNum(),
+            $user->role == 'Admin' ? $user->admin()->philSMSNum() : $user->personalBio->philSMSNum(),
             "❌ Account Unverified\nWe regret to inform you that your FilTracer account has been unverified. Please contact the admin for more information."
         );
 
-        return redirect('/account')->with([
+        $previousUrl = url()->previous();
+        $parsedUrl = parse_url($previousUrl);
+        if (isset($parsedUrl['query'])) {
+            parse_str($parsedUrl['query'], $queries);
+            unset($queries['unverify_modal']);
+            $previousUrl = $parsedUrl['path'] . '?' . http_build_query($queries);
+        }
+
+        return redirect($previousUrl)->with([
             'message' => 'Account unverified!',
             'subtitle' => 'The user will have limited access to system features'
         ]);
