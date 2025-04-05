@@ -44,8 +44,75 @@
                 </div>
 
                 <div class="flex justify-end">
-                    <button onclick="this.form.action=this.getAttribute('formaction'); this.form.submit();" formaction="/forgot-password" type="button" class="text-blue-600 text-sm bg-transparent border-none cursor-pointer p-0">Forgot password?</button>
+                    <button type="button" id="forgotPasswordBtn" class="text-blue-600 text-sm bg-transparent border-none cursor-pointer p-0 hover:text-blue-800 transition-colors">Forgot password?</button>
                 </div>
+
+                <!-- Password Reset Confirmation Modal -->
+                <div id="passwordResetModal" class="fixed inset-0 bg-gray-900/80 backdrop-blur-sm z-50 hidden flex justify-center items-center transition-all duration-300 opacity-0">
+                    <div class="bg-white p-8 rounded-xl shadow-xl max-w-md w-full mx-4 border border-gray-100 transform transition-all duration-300 scale-95 opacity-0" id="modalContent">
+                        <div class="flex items-center mb-6">
+                            <div class="bg-blue-50 p-3 rounded-full mr-4">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                </svg>
+                            </div>
+                            <h2 class="text-xl font-semibold text-gray-800">Reset Password</h2>
+                        </div>
+                        <p class="mb-8 text-gray-600 leading-relaxed">Are you sure you want to reset your password? A verification code will be sent to your registered phone number.</p>
+                        <div class="flex justify-end space-x-3">
+                            <button type="button" id="cancelResetBtn" class="px-5 py-2.5 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors duration-200 font-medium focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2">Cancel</button>
+                            <button type="button" id="confirmResetBtn" class="bg-blue-600 text-white px-5 py-2.5 rounded-lg hover:bg-blue-700 transition-colors duration-200 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center">
+                                <span>Reset Password</span>
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        const modal = document.getElementById('passwordResetModal');
+                        const modalContent = document.getElementById('modalContent');
+                        const forgotBtn = document.getElementById('forgotPasswordBtn');
+                        const cancelBtn = document.getElementById('cancelResetBtn');
+                        const confirmBtn = document.getElementById('confirmResetBtn');
+                        const form = document.getElementById('login-form');
+
+                        forgotBtn.addEventListener('click', function() {
+                            modal.classList.remove('hidden');
+                            // Set display flex explicitly since we're toggling between hidden and flex
+                            modal.style.display = 'flex';
+                            setTimeout(() => {
+                                modal.classList.add('opacity-100');
+                                modalContent.classList.add('opacity-100', 'scale-100');
+                                modalContent.classList.remove('scale-95', 'opacity-0');
+                            }, 10);
+                        });
+
+                        function closeModal() {
+                            modal.classList.remove('opacity-100');
+                            modalContent.classList.remove('opacity-100', 'scale-100');
+                            modalContent.classList.add('scale-95', 'opacity-0');
+                            setTimeout(() => {
+                                modal.classList.add('hidden');
+                                modal.style.display = 'none';
+                            }, 300);
+                        }
+
+                        cancelBtn.addEventListener('click', closeModal);
+
+                        confirmBtn.addEventListener('click', function() {
+                            form.action = '/forgot-password';
+                            form.submit();
+                        });
+
+                        modal.addEventListener('click', function(e) {
+                            if (e.target === modal) closeModal();
+                        });
+                    });
+                </script>
 
                 <p class="text-gray-300 text-center text-sm my-4">Protected by reCaptcha v3</p>
                 <button class="g-recaptcha bg-[#147DC8] rounded-lg text-white py-2"
