@@ -480,11 +480,13 @@ class AdminController extends Controller
     public function alumniListView(Request $request, Department $department)
     {
         // $users = User::hasBio('educational');
-        $users = User::partialSet();
+        $users = User::query()->where('role', '=', 'Alumni');
 
         $course = (int) $request->query('course');
         if ($course && $course !== -1) {
-            $users = User::isCourse($request->query('course'));
+            $users = $users->whereHas('educationalBios', function ($query) use ($course) {
+                $query->where('course_id', '=', $course);
+            });
         }
 
         $search = $request->query('search');
@@ -496,6 +498,7 @@ class AdminController extends Controller
             ->where('department_id', '=', $department->id)
             ->where('role', '=', 'Alumni')
             ->paginate(7);
+
 
         $courses = $department->getCourses();
 
