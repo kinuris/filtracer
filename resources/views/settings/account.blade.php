@@ -55,6 +55,8 @@
                                     @endforeach
                                 </select>
                             </div>
+                            @else
+                            <input type="hidden" name="department" value="{{ $user->department->id }}">
                             @endif
                         </div>
 
