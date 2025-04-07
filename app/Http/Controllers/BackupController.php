@@ -11,7 +11,9 @@ class BackupController extends Controller
 {
     public function index()
     {
-        $backups = DatabaseSnapshot::all();
+        $backups = DatabaseSnapshot::query()
+            ->latest()
+            ->get();
 
         return view('backup.index')->with('backups', $backups);
     }
