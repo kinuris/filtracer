@@ -491,7 +491,13 @@ class AdminController extends Controller
 
         $search = $request->query('search');
         if ($search) {
-            $users = $users->where('name', 'LIKE', '%' . $search . '%');
+            $users = $users
+                ->whereRelation('partialPersonal', 'first_name', 'LIKE', '%' . $search . '%')
+                ->orWhereRelation('partialPersonal', 'middle_name', 'LIKE', '%' . $search . '%')
+                ->orWhereRelation('partialPersonal', 'last_name', 'LIKE', '%' . $search . '%')
+                ->orWhereRelation('personalBio', 'first_name', 'LIKE', '%' . $search . '%')
+                ->orWhereRelation('personalBio', 'middle_name', 'LIKE', '%' . $search . '%')
+                ->orWhereRelation('personalBio', 'last_name', 'LIKE', '%' . $search . '%');
         }
 
         $users = $users
