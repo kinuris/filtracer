@@ -160,6 +160,10 @@ class User extends Authenticatable
             }
         }
 
+        foreach (User::partialSet()->get() as $user) {
+            array_push($compSet, $user->id);
+        }
+
         return User::query()->whereIn('id', $compSet);
     }
 

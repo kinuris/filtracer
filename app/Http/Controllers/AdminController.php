@@ -302,9 +302,18 @@ class AdminController extends Controller
     public function reportsStatisticalView()
     {
         $users = User::compSet()
-            ->orWhereHas('partialPersonal')
             ->where('role', '=', 'Alumni')
             ->orderBy('created_at', 'DESC');
+
+        $search = request()->query('search');
+        if ($search) {
+            $users = $users->whereRelation('partialPersonal', 'first_name', 'LIKE', '%' . $search . '%')
+                ->orWhereRelation('partialPersonal', 'middle_name', 'LIKE', '%' . $search . '%')
+                ->orWhereRelation('partialPersonal', 'last_name', 'LIKE', '%' . $search . '%')
+                ->orWhereRelation('personalBio', 'first_name', 'LIKE', '%' . $search . '%')
+                ->orWhereRelation('personalBio', 'middle_name', 'LIKE', '%' . $search . '%')
+                ->orWhereRelation('personalBio', 'last_name', 'LIKE', '%' . $search . '%');
+        }
 
         $users = $users->paginate(7);
 
