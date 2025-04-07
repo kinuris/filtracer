@@ -378,6 +378,11 @@ class AdminController extends Controller
     {
         $depts = Department::query()->where('name', '!=', 'Admins Assigned');
 
+        $search = request('search');
+        if ($search) {
+            $depts = $depts->where('name', 'LIKE', '%' . $search . '%');
+        }
+
         $depts = $depts->paginate(5);
 
         return view('settings.department')->with('departments', $depts);
