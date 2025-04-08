@@ -281,7 +281,7 @@ if ($department && $course) {
                     <option value="-1">All Departments</option>
                     @php($depts = App\Models\Department::allValid())
                     @foreach ($depts as $dept)
-                    <option @if(Auth::user()->admin()->is_super) @if (request('department')==$dept->id) selected @endif value="{{ $dept->id }}" @else @if(Auth::user()->admin()->office == $dept->id) selected @endif value="{{ $dept->id }}" @endif>{{ $dept->name }}</option>
+                    <option @if(Auth::user()->admin()->is_super) @if (request('department')==$dept->id) selected @endif value="{{ $dept->id }}" @else @if(Auth::user()->admin()->office == $dept->id && !Auth::user()->admin()->is_super) selected @endif value="{{ $dept->id }}" @endif>{{ $dept->name }}</option>
                     @endforeach
                 </select>
 
