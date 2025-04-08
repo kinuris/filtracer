@@ -197,7 +197,7 @@
                                 <div class="mx-2"></div>
 
                                 <div class="flex flex-col flex-1">
-                                    <div id="strand_container_{{ $loop->index }}" class="{{ $primsec->type === 'primary' ? 'hidden' : '' }} mb-3">
+                                    <div id="strand_container_{{ $loop->index }}" class="{{ $primsec->type === 'primary' ? 'hidden' : '' }} mb-3 flex flex-col">
                                         <label for="strand_{{ $loop->index }}">Strand (for Senior High)</label>
                                         <select class="text-gray-400 border rounded-lg p-2" name="strand" id="strand_{{ $loop->index }}">
                                             <option {{ $primsec->strand === 'STEM' ? 'selected' : '' }} value="STEM">STEM</option>

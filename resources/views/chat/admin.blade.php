@@ -135,7 +135,7 @@
 
                         </div>
                     </div>
-                    <div class="border-l px-6 py-3 h-full min-h-[calc(100vh-14.1rem)] max-h-[calc(100vh-14.1rem)] overflow-scroll">
+                    <div class="border-l px-6 py-3 h-full min-h-[calc(100vh-14.1rem)] max-h-[calc(100vh-14.1rem)] overflow-auto">
                         @if (!$selected)
                         <div class="div w-full h-full flex flex-col justify-center place-items-center">
                             <img class="w-16" src="{{ asset('assets/chat_gray.svg') }}" alt="Messages">

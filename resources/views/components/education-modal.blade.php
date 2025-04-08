@@ -81,14 +81,16 @@
 
                 <label class="mt-3" for="secondary_track">Track/Strand</label>
                 <select class="text-gray-400 border rounded-lg p-2" name="track" id="secondary_track">
-                    <option value="STEM">STEM</option>
+                    <option  value="STEM">STEM</option>
                     <option value="HUMSS">HUMSS</option>
                     <option value="ABM">ABM</option>
-                    <option value="TVL">TVL</option>
                     <option value="GAS">GAS</option>
-                    <option value="Arts and Design">Arts and Design</option>
-                    <option value="Sports">Sports</option>
-                    <option value="None">None</option>
+                    <option value="Home Economics">Home Economics</option>
+                    <option value="ICT">ICT</option>
+                    <option value="Industrial Arts">Industrial Arts</option>
+                    <option value="Agri-Fishery Arts">Agri-Fishery Arts</option>
+                    <option value="Sports Track">Sports Track</option>
+                    <option value="Arts and Design Track">Arts and Design Track</option>
                 </select>
 
                 <div class="flex mt-3 gap-3">

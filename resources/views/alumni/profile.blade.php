@@ -8,7 +8,7 @@
     </div>
 
     <div class="flex max-h-full">
-        <div class="shadow rounded-lg h-fit mt-6 flex-1 min-w-80 overflow-scroll">
+        <div class="shadow rounded-lg h-fit mt-6 flex-1 min-w-80 overflow-auto">
             <div class="bg-white py-4 flex flex-col px-6 border-b rounded-lg">
                 <img class="w-32 h-32 rounded-full object-cover shadow-md mr-8" src="{{ $user->image() }}" alt="Profile">
                 <p class="text-lg font-bold my-6">{{ $user->name }}</p>

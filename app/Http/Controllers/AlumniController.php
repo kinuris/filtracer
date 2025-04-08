@@ -214,14 +214,14 @@ class AlumniController extends Controller
             'location' => ['required'],
             'degree_type' => ['required'],
             'course' => ['required'],
-            'major' => ['required'],
+            'major' => ['nullable'],
             'start' => ['required'],
             'end' => ['nullable', 'after:start'],
         ]);
 
         $validated['user_id'] = $alumni->id;
         $validated['school_location'] = $validated['location'];
-        $validated['major_id'] = $validated['major'];
+        $validated['major_id'] = isset($validated['major']) ? $validated['major'] : null;
         $validated['course_id'] = $validated['course'];
 
         $educ->update($validated);
