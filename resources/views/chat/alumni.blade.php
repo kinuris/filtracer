@@ -94,8 +94,8 @@
                             <!-- NOTE: Messages go here -->
                         </div>
                         <div class="div w-full bg-white/80 backdrop-blur-sm py-3 flex flex-col justify-end absolute px-4 right-0 bottom-0">
-                            <div class="flex">
-                                <input class="border rounded-l-lg border-r-0 bg-gray-50 font-light text-sm  min-w-72 flex-1 focus:outline-none px-2" placeholder="Type something here..." type="text" name="message" id="message">
+                            <div class="flex justify-end">
+                                <input class="border max-w-[calc(100%-26rem)] rounded-l-lg border-r-0 bg-gray-50 font-light text-sm  min-w-72 flex-1 focus:outline-none px-2" placeholder="Type something here..." type="text" name="message" id="message">
                                 <button class="bg-gray-50 border border-l-0 w-10 h-10 flex justify-center place-items-center rounded-r-lg">
                                     <label class="cursor-pointer p-2" for="attachment">
                                         <img class="w-5 h-5" src="{{ asset('assets/attachment.svg') }}" alt="Attachment">

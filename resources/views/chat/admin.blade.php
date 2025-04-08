@@ -128,7 +128,7 @@
                     </div>
                     <div class="px-6 py-3 flex flex-col h-full">
                         <form class="self-center mb-2" action="">
-                            <input id="search-box" class="border rounded-lg bg-gray-50 font-light text-sm p-2 min-w-72" placeholder="Search..." type="text" name="search">
+                            <input id="search-box" class="border rounded-lg bg-gray-50 font-light text-sm p-2 min-w-72 max-w-72" placeholder="Search..." type="text" name="search">
                         </form>
 
                         <div id="messageHeadersContainer">
@@ -146,9 +146,9 @@
                             <!-- NOTE: Messages go here -->
                         </div>
                         <div class="div w-full bg-white/80 backdrop-blur-sm py-3 flex flex-col justify-end absolute px-4 right-0 bottom-0">
-                            <div class="flex">
+                            <div class="flex justify-end">
                                 <input 
-                                    class="border rounded-l-lg border-r-0 bg-gray-50 font-light text-sm  min-w-72 flex-1 focus:outline-none px-2 @if(isset($association) && $association->status === 'pending') bg-gray-200 cursor-not-allowed @endif" 
+                                    class="border max-w-[calc(100%-26rem)] rounded-l-lg border-r-0 bg-gray-50 font-light text-sm flex-1 focus:outline-none px-2 @if(isset($association) && $association->status === 'pending') bg-gray-200 cursor-not-allowed @endif" 
                                     placeholder="@if(isset($association) && $association->status === 'pending') Request Pending @else Type something here...@endif" 
                                     type="text" 
                                     name="message" 
