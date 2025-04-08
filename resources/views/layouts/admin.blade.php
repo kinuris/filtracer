@@ -95,7 +95,7 @@
                 </a>
                 <div class="absolute hidden group-hover:block bg-white shadow-lg rounded-lg">
                     <a href="/report/graphical" class="block px-4 py-2 hover:bg-gray-100">Graphical Report</a>
-                    <a href="/report/statistical?department={{ Auth::user()->admin()->office }}" class="block px-4 py-2 hover:bg-gray-100">Statistical Report</a>
+                    <a href="/report/statistical?department={{ Auth::user()->admin()->is_super ? '' : Auth::user()->admin()->office }}" class="block px-4 py-2 hover:bg-gray-100">Statistical Report</a>
                 </div>
             </div>
 
