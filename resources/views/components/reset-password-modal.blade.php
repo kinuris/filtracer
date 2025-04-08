@@ -20,7 +20,7 @@
 
                 <div class="flex mt-4 justify-end">
                     <button type="button" id="closeResetPasswordModal" class="mr-2 px-4 py-2 bg-white text-blue-500 border border-blue-500 rounded">Cancel</button>
-                    <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded">Add</button>
+                    <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded">Reset</button>
                 </div>
             </div>
         </form>
