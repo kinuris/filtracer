@@ -16,7 +16,8 @@ return new class extends Migration
 
             $table->foreignId('user_id')
                 ->references('id')
-                ->on('users');
+                ->on('users')
+                ->cascadeOnDelete();
 
             $table->enum('type', ['primary', 'secondary']);
             $table->enum('strand', [

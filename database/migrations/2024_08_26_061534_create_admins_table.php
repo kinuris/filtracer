@@ -35,7 +35,8 @@ return new class extends Migration
 
             $table->foreignId('office')
                 ->references('id')
-                ->on('departments');
+                ->on('departments')
+                ->cascadeOnDelete();
 
             $table->string('email_address')->unique();
             $table->string('phone_number');

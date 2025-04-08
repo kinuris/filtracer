@@ -23,7 +23,8 @@ return new class extends Migration
 
             $table->foreignId('import_history_id')
                 ->references('id')
-                ->on('import_histories');
+                ->on('import_histories')
+                ->cascadeOnDelete();
 
             $table->timestamps();
         });

@@ -423,6 +423,8 @@ $viewPost = App\Models\Post::find(request('view'));
         <?php echo $users->whereRelation('professionalRecords', 'employment_status', '=', 'Student')->count() . ','; ?>
         <?php $users = User::query()->where('role', '=', 'Alumni'); ?>
         <?php echo $users->whereRelation('professionalRecords', 'employment_status', '=', 'Retired')->count() . ','; ?>
+        <?php $users = User::query()->where('role', '=', 'Alumni'); ?>
+        <?php echo $users->whereRelation('professionalRecords', 'employment_status', '=', 'Working Student')->count() . ','; ?>
     ];
 
     const data = {
@@ -432,6 +434,7 @@ $viewPost = App\Models\Post::find(request('view'));
             'Self-employed',
             'Student',
             'Retired',
+            'Working Student'
         ],
         datasets: [{
             data: stats,

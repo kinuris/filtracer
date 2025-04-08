@@ -16,11 +16,13 @@ return new class extends Migration
 
             $table->foreignId('admin_id')
                 ->references('id')
-                ->on('users');
+                ->on('users')
+                ->cascadeOnDelete();
 
             $table->foreignId('alumni_id')
                 ->references('id')
-                ->on('users');
+                ->on('users')
+                ->cascadeOnDelete();
 
             $table->timestamps();
         });
