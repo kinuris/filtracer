@@ -230,7 +230,9 @@ if ($department && $course) {
         <h1 class="font-medium tracking-widest text-lg">Statistical Report</h1>
         <div class="flex-1"></div>
 
-        @php ($tw = Vite::asset('resources/css/app.css'))
+        @php
+            $tw = Vite::asset('resources/css/app.css')
+        @endphp
         <button class="text-white bg-blue-600 p-2 px-3 rounded" onclick="printJS({ 
             printable: 'printableStat', 
             type: 'html', 
@@ -242,14 +244,64 @@ if ($department && $course) {
         <div class="bg-white p-4 flex place-items-center border-b rounded-lg">
             <div id="printableStat" class="border border-black w-full p-4 rounded-lg">
                 <div class="flex justify-between">
-                    @if ($department && $course)
-                    <h1 class="font-light text-blue-500"><span class="mx-1 italic font-bold">{{ $category }}</span> <span class="text-xl">|</span> <span class="italic font-bold mx-1">{{ $department->name }}</span> <span class="text-xl">|</span> <span class="italic font-bold mx-1">{{ $course->name }}</span></h1>
-                    @elseif ($department)
-                    <h1 class="font-light text-blue-500"><span class="mx-1 italic font-bold">{{ $category }}</span> <span class="text-xl">|</span> <span class="italic font-bold mx-1">{{ $department->name }}</span> <span class="text-xl">|</span> <span class="italic font-bold mx-1">All Courses</span></h1>
-                    @else
-                    <h1 class="font-light text-blue-500"><span class="mx-1 italic font-bold">{{ $category }}</span> <span class="text-xl">|</span> <span class="italic font-bold mx-1">All Departments</span> <span class="text-xl">|</span> <span class="italic font-bold mx-1">All Courses</span></h1>
-                    @endif
 
+                @php
+                    $category_name = request('category');
+                    switch ($category_name) {
+                        case 'All Entities':
+                            $category_name = 'All Users';
+                            break;
+                        case 'All Users':
+                            $category_name = 'Alumni';
+                            break;
+                        case 'Employed Alumni':
+                            $category_name = 'Employed Alumni';
+                            break;
+                        case 'Working Student':
+                            $category_name = 'Working Student';
+                            break;
+                        case 'Unemployed Alumni':
+                            $category_name = 'Unemployed Alumni';
+                            break;
+                        case 'Self-Employed Alumni':
+                            $category_name = 'Self-Employed Alumni';
+                            break;
+                        case 'Student Alumni':
+                            $category_name = 'Student Alumni';
+                            break;
+                        case 'Retired Alumni':
+                            $category_name = 'Retired Alumni';
+                            break;
+                        case 'Verified Alumni':
+                            $category_name = 'Verified Alumni';
+                            break;
+                        case 'Unverified Alumni':
+                            $category_name = 'Unverified Alumni';
+                            break;
+                        case 'Verified Admin':
+                            $category_name = 'Verified Admin';
+                            break;
+                        case 'Unverified Admin':
+                            $category_name = 'Unverified Admin';
+                            break;
+                        case 'Verified User':
+                            $category_name = 'Verified Users';
+                            break;
+                        case 'Unverified User':
+                            $category_name = 'Unverified Users';
+                            break;
+                        default:
+                            $category_name = 'All Users';
+                            break;
+                    }
+                    @endphp
+                    @if ($department && $course)
+                    <h1 class="font-light text-blue-500"><span class="mx-1 italic font-bold">{{ $category_name }}</span> <span class="text-xl">|</span> <span class="italic font-bold mx-1">{{ $department->name }}</span> <span class="text-xl">|</span> <span class="italic font-bold mx-1">{{ $course->name }}</span></h1>
+                    @elseif ($department)
+                    <h1 class="font-light text-blue-500"><span class="mx-1 italic font-bold">{{ $category_name }}</span> <span class="text-xl">|</span> <span class="italic font-bold mx-1">{{ $department->name }}</span> <span class="text-xl">|</span> <span class="italic font-bold mx-1">All Courses</span></h1>
+                    @else
+                    <h1 class="font-light text-blue-500"><span class="mx-1 italic font-bold">{{ $category_name }}</span> <span class="text-xl">|</span> <span class="italic font-bold mx-1">All Departments</span> <span class="text-xl">|</span> <span class="italic font-bold mx-1">All Courses</span></h1>
+                    @endif
                     <div><i class="text-[10px]">Generated at:</i> {{ date_create()->format('Y-m-d H:i:s') }}</div>
                 </div>
 
