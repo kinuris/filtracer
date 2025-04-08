@@ -88,7 +88,12 @@
                     <td>{{ date_create($user->created_at)->format('Y-m-d') }}</td>
                     @if (request('mode') === 'generated')
                     <td>{{ $user->username }}</td>
-                    <td>{{ $user->adminGenerated->default_password }}</td>
+                    <td>
+                        <span class="blur-sm hover:blur-none transition-all duration-200 cursor-pointer" 
+                              onclick="copyToClipboard('{{ $user->adminGenerated->default_password }}', this)">
+                            {{ $user->adminGenerated->default_password }}
+                        </span>
+                    </td>
                     @endif
                     <td>
                         <div class="flex justify-center w-full place-items-center">
@@ -172,6 +177,23 @@
 @endsection
 
 @section('script')
+<script>
+    function copyToClipboard(text, element) {
+        navigator.clipboard.writeText(text)
+            .then(() => {
+                // Provide user feedback (e.g., change text, add a tooltip)
+                element.innerText = 'Copied!';
+                setTimeout(() => {
+                    element.innerText = text; // Revert after a delay
+                }, 700);
+            })
+            .catch(err => {
+                console.error('Failed to copy text: ', err);
+                // Optionally, provide user feedback for failure
+                element.innerText = 'Copy Failed';
+            });
+    }
+</script>
 <script>
     const verifyModal = document.getElementById('verifyModal');
     const unverifyModal = document.getElementById('unverifyModal');
