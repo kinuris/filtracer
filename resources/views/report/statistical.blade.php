@@ -279,7 +279,9 @@ if ($department && $course) {
                 <p class="tracking-wider font-semibold ml-4 mr-4">From</p>
                 <select @if(!Auth::user()->admin()->is_super) disabled @endif onchange="handleDepartmentChange()" class="g-gray-100 p-2 max-w-56 rounded border text-gray-400 mr-4" name="department" id="department">
                     <option value="-1">All Departments</option>
-                    @php($depts = App\Models\Department::allValid())
+                    @php
+                        $depts = App\Models\Department::allValid()
+                    @endphp
                     @foreach ($depts as $dept)
                     <option @if(Auth::user()->admin()->is_super) @if (request('department')==$dept->id) selected @endif value="{{ $dept->id }}" @else @if(Auth::user()->admin()->office == $dept->id && !Auth::user()->admin()->is_super) selected @endif value="{{ $dept->id }}" @endif>{{ $dept->name }}</option>
                     @endforeach
@@ -289,7 +291,9 @@ if ($department && $course) {
 
                 <select @if(request('locked')) disabled @endif onchange="handleCourseChange()" class="g-gray-100 p-2 min-w-56 rounded border text-gray-400" name="courses" id="courses">
                     <option value="-1">All Courses</option>
-                    @php($dept = $adminDept ?? App\Models\Department::find(request('department')))
+                    @php
+                        $dept = $adminDept ?? App\Models\Department::find(request('department'))
+                    @endphp
                     @if (isset($dept))
                     @foreach ($dept->getCourses() as $course)
                     <option @if (request('courses')==$course->id) selected @endif value="{{ $course->id }}">{{ $course->name }}</option>
@@ -307,13 +311,72 @@ if ($department && $course) {
         <form action="">
             <div class="bg-white py-4 flex place-items-center px-6 border-b rounded-t-lg justify-between">
                 <p class="font-bold">
-                    All Users
+                    @php
+                    $category_name = request('category');
+                    switch ($category_name) {
+                        case 'All Entities':
+                            $category_name = 'All Users';
+                            break;
+                        case 'All Users':
+                            $category_name = 'Alumni';
+                            break;
+                        case 'Employed Alumni':
+                            $category_name = 'Employed Alumni';
+                            break;
+                        case 'Working Student':
+                            $category_name = 'Working Student';
+                            break;
+                        case 'Unemployed Alumni':
+                            $category_name = 'Unemployed Alumni';
+                            break;
+                        case 'Self-Employed Alumni':
+                            $category_name = 'Self-Employed Alumni';
+                            break;
+                        case 'Student Alumni':
+                            $category_name = 'Student Alumni';
+                            break;
+                        case 'Retired Alumni':
+                            $category_name = 'Retired Alumni';
+                            break;
+                        case 'Verified Alumni':
+                            $category_name = 'Verified Alumni';
+                            break;
+                        case 'Unverified Alumni':
+                            $category_name = 'Unverified Alumni';
+                            break;
+                        case 'Verified Admin':
+                            $category_name = 'Verified Admin';
+                            break;
+                        case 'Unverified Admin':
+                            $category_name = 'Unverified Admin';
+                            break;
+                        case 'Verified User':
+                            $category_name = 'Verified Users';
+                            break;
+                        case 'Unverified User':
+                            $category_name = 'Unverified Users';
+                            break;
+                        default:
+                            $category_name = 'All Users';
+                            break;
+                    }
+                    @endphp
+                    {{ $category_name }}
                     @if(!Auth::user()->admin()->is_super)
                     from {{ $dept->name }}
-                    @else
+                    @elseif ($dept == null)
                     from All Departments
+                    @elseif ($dept != null)
+                    from {{ $dept->name }}
                     @endif
+                    @php
+                        $course = App\Models\Course::find(request('courses'));
+                    @endphp
+                    @if($course == null)
                     from All Courses
+                    @elseif ($course != null)
+                    {{ $course->name }}
+                    @endif
                 </p>
                 <input value="{{ request('search') ?? '' }}" class="bg-gray-100 p-2 rounded border min-w-[max(33%,270px)]" placeholder="Search..." type="text" name="search" id="search">
             </div>
@@ -384,6 +447,8 @@ if ($department && $course) {
         const department = document.getElementById('department').value;
 
         const params = new URLSearchParams(window.location.search);
+
+        params.delete('courses');
         params.set('department', department);
 
         window.location.href = '/report/statistical?' + params.toString();
@@ -412,29 +477,5 @@ if ($department && $course) {
 
         window.location.href = '/report/statistical?' + params.toString();
     }
-
-    // const category = document.getElementById('courses');
-
-    // async function handleDepartmentChange() {
-    //     const response = await fetch('/department/courses/' + document.getElementById('department').value);
-    //     const {
-    //         courses
-    //     } = await response.json();
-
-    //     const option = document.createElement('option');
-    //     option.value = '-1';
-    //     option.innerHTML = 'All Courses';
-
-    //     category.innerHTML = '';
-    //     category.appendChild(option);
-
-    //     for (let course of courses) {
-    //         const child = document.createElement('option');
-    //         child.innerText = course.name;
-    //         child.value = course.id;
-
-    //         category.appendChild(child);
-    //     }
-    // }
 </script>
 @endsection
