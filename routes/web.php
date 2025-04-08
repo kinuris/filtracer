@@ -89,6 +89,8 @@ Route::controller(AlumniController::class)
         Route::get('/alumni/setup/profilepic', 'setupProfilepicView');
         Route::post('/alumni/setup/profilepic/{alumni}', 'setupProfilepic');
 
+        Route::post('/alumni/password/{alumni}/reset', 'resetAlumniPassword');
+
         Route::get('/settings', 'settingsView');
         Route::get('/settings/alumni/password', 'settingsPasswordView');
         Route::get('/settings/alumni/display', 'settingsDisplayView');

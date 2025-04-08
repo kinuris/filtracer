@@ -20,6 +20,7 @@ use App\Models\UserAlert;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 
 class AlumniController extends Controller
 {
@@ -31,6 +32,37 @@ class AlumniController extends Controller
     public function settingsDisplayView()
     {
         return view('alumni.settings.display');
+    }
+
+    public function resetAlumniPassword(Request $request, User $alumni)
+    {
+        $validator = Validator::make($request->all(), [
+            'current' => ['required'],
+            'new' => ['required', 'min:8'],
+            'confirm' => ['required', 'same:new'],
+        ]);
+
+        if ($validator->fails()) {
+            return back()
+                ->withErrors($validator)
+                ->withInput()
+                ->with('failed_message', 'Failed to reset password. Please check your inputs.')
+                ->with('failed_subtitle', 'Please ensure that all fields are filled correctly.');
+        }
+
+        $validated = $validator->validated();
+
+        if (!password_verify($validated['current'], $alumni->password)) {
+            return back()->with('error', 'Old password is incorrect');
+        }
+
+        $alumni->update([
+            'password' => bcrypt($validated['new']),
+        ]);
+
+        return back()
+            ->with('message', 'Password updated successfully')
+            ->with('subtitle', 'Your account is now secured with your new password.');
     }
 
     public function denyBinding(BindingRequest $binding)

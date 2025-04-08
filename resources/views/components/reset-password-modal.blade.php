@@ -2,7 +2,8 @@
     <div class="bg-white p-6 rounded-lg shadow-lg w-1/3">
         <h2 class="text-lg font-bold mb-4">Password Information</h2>
 
-        <form action="">
+        <form action="/alumni/password/{{ Auth::user()->id }}/reset" method="POST">
+            @csrf
             <div class="flex flex-col">
                 <label for="current">Current Password</label>
                 <input type="password" class="text-gray-400 border rounded-lg p-2" placeholder="Current Password" name="current" id="current">
