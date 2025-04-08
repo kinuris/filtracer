@@ -88,6 +88,7 @@ $viewPost = App\Models\Post::find(request('view'));
 <div class="bg-gray-100 w-full h-full p-8 flex flex-col max-h-[calc(100%-4rem)] overflow-auto">
     <div class="shadow rounded-lg mt-4">
         <div class="bg-white p-8 flex items-center justify-between rounded-lg">
+            @if (Auth::user()->role === 'Admin' && Auth::user()->admin()->is_super)
             <a href="/report/statistical?category=All+Entities" class="flex items-center group transition-transform hover:transform hover:scale-105">
                 <div class="flex flex-col mr-4">
                     <p class="text-3xl font-bold text-gray-800 group-hover:text-blue-600">{{ $users->count() }}</p>
@@ -97,9 +98,21 @@ $viewPost = App\Models\Post::find(request('view'));
                     <img class="w-10 h-10" src="{{ asset('assets/users.svg') }}" alt="Registered">
                 </div>
             </a>
+            @else
+            <div class="flex items-center group">
+                <div class="flex flex-col mr-4">
+                    <p class="text-3xl font-bold text-gray-800">{{ $users->count() }}</p>
+                    <p class="text-sm text-gray-500">Registered Users</p>
+                </div>
+                <div class="p-3 rounded-full bg-gray-100">
+                    <img class="w-10 h-10" src="{{ asset('assets/users.svg') }}" alt="Registered">
+                </div>
+            </div>
+            @endif
 
             <div class="h-16 border-r border-gray-200 mx-4"></div>
 
+            @if (Auth::user()->role === 'Admin' && Auth::user()->admin()->is_super)
             <a href="/report/statistical?category=All+Users" class="flex items-center group transition-transform hover:transform hover:scale-105">
                 <div class="flex flex-col mr-4">
                     <p class="text-3xl font-bold text-gray-800 group-hover:text-green-600">{{ $users->where('role', '=', 'Alumni')->count() }}</p>
@@ -109,9 +122,21 @@ $viewPost = App\Models\Post::find(request('view'));
                     <img class="w-10 h-10" src="{{ asset('assets/registered.svg') }}" alt="Registered">
                 </div>
             </a>
+            @else
+            <div class="flex items-center group">
+                <div class="flex flex-col mr-4">
+                    <p class="text-3xl font-bold text-gray-800">{{ $users->where('role', '=', 'Alumni')->count() }}</p>
+                    <p class="text-sm text-gray-500">Registered Alumni</p>
+                </div>
+                <div class="p-3 rounded-full bg-gray-100">
+                    <img class="w-10 h-10" src="{{ asset('assets/registered.svg') }}" alt="Registered">
+                </div>
+            </div>
+            @endif
 
             <div class="h-16 border-r border-gray-200 mx-4"></div>
 
+            @if (Auth::user()->role === 'Admin' && Auth::user()->admin()->is_super)
             <a href="/report/statistical?category=Employed+Alumni" class="flex items-center group transition-transform hover:transform hover:scale-105">
                 <div class="flex flex-col mr-4">
                     <p class="text-3xl font-bold text-gray-800 group-hover:text-purple-600">{{ $users->where('role', '=', 'Alumni')->whereRelation('professionalRecords', 'employment_status', '=', 'Employed')->count() }}</p>
@@ -121,9 +146,21 @@ $viewPost = App\Models\Post::find(request('view'));
                     <img class="w-10 h-10" src="{{ asset('assets/employed.svg') }}" alt="Employed">
                 </div>
             </a>
+            @else
+            <div class="flex items-center group">
+                <div class="flex flex-col mr-4">
+                    <p class="text-3xl font-bold text-gray-800">{{ $users->where('role', '=', 'Alumni')->whereRelation('professionalRecords', 'employment_status', '=', 'Employed')->count() }}</p>
+                    <p class="text-sm text-gray-500">Employed Alumni</p>
+                </div>
+                <div class="p-3 rounded-full bg-gray-100">
+                    <img class="w-10 h-10" src="{{ asset('assets/employed.svg') }}" alt="Employed">
+                </div>
+            </div>
+            @endif
 
             <div class="h-16 border-r border-gray-200 mx-4"></div>
 
+            @if (Auth::user()->role === 'Admin' && Auth::user()->admin()->is_super)
             <a href="/report/statistical?category=Unemployed+Alumni" class="flex items-center group transition-transform hover:transform hover:scale-105">
                 <div class="flex flex-col mr-4">
                     @php($users = App\Models\User::query())
@@ -134,6 +171,18 @@ $viewPost = App\Models\Post::find(request('view'));
                     <img class="w-10 h-10" src="{{ asset('assets/unemployed.svg') }}" alt="Unemployed">
                 </div>
             </a>
+            @else
+            <div class="flex items-center group">
+                <div class="flex flex-col mr-4">
+                    @php($users = App\Models\User::query())
+                    <p class="text-3xl font-bold text-gray-800">{{ $users->where('role', '=', 'Alumni')->whereRelation('professionalRecords', 'employment_status', '=', 'Unemployed')->count() }}</p>
+                    <p class="text-sm text-gray-500">Unemployed Alumni</p>
+                </div>
+                <div class="p-3 rounded-full bg-gray-100">
+                    <img class="w-10 h-10" src="{{ asset('assets/unemployed.svg') }}" alt="Unemployed">
+                </div>
+            </div>
+            @endif
         </div>
     </div>
 
