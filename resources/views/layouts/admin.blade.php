@@ -15,14 +15,14 @@
     <title>@yield('title')</title>
 </head>
 
-<body>
+<bod>
     <div class="flex w-screen">
         @if (request()->path() !== 'admin/chat')
-        <a href="/admin/chat" class="fixed rounded-full bottom-0 z-50 right-0 mb-6 mr-6 shadow-lg bg-blue-600 transition-transform hover:scale-110">
+        <a href="/admin/chat" class="fixed rounded-full bottom-0 z-50 right-0 mb-6 mr-6 shadow-md bg-blue-300 hover:bg-blue-600 transition-all hover:shadow-lg transform scale-75 hover:scale-150">
             <div class="w-5 h-5 flex place-items-center justify-center bg-red-500 absolute -top-1 -left-1 rounded-full">
                 <p class="text-white text-xs text-center font-semibold" id="chatAlerts"></p>
             </div>
-            <img class="w-8 m-3" src="{{ asset('assets/chat.svg') }}" alt="Chat">
+            <img class="w-8 m-2 hover:m-3" src="{{ asset('assets/chat.svg') }}" alt="Chat">
         </a>
         @endif
         <div class="bg-white border-r h-screen max-h-screen min-w-[max(20%,300px)] px-6 pb-2 flex flex-col">
@@ -275,8 +275,10 @@
                     if (successTimer) {
                         successTimer.style.width = '100%';
                         successTimer.style.transition = 'width 5s linear';
-                        setTimeout(() => { successTimer.style.width = '0%'; }, 100);
-                        setTimeout(() => { 
+                        setTimeout(() => {
+                            successTimer.style.width = '0%';
+                        }, 100);
+                        setTimeout(() => {
                             const alert = successTimer.closest('.animate-fade-in');
                             if (alert) alert.style.display = 'none';
                         }, 5100);
@@ -311,8 +313,10 @@
                     if (failedTimer) {
                         failedTimer.style.width = '100%';
                         failedTimer.style.transition = 'width 5s linear';
-                        setTimeout(() => { failedTimer.style.width = '0%'; }, 100);
-                        setTimeout(() => { 
+                        setTimeout(() => {
+                            failedTimer.style.width = '0%';
+                        }, 100);
+                        setTimeout(() => {
                             const alert = failedTimer.closest('.animate-fade-in');
                             if (alert) alert.style.display = 'none';
                         }, 5100);
@@ -423,6 +427,6 @@
             }
         })
     </script>
-</body>
+    </body>
 
 </html>
