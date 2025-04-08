@@ -38,7 +38,7 @@
                         <h3 class="font-bold text-gray-800 text-lg">Notifications</h3>
                     </div>
                     <div class="flex items-center gap-2">
-                        <span class="text-xs text-gray-500 hover:underline cursor-pointer">Mark all as read</span>
+                        <a href="/alert/seenall" class="text-xs text-gray-500 hover:underline cursor-pointer">Mark all as read</a>
                         <button class="p-1.5 rounded-full hover:bg-gray-100 transition-all">
                             <img src="{{ asset('assets/option.svg') }}" alt="Menu" class="h-4 w-4">
                         </button>
@@ -59,7 +59,7 @@
                         <h3 class="font-bold text-gray-800 text-lg">Messages</h3>
                     </div>
                     <div class="flex items-center gap-2">
-                        <span class="text-xs text-gray-500 hover:underline cursor-pointer">View all</span>
+                        <a href="/alumni/chat" class="text-xs text-gray-500 hover:underline cursor-pointer">View all</a>
                         <button class="p-1.5 rounded-full hover:bg-gray-100 transition-all">
                             <img src="{{ asset('assets/option.svg') }}" alt="Menu" class="h-4 w-4">
                         </button>
