@@ -3,6 +3,243 @@
 @section('title', 'Statistical Report')
 
 @section('content')
+<?php
+
+$department = App\Models\Department::find(request('department') ?? -1);
+$course = App\Models\Course::find(request('courses') ?? -1);
+$category = request('category');
+
+if ($department && $course) {
+    $query = App\Models\User::query()
+        ->whereIn(
+            'id',
+            App\Models\User::compSet()
+                ->orWhereHas('partialPersonal')
+                ->get()
+                ->pluck('id')
+        )
+        ->where('role', '!=', 'Admin')
+        ->where('department_id', '=', $department->id)
+        ->whereRelation('course', 'courses.id', '=', $course->id);
+
+    switch ($category) {
+        case "All Entities":
+            $users = App\Models\User::query()->whereIn(
+                'id',
+                App\Models\User::compSet()
+                    ->orWhereHas('partialPersonal')
+                    ->where('role', '!=', 'Admin')
+                    ->get()
+                    ->merge(App\Models\User::where('role', '=', 'Admin')->get())
+                    ->map(function ($user) use ($course) {
+                        return $user->id;
+                    }),
+            )->paginate(6);
+            break;
+        case "All Users":
+            break;
+        case "Registered Users":
+            throw new Exception('SHIT DONT WORK YET');
+            break;
+        case "Working Student":
+        case "Employed Alumni":
+        case "Unemployed Alumni":
+        case "Self-Employed Alumni":
+        case "Student Alumni":
+        case "Retired Alumni":
+            switch ($category) {
+                case "Working Student":
+                    $category = "Working Student";
+                    break;
+                case "Employed Alumni":
+                    $category = "Employed";
+                    break;
+                case "Unemployed Alumni":
+                    $category = "Unemployed";
+                    break;
+                case "Self-Employed Alumni":
+                    $category = "Self-employed";
+                    break;
+                case "Student Alumni":
+                    $category = "Student";
+                    break;
+                case "Retired Alumni":
+                    $category = "Retired";
+                    break;
+            }
+
+            $query->whereRelation('professionalRecords', 'employment_status', '=', $category);
+            break;
+        case "Verified Alumni":
+        case "Unverified Alumni":
+            $query->whereRelation('personalRecords', 'status', '=', $category === "Verified Alumni" ? 1 : 0);
+            break;
+    }
+
+    $users = $query->paginate(6);
+} else if ($department) {
+    $query = App\Models\User::query()
+        ->whereIn(
+            'id',
+            App\Models\User::compSet()
+                ->orWhereHas('partialPersonal')
+                ->get()
+                ->pluck('id')
+        )
+        ->where('role', '!=', 'Admin')
+        ->where('department_id', '=', $department->id)
+        ->whereRelation('department', 'departments.id', '=', $department->id);
+
+    switch ($category) {
+        case "All Entities":
+            $users = App\Models\User::query()->whereIn(
+                'id',
+                App\Models\User::compSet()
+                    ->orWhereHas('partialPersonal')
+                    ->where('role', '!=', 'Admin')
+                    ->get()
+                    ->merge(App\Models\User::where('role', '=', 'Admin')->get())
+                    ->map(function ($user) use ($course) {
+                        return $user->id;
+                    }),
+            )->paginate(6);
+            break;
+        case "All Users":
+            break;
+        case "Registered Users":
+            break;
+        case "Working Student":
+        case "Employed Alumni":
+        case "Unemployed Alumni":
+        case "Self-Employed Alumni":
+        case "Student Alumni":
+        case "Retired Alumni":
+            switch ($category) {
+                case "Working Student":
+                    $category = "Working Student";
+                    break;
+                case "Employed Alumni":
+                    $category = "Employed";
+                    break;
+                case "Unemployed Alumni":
+                    $category = "Unemployed";
+                    break;
+                case "Self-Employed Alumni":
+                    $category = "Self-employed";
+                    break;
+                case "Student Alumni":
+                    $category = "Student";
+                    break;
+                case "Retired Alumni":
+                    $category = "Retired";
+                    break;
+            }
+
+            $query->whereRelation('professionalRecords', 'employment_status', '=', $category);
+            break;
+        case "Verified Alumni":
+        case "Unverified Alumni":
+            $query->whereRelation('personalRecords', 'status', '=', $category === "Verified Alumni" ? 1 : 0);
+            break;
+    }
+
+    $users = $query->paginate(6);
+} else {
+    switch ($category) {
+        case "All Entities":
+            $users = App\Models\User::query()->whereIn(
+                'id',
+                App\Models\User::compSet()
+                    ->orWhereHas('partialPersonal')
+                    ->where('role', '!=', 'Admin')
+                    ->get()
+                    ->merge(App\Models\User::where('role', '=', 'Admin')->get())
+                    ->map(function ($user) use ($course) {
+                        return $user->id;
+                    }),
+            )->paginate(6);
+            break;
+        case "All Users":
+            $users = App\Models\User::compSet()
+                ->orWhereHas('partialPersonal')
+                ->where('role', '!=', 'Admin')
+                ->paginate(6);
+            break;
+        case "Registered Users":
+            break;
+        case "Working Student":
+        case "Employed Alumni":
+        case "Unemployed Alumni":
+        case "Self-Employed Alumni":
+        case "Student Alumni":
+        case "Retired Alumni":
+            switch ($category) {
+                case "Working Student":
+                    $category = "Working Student";
+                    break;
+                case "Employed Alumni":
+                    $category = "Employed";
+                    break;
+                case "Unemployed Alumni":
+                    $category = "Unemployed";
+                    break;
+                case "Self-Employed Alumni":
+                    $category = "Self-employed";
+                    break;
+                case "Student Alumni":
+                    $category = "Student";
+                    break;
+                case "Retired Alumni":
+                    $category = "Retired";
+                    break;
+            }
+
+            $users = App\Models\User::compSet()
+                ->where('role', '!=', 'Admin')
+                ->whereRelation('professionalRecords', 'employment_status', '=', $category)
+                ->paginate(6);
+            break;
+        case "Verified Alumni":
+        case "Unverified Alumni":
+            $users = App\Models\User::partialSet()
+                ->where('role', '!=', 'Admin')
+                ->whereRelation('personalRecords', 'status', '=', $category === "Verified Alumni" ? 1 : 0)
+                ->paginate(6);
+            break;
+        case "Verified Admin":
+        case "Unverified Admin":
+            $users = App\Models\User::query()
+                ->where('role', '=', 'Admin')
+                ->whereRelation('adminRelation', 'is_verified', '=', $category === "Verified Admin" ? 1 : 0)
+                ->whereRelation('adminRelation', 'is_super', '=', 0)
+                ->paginate(6);
+            break;
+        case "Verified User":
+        case "Unverified User":
+            $users = App\Models\User::query()
+                ->where(function ($query) use ($category) {
+                    if ($category === "Verified User") {
+                        $query->where('role', '!=', 'Admin')
+                            ->whereRelation('personalRecords', 'status', '=', 1);
+                    } else {
+                        $query->where('role', '!=', 'Admin')
+                            ->where(function ($query) {
+                                $query->whereDoesntHave('personalRecords')
+                                    ->orWhereRelation('personalRecords', 'status', '=', 0);
+                            });
+                    }
+                })
+                ->orWhere(function ($query) use ($category) {
+                    $query->where('role', '=', 'Admin')
+                        ->whereRelation('adminRelation', 'is_verified', '=', $category === "Verified User" ? 1 : 0)
+                        ->whereRelation('adminRelation', 'is_super', '=', 0);
+                })
+                ->paginate(6);
+            break;
+    }
+}
+?>
+
 <div class="bg-gray-100 w-full h-full p-8 max-h-[calc(100%-4rem)] overflow-auto">
     <h1 class="font-medium tracking-widest text-lg">Statistical Report</h1>
     <p class="text-gray-400 text-xs mb-2">Report / <span class="text-blue-500">Statistical</span></p>
@@ -13,7 +250,7 @@
                 <p class="tracking-wider font-semibold mr-4">All</p>
                 <select onchange="handleChangeCategory()" class="g-gray-100 p-2 rounded border text-gray-400" name="category" id="category">
                     <optgroup label="All">
-                        @if (Auth::user()->admin()->is_super) 
+                        @if (Auth::user()->admin()->is_super)
                         <option @if (request('category')=='All Entities' ) selected @endif value="All Entities">All Users</option>
                         @endif
                         <option @if (request('category')=='All Users' ) selected @endif value="All Users">Alumni</option>
@@ -54,9 +291,9 @@
                     <option value="-1">All Courses</option>
                     @php($dept = $adminDept ?? App\Models\Department::find(request('department')))
                     @if (isset($dept))
-                        @foreach ($dept->getCourses() as $course)
-                        <option @if (request('courses') == $course->id) selected @endif value="{{ $course->id }}">{{ $course->name }}</option>
-                        @endforeach
+                    @foreach ($dept->getCourses() as $course)
+                    <option @if (request('courses')==$course->id) selected @endif value="{{ $course->id }}">{{ $course->name }}</option>
+                    @endforeach
                     @endif
                 </select>
 
@@ -70,13 +307,13 @@
         <form action="">
             <div class="bg-white py-4 flex place-items-center px-6 border-b rounded-t-lg justify-between">
                 <p class="font-bold">
-                    All Users 
+                    All Users
                     @if(!Auth::user()->admin()->is_super)
-                        from {{ $dept->name }}
+                    from {{ $dept->name }}
                     @else
-                        from All Departments
+                    from All Departments
                     @endif
-                     from All Courses
+                    from All Courses
                 </p>
                 <input value="{{ request('search') ?? '' }}" class="bg-gray-100 p-2 rounded border min-w-[max(33%,270px)]" placeholder="Search..." type="text" name="search" id="search">
             </div>
@@ -95,14 +332,38 @@
                 <tr class="border-b text-gray-500">
                     <td class="text-blue-900 py-3 px-8 font-thin">{{ $user->id }}</td>
                     <td>
+                        @if($user->role == 'Admin')
+                        {{ $user->admin()->first_name }}
+                        {{ $user->admin()->middle_name ? substr($user->admin()->middle_name, 0, 1) . '. ' : '' }}
+                        {{ $user->admin()->last_name }}
+                        @else
                         {{ ($user->personalBio ? $user->personalBio->first_name : $user->partialPersonal->first_name) }}
                         {{ ($user->personalBio ? ($user->personalBio->middle_name ? substr($user->personalBio->middle_name, 0, 1) . '. ' : '') : ($user->partialPersonal->middle_name ? substr($user->partialPersonal->middle_name, 0, 1) . '. ' : '')) }}
                         {{ ($user->personalBio ? $user->personalBio->last_name : $user->partialPersonal->last_name) }}
                         {{ ($user->personalBio ? ($user->personalBio->suffix ? $user->personalBio->suffix : '') : ($user->partialPersonal->suffix ? $user->partialPersonal->suffix : '')) }}
+                        @endif
                     </td>
-                    <td>{{ $user->personalBio ? $user->personalBio->student_id : $user->partialPersonal->student_id }}</td>
-                    <td>{{ $user->personalBio ? $user->personalBio->email_address : $user->partialPersonal->email_address }}</td>
-                    <td>{{ $user->personalBio ? $user->personalBio->phone_number : $user->partialPersonal->phone_number }}</td>
+                    <td>
+                        @if($user->role == 'Admin')
+                        {{ $user->admin()->position_id }}
+                        @else
+                        {{ $user->personalBio ? $user->personalBio->student_id : $user->partialPersonal->student_id }}
+                        @endif
+                    </td>
+                    <td>
+                        @if($user->role == 'Admin')
+                        {{ $user->admin()->email_address }}
+                        @else
+                        {{ $user->personalBio ? $user->personalBio->email_address : $user->partialPersonal->email_address }}
+                        @endif
+                    </td>
+                    <td>
+                        @if($user->role == 'Admin')
+                        {{ $user->admin()->phone_number }}
+                        @else
+                        {{ $user->personalBio ? $user->personalBio->phone_number : $user->partialPersonal->phone_number }}
+                        @endif
+                    </td>
                     <td>
                         <a class="bg-blue-600 text-white p-2 rounded-md" href="/user/view/{{ $user->id }}">See Profile</a>
                     </td>
