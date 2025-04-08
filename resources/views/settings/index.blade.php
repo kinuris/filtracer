@@ -21,7 +21,6 @@
                 </div>
             </a>
         </div>
-        @endif
 
         <div class="shadow rounded-lg mt-6 flex-1">
             <a href="/settings/course">
@@ -36,9 +35,11 @@
                 </div>
             </a>
         </div>
+        @endif
     </div>
 
     <div class="flex">
+        @if (Auth::user()->admin()->is_super)
         <div class="shadow rounded-lg mt-4 flex-1">
             <a href="/settings/major">
                 <div class="bg-white h-24 p-7 flex place-items-center border-b rounded-lg">
@@ -54,6 +55,7 @@
         </div>
 
         <div class="mx-2"></div>
+        @endif
 
         <div class="shadow rounded-lg mt-4 flex-1">
             <a href="/settings/account">

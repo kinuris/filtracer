@@ -31,7 +31,7 @@
             <thead class="bg-white text-blue-900 border-b">
                 <th class="font-thin py-3">ID</th>
                 <th class="font-thin">Name</th>
-                <th class="font-thin">Student/Company ID</th>
+                <th class="font-thin">Student/Employee No.</th>
                 <th class="font-thin">Role</th>
                 <th class="font-thin">Date Registered</th>
                 @if (request('mode') === 'generated')

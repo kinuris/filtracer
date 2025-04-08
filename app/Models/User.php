@@ -402,7 +402,7 @@ class User extends Authenticatable
         if ($this->role == 'Admin') {
             $admin = $this->admin();
 
-            return is_null($admin) ? fake()->imageUrl() : asset('storage/user/images/' . $admin->profile_picture);
+            return is_null($admin) ? asset('/storage/user/images/admin-profile.png') : asset('storage/user/images/' . $admin->profile_picture);
         }
 
         $bio = $this->getPersonalBio();

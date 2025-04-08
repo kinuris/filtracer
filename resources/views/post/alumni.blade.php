@@ -29,7 +29,7 @@
                 <label class="font-medium" for="category">Category</label>
                 <select class="p-2 border rounded-lg ml-4" name="category" id="category">
                     @foreach ($categories as $category)
-                    <option {{ request('category') == $category ? 'selected' : '' }} value="{{ $category }}">{{ $category }}</option>
+                    <option {{ request('category') == $category ? 'selected' : '' }} value="{{ $category }}">{{ $category === 'Your Posts' ? 'My Posts' : $category }}</option>
                     @endforeach
                 </select>
 
@@ -201,6 +201,7 @@
         } else {
             eventStatuses.classList.add('hidden');
             jobStatuses.classList.add('hidden');
+            categoryStatus.removeAttribute('required');            
         }
 
         categoryStatus.value = null;

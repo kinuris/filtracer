@@ -17,7 +17,7 @@
                 <p class="text-gray-400 mt-2 text-xs leading-none">Ensure that these character requirements are met:</p>
                 <p class="text-gray-400 text-xs">At least 8 characters (and up to 100 characters)</p>
 
-                <div class="flex mt-4">
+                <div class="flex mt-4 justify-end">
                     <button type="button" id="closeResetPasswordModal" class="mr-2 px-4 py-2 bg-white text-blue-500 border border-blue-500 rounded">Cancel</button>
                     <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded">Add</button>
                 </div>

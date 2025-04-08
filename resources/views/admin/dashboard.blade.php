@@ -164,6 +164,7 @@ $viewPost = App\Models\Post::find(request('view'));
         </div>
     </div>
 
+    @if (Auth::user()->role === 'Admin' && Auth::user()->admin()->is_super)
     <div class="shadow rounded-lg min-h-96 overflow-auto mt-8">
         <div class="bg-white py-4 h-full flex flex-col px-6 rounded-lg">
             <h1 class="font-medium text-lg mb-4">Post Request Approval List</h1>
@@ -233,6 +234,7 @@ $viewPost = App\Models\Post::find(request('view'));
             </div>
         </div>
     </div>
+    @endif
 </div>
 @endsection
 
@@ -274,22 +276,60 @@ $viewPost = App\Models\Post::find(request('view'));
                     ?>
                 ],
                 backgroundColor: [
-                    'rgba(255, 99, 132, 0.2)',
-                    'rgba(255, 159, 64, 0.2)',
-                    'rgba(255, 205, 86, 0.2)',
-                    'rgba(75, 192, 192, 0.2)',
-                    'rgba(54, 162, 235, 0.2)',
-                    'rgba(153, 102, 255, 0.2)',
-                    'rgba(201, 203, 207, 0.2)'
+                    <?php
+                    foreach ($depts as $dept) {
+                        $shortened = $dept->shortened();
+                        if ($shortened == 'CAS') {
+                            echo "'rgba(153, 102, 255, 0.4)',"; // Purple
+                        } elseif ($shortened == 'CBA') {
+                            echo "'rgba(255, 255, 204, 0.8)',"; // Light Yellow
+                        } elseif ($shortened == 'CCS') {
+                            echo "'rgba(0, 255, 255, 0.4)',";   // Cyan / Teal Blue
+                        } elseif ($shortened == 'CCJE') {
+                            echo "'rgba(255, 99, 132, 0.4)',";  // Red
+                        } elseif ($shortened == 'CHTM') {
+                            echo "'rgba(255, 0, 255, 0.4)',";   // Magenta / Pink
+                        } elseif ($shortened == 'CON') {
+                            echo "'rgba(0, 255, 0, 0.4)',";     // Green
+                        } elseif ($shortened == 'COE') {
+                            echo "'rgba(255, 165, 0, 0.4)',";   // Orange
+                        } elseif ($shortened == 'CTE') {
+                            echo "'rgba(0, 0, 255, 0.4)',";     // Blue
+                        } elseif ($shortened == 'GS') {
+                            echo "'rgba(204, 153, 0, 0.4)',";    // Gold / Yellow Ochre
+                        } else {
+                            echo "'rgba(128, 128, 128, 0.4)',"; // Gray as default
+                        }
+                    }
+                    ?>
                 ],
                 borderColor: [
-                    'rgba(255, 99, 132, 1)',
-                    'rgba(255, 159, 64, 1)',
-                    'rgba(255, 205, 86, 1)',
-                    'rgba(75, 192, 192, 1)',
-                    'rgba(54, 162, 235, 1)',
-                    'rgba(153, 102, 255, 1)',
-                    'rgba(201, 203, 207, 1)'
+                    <?php
+                    foreach ($depts as $dept) {
+                        $shortened = $dept->shortened();
+                        if ($shortened == 'CAS') {
+                            echo "'rgba(153, 102, 255, 1)',";   // Purple
+                        } elseif ($shortened == 'CBA') {
+                            echo "'rgba(255, 255, 204, 1)',";   // Light Yellow
+                        } elseif ($shortened == 'CCS') {
+                            echo "'rgba(0, 255, 255, 1)',";     // Cyan / Teal Blue
+                        } elseif ($shortened == 'CCJE') {
+                            echo "'rgba(255, 99, 132, 1)',";    // Red
+                        } elseif ($shortened == 'CHTM') {
+                            echo "'rgba(255, 0, 255, 1)',";     // Magenta / Pink
+                        } elseif ($shortened == 'CON') {
+                            echo "'rgba(0, 255, 0, 1)',";       // Green
+                        } elseif ($shortened == 'COE') {
+                            echo "'rgba(255, 165, 0, 1)',";     // Orange
+                        } elseif ($shortened == 'CTE') {
+                            echo "'rgba(0, 0, 255, 1)',";       // Blue
+                        } elseif ($shortened == 'GS') {
+                            echo "'rgba(204, 153, 0, 1)',";      // Gold / Yellow Ochre
+                        } else {
+                            echo "'rgba(128, 128, 128, 1)',";   // Gray as default
+                        }
+                    }
+                    ?>
                 ],
                 borderWidth: 1
             }]

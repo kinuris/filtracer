@@ -108,7 +108,7 @@
             <thead class="bg-white text-blue-900 border-b">
                 <th class="font-thin py-3">ID</th>
                 <th class="font-thin">Name</th>
-                <th class="font-thin">Student/Company ID</th>
+                <th class="font-thin">Student/Employee No.</th>
                 <th class="font-thin">Username</th>
                 <th class="font-thin">Password</th>
                 <th class="font-thin">Date Created</th>
@@ -122,7 +122,12 @@
                     <td>{{ $partialPersonal->fullname }}</td>
                     <td>{{ $partialPersonal->student_id }}</td>
                     <td>{{ $user->username }}</td>
-                    <td>{{ $user->importGenerated->default_password }}</td>
+                    <td>
+                        <span class="blur-sm hover:blur-none transition-all duration-200 cursor-pointer" 
+                              onclick="copyToClipboard('{{ $user->importGenerated->default_password }}', this)">
+                            {{ $user->importGenerated->default_password }}
+                        </span>
+                    </td>
                     <td>{{ $user->created_at->format('Y-m-d') }}</td>
                     <td>
                         <div class="flex justify-center gap-4 place-items-center">
@@ -174,6 +179,20 @@
 
 @section('script')
 <script>
+    function copyToClipboard(text, element) {
+        navigator.clipboard.writeText(text)
+        .then(() => {
+            element.innerText = 'Copied!';
+            setTimeout(() => {
+                element.innerText = text;
+            }, 700);
+        })
+        .catch(err => {
+            console.error('Failed to copy text: ', err);
+            alert('Failed to copy text: ' + err);
+        });
+    }
+
     function closeFileExistsModal() {
         document.getElementById('file-exists-modal').classList.add('hidden');
     }

@@ -28,6 +28,11 @@ class AlumniController extends Controller
         return view('alumni.dashboard');
     }
 
+    public function settingsDisplayView()
+    {
+        return view('alumni.settings.display');
+    }
+
     public function denyBinding(BindingRequest $binding)
     {
         $binding->is_denied = true;
@@ -534,10 +539,24 @@ class AlumniController extends Controller
             $alumni->personalBio->update([
                 'profile_picture' => $filename,
             ]);
+        } else {
+            $alumni->personalBio->update([
+                'profile_picture' => 'alumni-profile.png',
+            ]);
         }
 
         $content = Auth::user()->name . ' alumni account has been completed';
         $action = '/user/view/' . $alumni->id;
+
+        $content = <<<TEXT
+            🎉 Account Complete!
+            Your FilTracer alumni account setup is complete! An admin will verify your details soon.
+            TEXT;
+
+        SendSMSAsyncJob::dispatch(
+            $alumni->personalBio->philSMSNum(),
+            $content
+        );
 
         foreach (User::query()->where('role', '=', 'Admin')->get() as $admin) {
             UserAlert::query()->create([

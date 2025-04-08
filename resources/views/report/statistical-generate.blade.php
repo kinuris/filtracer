@@ -18,6 +18,7 @@ if ($department && $course) {
                 ->pluck('id')
         )
         ->where('role', '!=', 'Admin')
+        ->where('department_id', '=', $department->id)
         ->whereRelation('course', 'courses.id', '=', $course->id);
 
     switch ($category) {
@@ -40,7 +41,28 @@ if ($department && $course) {
         case "Self-Employed Alumni":
         case "Student Alumni":
         case "Retired Alumni":
-            $query->whereRelation('professionalRecords', 'employment_status', '=', str_replace(' ', '', $category));
+            switch ($category) {
+                case "Working Student":
+                    $category = "Working Student";
+                    break;
+                case "Employed Alumni":
+                    $category = "Employed";
+                    break;
+                case "Unemployed Alumni":
+                    $category = "Unemployed";
+                    break;
+                case "Self-Employed Alumni":
+                    $category = "Self-employed";
+                    break;
+                case "Student Alumni":
+                    $category = "Student";
+                    break;
+                case "Retired Alumni":
+                    $category = "Retired";
+                    break;
+            }
+
+            $query->whereRelation('professionalRecords', 'employment_status', '=', $category);
             break;
         case "Verified Alumni":
         case "Unverified Alumni":
@@ -59,13 +81,14 @@ if ($department && $course) {
                 ->pluck('id')
         )
         ->where('role', '!=', 'Admin')
+        ->where('department_id', '=', $department->id)
         ->whereRelation('department', 'departments.id', '=', $department->id);
 
     switch ($category) {
         case "All Entities":
             // Merge all partialSet() (non-Admin) users with Admin users
             $users = App\Models\User::compSet()
-                ->orWhereHas('partialPersonals')
+                ->orWhereHas('partialPersonal')
                 ->where('role', '!=', 'Admin')
                 ->get()
                 ->merge(App\Models\User::where('role', '=', 'Admin')->get());
@@ -80,7 +103,28 @@ if ($department && $course) {
         case "Self-Employed Alumni":
         case "Student Alumni":
         case "Retired Alumni":
-            $query->whereRelation('professionalRecords', 'employment_status', '=', str_replace(' ', '', $category));
+            switch ($category) {
+                case "Working Student":
+                    $category = "Working Student";
+                    break;
+                case "Employed Alumni":
+                    $category = "Employed";
+                    break;
+                case "Unemployed Alumni":
+                    $category = "Unemployed";
+                    break;
+                case "Self-Employed Alumni":
+                    $category = "Self-employed";
+                    break;
+                case "Student Alumni":
+                    $category = "Student";
+                    break;
+                case "Retired Alumni":
+                    $category = "Retired";
+                    break;
+            }
+
+            $query->whereRelation('professionalRecords', 'employment_status', '=', $category);
             break;
         case "Verified Alumni":
         case "Unverified Alumni":

@@ -64,7 +64,7 @@ class ChatGroup extends Model
             return asset('storage/chat/images/' . $this->image_link);
         }
 
-        return fake()->imageUrl();
+        return asset('assets/default_gc.jpeg');
     }
 
     public function associations()

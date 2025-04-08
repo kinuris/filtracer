@@ -19,16 +19,16 @@
 'Saved Posts',
 'Your Posts',
 ])
-<div class="bg-gray-100 w-full h-full p-8 flex flex-col max-h-[calc(100%-4rem)] overflow-auto">
-    <h1 class="font-medium tracking-widest text-lg mb-4" id="title">{{ $title }}</h1>
+<div class="bg-gray-100 w-full h-full p-8 flex flex-col max-h-[calc(100%-4rem)]">
+    <h1 class="font-medium tracking-widest text-lg" id="title">{{ $title }}</h1>
 
-    <div class="shadow rounded-lg mt-4">
+    <div class="shadow rounded-lg my-4">
         <form action="">
             <div class="bg-white py-4 flex place-items-center px-6 border-b rounded-lg">
                 <label class="font-medium" for="category">Category</label>
                 <select class="p-2 border rounded-lg ml-4" name="category" id="category">
                     @foreach ($categories as $category)
-                    <option {{ request('category') == $category ? 'selected' : '' }} value="{{ $category }}">{{ $category }}</option>
+                    <option {{ request('category') == $category ? 'selected' : '' }} value="{{ $category }}">{{ $category === 'Your Posts' ? 'My Posts' : $category }}</option>
                     @endforeach
                 </select>
 
@@ -43,9 +43,9 @@
         </form>
     </div>
 
-    <div class="grid grid-cols-2 gap-4">
+    <div class="grid grid-cols-2 gap-4 overflow-auto">
         @foreach ($posts as $post)
-        <div class="shadow rounded-lg mt-4">
+        <div class="shadow rounded-lg mb-4">
             <div class="bg-white py-4 flex flex-col px-6 border-b rounded-lg h-full">
                 <div class="flex">
                     <img class="w-10 h-10 rounded-full object-cover" src="{{ $post->creator->image() }}" alt="Poster Profile">
@@ -111,10 +111,14 @@
                                 <img class="h-4 w-5" src="{{ asset('assets/post_edit.svg') }}" alt="Edit Post">
                                 <button class="text-left w-full block px-4 py-2 hover:bg-gray-100">Edit Post</button>
                             </div>
-                            <a href="/post/delete/{{ $post->id }}" class="pl-4 flex p-2 group place-items-center hover:bg-gray-100 cursor-pointer">
-                                <img class="h-4 w-5" src="{{ asset('assets/post_delete.svg') }}" alt="Delete Post">
-                                <button class="text-left w-full block px-4 py-2 hover:bg-gray-100">Delete Post</button>
-                            </a>
+
+                                @if (! (Auth::user()->role === 'Admin' && Auth::user()->admin()->is_super && $post->user_id === Auth::user()->id))
+                                <form action="/post/delete/{{ $post->id }}" method="POST" class="pl-4 flex p-2 group place-items-center hover:bg-gray-100 cursor-pointer">
+                                    @csrf
+                                    <img class="h-4 w-5" src="{{ asset('assets/post_delete.svg') }}" alt="Delete Post">
+                                    <button type="submit" class="text-left w-full block px-4 py-2 text-red-600">Delete Post</button>
+                                </form>
+                                @endif
                             @endif
 
                         </div>
@@ -227,6 +231,7 @@
         } else {
             eventStatuses.classList.add('hidden');
             jobStatuses.classList.add('hidden');
+            categoryStatus.removeAttribute('required');            
         }
 
         categoryStatus.value = null;

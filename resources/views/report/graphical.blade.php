@@ -49,7 +49,9 @@
                         $subCategory = request('subcategory') ?? 'Department'
                         @endphp
                         <select class="border p-1.5 rounded-lg bg-white text-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-blue-500" name="subcategory" id="subcategory">
+                            @if (Auth::user()->admin()->is_super)
                             <option {{ $subCategory == 'Department' ? 'selected' : '' }} value="Department">Department</option>
+                            @endif
                             <option {{ $subCategory == 'Batch' ? 'selected' : '' }} value="Batch">Batch</option>
                             <option {{ $subCategory == 'Course' ? 'selected' : '' }} value="Course">Course</option>
                             @if ($category !== 'Unemployed Alumni')
@@ -65,9 +67,9 @@
                         @php
                         $batches = [];
                         foreach (App\Models\User::all() as $user) {
-                            if ($user->isCompSet() && $user->getEducationalBio()->end) {
-                                $batches[$user->getEducationalBio()->end] = true;
-                            }
+                        if ($user->isCompSet() && $user->getEducationalBio()->end) {
+                        $batches[$user->getEducationalBio()->end] = true;
+                        }
                         }
 
                         $batches = array_keys($batches);
@@ -82,6 +84,7 @@
                         </select>
                     </div>
                     @elseif ($subCategory == 'Batch')
+                    @if (Auth::user()->admin()->is_super)
                     <div class="flex flex-col">
                         <label for="department" class="text-sm font-medium text-gray-700 mb-0.5">Department</label>
                         @php
@@ -94,6 +97,7 @@
                             @endforeach
                         </select>
                     </div>
+                    @endif
                     @endif
                 </div>
 
@@ -112,7 +116,17 @@
 
     <div class="shadow rounded-lg mt-4 flex-1 h-full max-h-full overflow-auto">
         <div class="bg-white py-4 flex flex-col px-6 border-b rounded-lg min-h-full">
-            <h1 class="font-medium text-lg h-12">All Registered Alumni by Department</h1>
+            <div class="flex justify-between">
+                @if (Auth::user()->admin()->is_super)
+                <h1 class="font-medium text-lg h-12">All Registered Alumni by Department</h1>
+                @else
+                <h1 class="font-medium text-lg h-12">All Registered Alumni by {{ Auth::user()->admin()->officeRelation->name }}</h1>
+                @endif
+
+                <div class="text-sm text-gray-600">
+                    Total Alumni: <span class="font-semibold" id="totalAlumni"></span>
+                </div>
+            </div>
             <canvas id="graphical"></canvas>
         </div>
     </div>
@@ -194,23 +208,44 @@
 
     use App\Models\Department;
     use App\Models\User;
+    use Illuminate\Support\Facades\Auth;
 
     // $groups = User::groupBy($subCategory);
     $users = User::partialSet()->get()->merge(User::compSet()->get());
     $groups = $users
         ->filter(function ($user) use ($subCategory, $category) {
             if ($subCategory === 'Department' || $subCategory === 'Course') {
+                $admin = User::query()->find(Auth::user()->id);
+                if (!$admin->admin()->is_super) {
+                    if (!empty(request('batch'))) {
+                        return $user->isCompSet() && $user->department_id == $admin->admin()->office &&
+                            $user->getEducationalBio()->end == request('batch');
+                    }
+
+                    return $user->isCompSet() && $user->department_id == $admin->admin()->office;
+                }
+
                 if (empty(request('batch'))) {
                     return $user->isCompSet();
                 }
 
                 return $user->isCompSet() && $user->getEducationalBio()->end === request('batch');
             } else if ($subCategory === 'Batch') {
+                $admin = User::query()->find(Auth::user()->id);
+                if (!$admin->admin()->is_super) {
+                    return $user->isCompSet() && $user->department_id == $admin->admin()->office;
+                }
+
                 if (empty(request('department'))) {
                     return $user->isCompSet();
                 }
 
                 return $user->isCompSet() && $user->department_id == request('department');
+            }
+
+            $admin = User::query()->find(Auth::user()->id);
+            if (!$admin->admin()->is_super) {
+                return $user->isCompSet() && $user->department_id == $admin->admin()->office;
             }
 
             return $user->isCompSet();
@@ -232,7 +267,7 @@
     $yAxis = array_map(fn($group) => User::countFromGroup($category, $group), $groups);
     ?>
 
-    <?php $total = 0 ?>
+    <?php $total = 0; ?>
 
     new Chart(ctx, {
         type: 'bar',
@@ -255,22 +290,100 @@
                     ?>
                 ],
                 backgroundColor: [
-                    'rgba(255, 99, 132, 0.2)',
-                    'rgba(255, 159, 64, 0.2)',
-                    'rgba(255, 205, 86, 0.2)',
-                    'rgba(75, 192, 192, 0.2)',
-                    'rgba(54, 162, 235, 0.2)',
-                    'rgba(153, 102, 255, 0.2)',
-                    'rgba(201, 203, 207, 0.2)'
+                    <?php
+                    if ($subCategory == 'Department') {
+                        foreach ($xAxis as $label) {
+                            switch ($label) {
+                                case 'College of Arts and Science':
+                                    echo "'rgba(153, 102, 255, 0.2)',";
+                                    break;
+                                case 'College of Business and Accountancy':
+                                    echo "'rgba(255, 205, 86, 0.2)',";
+                                    break;
+                                case 'College of Computer Studies':
+                                    echo "'rgba(75, 192, 192, 0.2)',";
+                                    break;
+                                case 'College of Criminal Justice Education':
+                                    echo "'rgba(255, 99, 132, 0.2)',";
+                                    break;
+                                case 'College of Hospitality and Tourism Management':
+                                    echo "'rgba(255, 0, 255, 0.2)',";
+                                    break;
+                                case 'College of Nursing':
+                                    echo "'rgba(0, 255, 0, 0.2)',";
+                                    break;
+                                case 'College of Engineering':
+                                    echo "'rgba(255, 165, 0, 0.2)',";
+                                    break;
+                                case 'College of Teacher Education':
+                                    echo "'rgba(0, 0, 255, 0.2)',";
+                                    break;
+                                case 'Graduate School':
+                                    echo "'rgba(255, 215, 0, 0.2)',";
+                                    break;
+                                default:
+                                    echo "'rgba(201, 203, 207, 0.2)',";
+                                    break;
+                            }
+                        }
+                    } else {
+                        echo "'rgba(255, 99, 132, 0.2)',
+                            'rgba(255, 159, 64, 0.2)',
+                            'rgba(255, 205, 86, 0.2)',
+                            'rgba(75, 192, 192, 0.2)',
+                            'rgba(54, 162, 235, 0.2)',
+                            'rgba(153, 102, 255, 0.2)',
+                            'rgba(201, 203, 207, 0.2)'";
+                    }
+                    ?>
                 ],
                 borderColor: [
-                    'rgba(255, 99, 132, 1)',
-                    'rgba(255, 159, 64, 1)',
-                    'rgba(255, 205, 86, 1)',
-                    'rgba(75, 192, 192, 1)',
-                    'rgba(54, 162, 235, 1)',
-                    'rgba(153, 102, 255, 1)',
-                    'rgba(201, 203, 207, 1)'
+                    <?php
+                    if ($subCategory == 'Department') {
+                        foreach ($xAxis as $label) {
+                            switch ($label) {
+                                case 'College of Arts & Science':
+                                    echo "'rgba(153, 102, 255, 1)',";
+                                    break;
+                                case 'College of Business & Accountancy':
+                                    echo "'rgba(255, 205, 86, 1)',";
+                                    break;
+                                case 'College of Computer Studies':
+                                    echo "'rgba(75, 192, 192, 1)',";
+                                    break;
+                                case 'College of Criminal Justice Education':
+                                    echo "'rgba(255, 99, 132, 1)',";
+                                    break;
+                                case 'College of Hospitality & Tourism Management':
+                                    echo "'rgba(255, 0, 255, 1)',";
+                                    break;
+                                case 'College of Nursing':
+                                    echo "'rgba(0, 255, 0, 1)',";
+                                    break;
+                                case 'College of Engineering':
+                                    echo "'rgba(255, 165, 0, 1)',";
+                                    break;
+                                case 'College of Teacher Education':
+                                    echo "'rgba(0, 0, 255, 1)',";
+                                    break;
+                                case 'Graduate School':
+                                    echo "'rgba(255, 215, 0, 1)',";
+                                    break;
+                                default:
+                                    echo "'rgba(201, 203, 207, 1)',";
+                                    break;
+                            }
+                        }
+                    } else {
+                        echo "'rgba(255, 99, 132, 1)',
+                            'rgba(255, 159, 64, 1)',
+                            'rgba(255, 205, 86, 1)',
+                            'rgba(75, 192, 192, 1)',
+                            'rgba(54, 162, 235, 1)',
+                            'rgba(153, 102, 255, 1)',
+                            'rgba(201, 203, 207, 1)'";
+                    }
+                    ?>
                 ],
                 borderWidth: 1
             }]
@@ -300,5 +413,8 @@
             }
         }
     });
+
+    const totalAlumni = document.getElementById('totalAlumni');
+    totalAlumni.innerText = <?php echo $total ?>;
 </script>
 @endsection

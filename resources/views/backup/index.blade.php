@@ -67,8 +67,6 @@
                 @else
                 <span>No backups available</span>
                 @endif
-
-                
             </div>
 
             <div class="flex-1"></div>
@@ -209,11 +207,29 @@
                                     <img src="{{ asset('assets/download.svg') }}" alt="Download">
                                 </button>
                             </form>
-                            <button onclick="startRestoreBackup({{ $backup->id }})" class="hover:bg-green-700/20 text-white font-bold py-2 px-4 rounded">
+
+                            <button onclick="openRestoreConfirmationModal({{ $backup->id }})" class="hover:bg-green-700/20 text-white font-bold py-2 px-4 rounded">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-600" viewBox="0 0 20 20" fill="currentColor">
                                     <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd" />
                                 </svg>
                             </button>
+
+                            <div id="restoreConfirmModal-{{ $backup->id }}" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50 hidden">
+                                <div class="bg-white rounded-lg shadow-lg w-1/3">
+                                    <div class="border-b px-4 py-2 flex justify-between items-center">
+                                        <h3 class="font-semibold text-lg">Confirm Restore</h3>
+                                        <button class="text-gray-600 hover:text-gray-800" onclick="closeRestoreConfirmationModal({{ $backup->id }})">&times;</button>
+                                    </div>
+                                    <div class="p-4">
+                                        <p class="text-center text-gray-700">Are you sure you want to restore this backup?</p>
+                                        <p class="text-center text-gray-700 font-semibold">{{ $backup->created_at }}</p>
+                                    </div>
+                                    <div class="flex justify-end p-4 border-t">
+                                        <button class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded mr-2" onclick="closeRestoreConfirmationModal({{ $backup->id }})">Cancel</button>
+                                        <button onclick="startRestoreBackup({{ $backup->id }})" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">Restore</button>
+                                    </div>
+                                </div>
+                            </div>
 
                             <div id="restoreBackupModal-{{ $backup->id }}" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50 hidden">
                                 <div class="bg-white rounded-lg shadow-lg w-1/3">
@@ -287,6 +303,21 @@
 @endsection
 
 @section('script')
+<script>
+    function openRestoreConfirmationModal(backupId) {
+        const modal = document.getElementById(`restoreConfirmModal-${backupId}`);
+        if (modal) {
+            modal.classList.remove('hidden');
+        }
+    }
+
+    function closeRestoreConfirmationModal(backupId) {
+        const modal = document.getElementById(`restoreConfirmModal-${backupId}`);
+        if (modal) {
+            modal.classList.add('hidden');
+        }
+    }
+</script>
 <script>
     async function startRestoreBackup(backupId) {
         // Show the restore modal

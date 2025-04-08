@@ -474,15 +474,17 @@
 @if ($query === 'educational')
 <script>
     const openEducationModal = document.getElementById('openEducationModal');
-    const closeEducationModal = document.getElementById('closeEducationModal');
+    const closeEducationModalButtons = document.querySelectorAll('.closeEducationModal');
     const educationModal = document.getElementById('educationModal');
 
     openEducationModal.addEventListener('click', () => {
         educationModal.classList.remove('hidden');
     });
 
-    closeEducationModal.addEventListener('click', () => {
-        educationModal.classList.add('hidden');
+    closeEducationModalButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            educationModal.classList.add('hidden');
+        });
     });
 
     window.addEventListener('click', (e) => {

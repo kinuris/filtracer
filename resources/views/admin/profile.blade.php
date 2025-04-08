@@ -18,7 +18,7 @@
             <div class="flex-1"></div>
 
             <a class="rounded-lg p-2 px-3 bg-blue-600 text-white mr-3" href="/settings/account">Go to Settings</a>
-            <a class="rounded-lg p-2 px-3 bg-blue-600 text-white" href="">Log History</a>
+            <!-- <a class="rounded-lg p-2 px-3 bg-blue-600 text-white" href="">Log History</a> -->
         </div>
     </div>
 
@@ -51,11 +51,13 @@
                 </div>
 
                 <div class="flex mt-4">
+                    @if (!$user->admin()->is_super)
                     <div class="flex flex-1">
                         <p class="flex-[2] text-gray-500">Office</p>
                         <p class="flex-[5] font-bold">{{ $user->department->name }}</p>
                     </div>
-                    <div class="flex flex-1">
+                    @endif
+                    <div class="flex @if($user->admin()->is_super) w-1/2 @else flex-1 @endif">
                         <p class="flex-[2] text-gray-500">Phone Number</p>
                         <p class="flex-[5] font-bold">{{ $personal ? $personal->phone_number : "(No personal record)" }}</p>
                     </div>

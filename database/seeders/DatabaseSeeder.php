@@ -64,7 +64,7 @@ class DatabaseSeeder extends Seeder
             'logo' => 'cn.png',
         ]);
 
-        Department::query()->create([
+        $gradsch = Department::query()->create([
             'name' => 'Graduate School',
             'logo' => 'gradsch.png',
         ]);
@@ -187,6 +187,18 @@ class DatabaseSeeder extends Seeder
             'department_id' => $cte->id,
             'name' => 'Teacher Education Certificate',
             'image_link' => 'cte/teacher-education-certificate.png',
+        ]);
+
+        Course::query()->create([
+            'department_id' => $gradsch->id,
+            'name' => 'Master of Arts in Teaching',
+            'image_link' => 'gradsch/master-of-arts-in-teaching.png',
+        ]);
+
+        Course::query()->create([
+            'department_id' => $gradsch->id,
+            'name' => 'Doctor of Education',
+            'image_link' => 'gradsch/doctor-of-education.png',
         ]);
 
         // foreach (Department::allValid() as $dept) {
@@ -325,7 +337,7 @@ class DatabaseSeeder extends Seeder
                     'Doctoral',
                 ]),
                 'major_id' => is_null($major) ? null :  $major->id,
-                'course_id' => Course::where('department_id', '=', $user->department_id)->exists() 
+                'course_id' => Course::where('department_id', '=', $user->department_id)->exists()
                     ? Course::where('department_id', '=', $user->department_id)->inRandomOrder()->first()->id
                     : Course::inRandomOrder()->first()->id,
                 'start' => $year,

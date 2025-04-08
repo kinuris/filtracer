@@ -43,7 +43,8 @@ class SuperAdminController extends Controller
         $user->update(['username' => $validated['username']]);
         $user->personalBio->update($validated);
 
-        return back()->with('message', 'Account updated successfully.');
+        return back()->with('message', 'Account updated successfully.')
+            ->with('subtitle', 'The account details have been updated.');
     }
 
     public function createAccountView()
@@ -51,10 +52,11 @@ class SuperAdminController extends Controller
         return view('superadmin.create-account');
     }
 
-    public function sendSmsCredentials(Request $request) {
+    public function sendSmsCredentials(Request $request)
+    {
         $request->validate([
             'import_history_id' => ['required', 'exists:import_histories,id'],
-        ]); 
+        ]);
 
         $users = User::query()
             ->whereRelation('importGenerated', 'import_history_id', '=', $request->import_history_id)
@@ -74,7 +76,8 @@ class SuperAdminController extends Controller
             SendSMSAsyncJob::dispatch($user->partialPersonal->philSMSNum(), $content);
         }
 
-        return back()->with('message', 'SMS credentials sent successfully.');
+        return back()->with('message', 'SMS credentials sent successfully.')
+            ->with('subtitle', 'SMS credentials have been sent to the imported users.');
     }
 
     public function createAccount(Request $request)
@@ -143,7 +146,8 @@ class SuperAdminController extends Controller
             'department_id' => $validated['department'],
         ]);
 
-        return back()->with('message', 'Account created successfully.');
+        return back()->with('message', 'Account created successfully.')
+            ->with('subtitle', 'A new alumni account has been created.');
     }
 
     public function createAdmin()
@@ -206,7 +210,8 @@ class SuperAdminController extends Controller
             'user_id' => $user->id,
         ], $validated));
 
-        return back()->with('message', 'Admin account created successfully.');
+        return back()->with('message', 'Admin account created successfully.')
+            ->with('subtitle', 'A new admin account has been created.');
     }
 
     public function createBulkView()
@@ -358,7 +363,8 @@ class SuperAdminController extends Controller
 
             $post->delete();
 
-            return back()->with('message', 'Post deleted successfully.');
+            return back()->with('message', 'Post deleted successfully.')
+                ->with('subtitle', 'The selected post has been successfully deleted.');
         } catch (Exception $e) {
             return back()->withErrors(['error' => 'Failed to delete post: ' . $e->getMessage()]);
         }
@@ -369,8 +375,13 @@ class SuperAdminController extends Controller
         $statusSelect = request()->query('status', 'Pending');
 
         $posts = Post::query()
-            ->where('status', '=', $statusSelect)
-            ->latest()
+            ->where('status', '=', $statusSelect);
+
+        if (User::query()->find(Auth::user()->id)->admin()->is_super) {
+            $posts = $posts->where('user_id', '!=', Auth::user()->id);
+        }
+
+        $posts = $posts->latest()
             ->paginate(6);
 
         return view('superadmin.post-request')->with('posts', $posts);
@@ -400,7 +411,8 @@ class SuperAdminController extends Controller
                 'user_id' => $post->creator->id,
             ]);
 
-            return back()->with('message', 'Post status updated successfully.');
+            return back()->with('message', 'Post status updated successfully.')
+                ->with('subtitle', 'The post status has been updated.');
         } catch (Exception $e) {
             return back()->withErrors(['error' => 'Failed to update post status: ' . $e->getMessage()]);
         }

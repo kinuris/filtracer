@@ -4,7 +4,7 @@
 <div class="bg-gray-100 w-full h-full p-8 flex flex-col">
     <h1 class="font-medium tracking-widest text-lg">Password Settings</h1>
 
-    <div class="w-full max-w-3xl mx-auto p-6 bg-white shadow-md rounded-lg mt-8">
+    <div class="w-full mx-auto p-6 bg-white shadow-md rounded-lg mt-8">
         <h2 class="text-2xl font-semibold mb-4">Reset Password</h2>
         <p class="text-gray-600 text-sm mb-4">
             <strong>Password requirements:</strong> <br>
@@ -13,13 +13,13 @@
         </p>
 
         @if ($errors->any())
-            <div class="mb-4">
-                <ul class="list-disc list-inside text-red-600">
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
+        <div class="mb-4">
+            <ul class="list-disc list-inside text-red-600">
+                @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
         @endif
 
         <form action="/settings/alumni/password/{{ Auth::user()->id }}" method="POST">
@@ -43,6 +43,10 @@
             </div>
 
             <div class="flex justify-end gap-2">
+                <button type="reset"
+                    class="px-4 py-2 text-gray-600 border border-gray-600 rounded-lg hover:bg-gray-100 transition">
+                    Clear
+                </button>
                 <a
                     href="/settings"
                     class="px-4 py-2 text-blue-600 border border-blue-600 rounded-lg hover:bg-blue-100 transition">

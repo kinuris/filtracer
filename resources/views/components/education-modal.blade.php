@@ -61,8 +61,8 @@
                     </div>
                 </div>
 
-                <div class="flex mt-4">
-                    <button type="button" id="closeEducationModal" class="mr-2 px-4 py-2 bg-white text-blue-500 border border-blue-500 rounded">Cancel</button>
+                <div class="flex mt-4 justify-end">
+                    <button type="button" class="closeEducationModal mr-2 px-4 py-2 bg-white text-blue-500 border border-blue-500 rounded">Cancel</button>
                     <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded">Add</button>
                 </div>
             </div>
@@ -103,8 +103,8 @@
                     </div>
                 </div>
 
-                <div class="flex mt-4">
-                    <button type="button" id="closeEducationModal" class="mr-2 px-4 py-2 bg-white text-blue-500 border border-blue-500 rounded">Cancel</button>
+                <div class="flex mt-4 justify-end">
+                    <button type="button" class="closeEducationModal mr-2 px-4 py-2 bg-white text-blue-500 border border-blue-500 rounded">Cancel</button>
                     <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded">Add</button>
                 </div>
             </div>
@@ -133,8 +133,8 @@
                     </div>
                 </div>
 
-                <div class="flex mt-4">
-                    <button type="button" id="closeEducationModal" class="mr-2 px-4 py-2 bg-white text-blue-500 border border-blue-500 rounded">Cancel</button>
+                <div class="flex mt-4 justify-end">
+                    <button type="button" class="closeEducationModal mr-2 px-4 py-2 bg-white text-blue-500 border border-blue-500 rounded">Cancel</button>
                     <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded">Add</button>
                 </div>
             </div>

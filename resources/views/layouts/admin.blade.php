@@ -95,7 +95,7 @@
                 </a>
                 <div class="absolute hidden group-hover:block bg-white shadow-lg rounded-lg">
                     <a href="/report/graphical" class="block px-4 py-2 hover:bg-gray-100">Graphical Report</a>
-                    <a href="/report/statistical" class="block px-4 py-2 hover:bg-gray-100">Statistical Report</a>
+                    <a href="/report/statistical?department={{ Auth::user()->admin()->office }}" class="block px-4 py-2 hover:bg-gray-100">Statistical Report</a>
                 </div>
             </div>
 
@@ -180,12 +180,38 @@
                             </div>
                         </a>
 
-                        <a href="/logout" class="block py-2 text-sm text-gray-700" role="menuitem" tabindex="-1" id="menu-item-6">
+                        <button type="button" onclick="document.getElementById('logoutModal').classList.remove('hidden')" class="block py-2 text-sm text-gray-700" role="menuitem" tabindex="-1" id="menu-item-6">
                             <div class="py-1 flex place-items-center" role="none">
                                 <img class="block w-4 mx-4" src="{{ asset('assets/logout.svg') }}" alt="Profile">
                                 Logout
                             </div>
-                        </a>
+                        </button>
+
+                        <div class="hidden fixed z-50 inset-0 bg-gray-900 bg-opacity-60 backdrop-blur-sm overflow-y-auto" id="logoutModal">
+                            <div class="flex items-center justify-center min-h-screen p-4">
+                                <div class="bg-white rounded-lg shadow-xl overflow-hidden transform transition-all max-w-md w-full">
+                                    <div class="px-6 pt-6 pb-4">
+                                        <div class="flex justify-center mb-4">
+                                            <div class="rounded-full bg-red-100 p-3">
+                                                <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                                                </svg>
+                                            </div>
+                                        </div>
+                                        <h3 class="text-xl font-semibold text-gray-900 text-center">Confirm Logout</h3>
+                                        <p class="mt-2 text-sm text-gray-600 text-center">Are you sure you want to log out of your account?</p>
+                                    </div>
+                                    <div class="bg-gray-50 px-6 py-4 flex justify-between">
+                                        <button onclick="document.getElementById('logoutModal').classList.add('hidden')" type="button" class="py-2 px-4 bg-white border border-gray-300 text-gray-700 font-medium rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200">
+                                            Cancel
+                                        </button>
+                                        <a href="/logout" class="py-2 px-4 bg-red-600 text-white font-medium rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 shadow-sm transition-colors duration-200">
+                                            Log Out
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 
                         @php($linkedAccounts = App\Models\BoundAccount::query()->where('admin_id', '=', Auth::user()->id)->get())
                         <div class="relative group">

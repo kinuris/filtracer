@@ -99,7 +99,7 @@
                                 <img class="w-14 rounded-full shadow aspect-square object-cover" src="{{ $user->image() }}" alt="Profile Picture">
                                 <div class="flex flex-col ml-5">
                                     <p class="font-thin">Edit your photo</p>
-                                    <a class="text-blue-600" href="">Update</a>
+                                    <a class="text-blue-600" href="/admin/profilepic/{{ $user->id }}/remove">Remove</a>
                                 </div>
                             </div>
                         </div>

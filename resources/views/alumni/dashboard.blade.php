@@ -29,7 +29,7 @@
 
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 my-8">
             <!-- Notifications Panel -->
-            <div class="bg-white shadow-md hover:shadow-xl transition-all duration-300 rounded-lg overflow-hidden border border-gray-100">
+            <div id="notificationsPanel" class="bg-white shadow-md hover:shadow-xl transition-all duration-300 rounded-lg overflow-hidden border border-gray-100">
                 <div class="flex justify-between items-center p-5 bg-gradient-to-r from-blue-50 to-white border-b">
                     <div class="flex items-center gap-3">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-600" viewBox="0 0 20 20" fill="currentColor">
@@ -49,7 +49,7 @@
             </div>
 
             <!-- Messages Panel -->
-            <div class="bg-white shadow-md hover:shadow-xl transition-all duration-300 rounded-lg overflow-hidden border border-gray-100">
+            <div id="messagesPanel" class="bg-white shadow-md hover:shadow-xl transition-all duration-300 rounded-lg overflow-hidden border border-gray-100">
                 <div class="flex justify-between items-center p-5 bg-gradient-to-r from-green-50 to-white border-b">
                     <div class="flex items-center gap-3">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-600" viewBox="0 0 20 20" fill="currentColor">
@@ -77,6 +77,24 @@
 <script>
     const alertContainerBottom = document.querySelector('#alertContainerBottom');
     const messageContainerBottom = document.querySelector('#messageContainerBottom');
+
+    const notificationsPanel = document.querySelector('#notificationsPanel');
+    const messagesPanel = document.querySelector('#messagesPanel');
+
+    const initialNotifiesState = localStorage.getItem('display-notifies');
+    const initialMessagesState = localStorage.getItem('display-messages');
+
+    if (initialNotifiesState === null || initialNotifiesState === 'true') {
+        notificationsPanel.style.display = 'block';
+    } else {
+        notificationsPanel.style.display = 'none';
+    }
+
+    if (initialMessagesState === null || initialMessagesState === 'true') {
+        messagesPanel.style.display = 'block';
+    } else {
+        messagesPanel.style.display = 'none';
+    }
 
     (function() {
         async function repeat() {

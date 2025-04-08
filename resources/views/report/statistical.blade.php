@@ -13,7 +13,9 @@
                 <p class="tracking-wider font-semibold mr-4">All</p>
                 <select onchange="handleChangeCategory()" class="g-gray-100 p-2 rounded border text-gray-400" name="category" id="category">
                     <optgroup label="All">
+                        @if (Auth::user()->admin()->is_super) 
                         <option @if (request('category')=='All Entities' ) selected @endif value="All Entities">All Users</option>
+                        @endif
                         <option @if (request('category')=='All Users' ) selected @endif value="All Users">Alumni</option>
                     </optgroup>
                     <optgroup label="Employment">
@@ -25,6 +27,7 @@
                         <option @if (request('category')=='Student Alumni' ) selected @endif value="Student Alumni">Student Alumni</option>
                         <option @if (request('category')=='Retired Alumni' ) selected @endif value="Retired Alumni">Retired Alumni</option>
                     </optgroup>
+                    @if(Auth::user()->admin()->is_super)
                     <optgroup label="User Status">
                         <option @if (request('category')=='Verified Alumni' ) selected @endif value="Verified Alumni">Verified Alumni</option>
                         <option @if (request('category')=='Unverified Alumni' ) selected @endif value="Unverified Alumni">Unverified Alumni</option>
@@ -33,24 +36,27 @@
                         <option @if (request('category')=='Verified User' ) selected @endif value="Verified User">Verified Users</option>
                         <option @if (request('category')=='Unverified User' ) selected @endif value="Unverified User">Unverified Users</option>
                     </optgroup>
+                    @endif
                 </select>
 
                 <p class="tracking-wider font-semibold ml-4 mr-4">From</p>
-                <select @if(request('locked')) disabled @endif onchange="handleDepartmentChange()" class="g-gray-100 p-2 max-w-56 rounded border text-gray-400 mr-4" name="department" id="department">
+                <select @if(!Auth::user()->admin()->is_super) disabled @endif onchange="handleDepartmentChange()" class="g-gray-100 p-2 max-w-56 rounded border text-gray-400 mr-4" name="department" id="department">
                     <option value="-1">All Departments</option>
                     @php($depts = App\Models\Department::allValid())
                     @foreach ($depts as $dept)
-                    <option @if (request('department')==$dept->id) selected @endif value="{{ $dept->id }}">{{ $dept->name }}</option>
+                    <option @if(Auth::user()->admin()->is_super) @if (request('department')==$dept->id) selected @endif value="{{ $dept->id }}" @else @if(Auth::user()->admin()->office == $dept->id) selected @endif value="{{ $dept->id }}" @endif>{{ $dept->name }}</option>
                     @endforeach
                 </select>
 
+                <input type="hidden" name="department" value="{{ request('department') ?? '' }}">
+
                 <select @if(request('locked')) disabled @endif onchange="handleCourseChange()" class="g-gray-100 p-2 min-w-56 rounded border text-gray-400" name="courses" id="courses">
                     <option value="-1">All Courses</option>
-                    @php($dept = App\Models\Department::find(request('department')))
+                    @php($dept = $adminDept ?? App\Models\Department::find(request('department')))
                     @if (isset($dept))
-                    @foreach ($dept->getCourses() as $course)
-                    <option @if (request('courses')==$course->id) selected @endif value="{{ $course->id }}">{{ $course->name }}</option>
-                    @endforeach
+                        @foreach ($dept->getCourses() as $course)
+                        <option @if (request('courses') == $course->id) selected @endif value="{{ $course->id }}">{{ $course->name }}</option>
+                        @endforeach
                     @endif
                 </select>
 
@@ -63,7 +69,15 @@
     <div class="shadow rounded-lg mt-4">
         <form action="">
             <div class="bg-white py-4 flex place-items-center px-6 border-b rounded-t-lg justify-between">
-                <p class="font-bold">All Users from All Departments from All Courses</p>
+                <p class="font-bold">
+                    All Users 
+                    @if(!Auth::user()->admin()->is_super)
+                        from {{ $dept->name }}
+                    @else
+                        from All Departments
+                    @endif
+                     from All Courses
+                </p>
                 <input value="{{ request('search') ?? '' }}" class="bg-gray-100 p-2 rounded border min-w-[max(33%,270px)]" placeholder="Search..." type="text" name="search" id="search">
             </div>
         </form>

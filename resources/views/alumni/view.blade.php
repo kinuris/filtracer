@@ -26,9 +26,9 @@
                 @else
                 <div class="flex gap-3">
                     <p class="text-gray-400 text-sm">Incomplete Setup (Cannot Verify/Unverify)</p>
-                    <button type="button" onclick="document.getElementById('deleteModal{{ $user->id }}').classList.remove('hidden')" class="border-0 bg-transparent cursor-pointer p-0">
+                    <!-- <button type="button" onclick="document.getElementById('deleteModal{{ $user->id }}').classList.remove('hidden')" class="border-0 bg-transparent cursor-pointer p-0">
                         <img src="{{ asset('assets/trash.svg') }}" alt="Trash">
-                    </button>
+                    </button> -->
 
                     <!-- Delete Confirmation Modal -->
                     <div id="deleteModal{{ $user->id }}" class="hidden fixed inset-0 z-50">
@@ -65,11 +65,14 @@
 
             @if($user->isCompSet())<a class="rounded-lg p-2 px-3 bg-blue-600 text-white" href="/profile/report/{{ $user->id }}">Generate Report</a>@endif
             @if (Auth::user()->admin()->is_super)
-            <button class="rounded-lg p-2 px-3 bg-blue-600 text-white mx-3" id="openManageAccountModal">Manage Account</button>
+            <!-- <button class="rounded-lg p-2 px-3 bg-blue-600 text-white mx-3" id="openManageAccountModal">Manage Account</button> -->
             @else
             <div class="mx-1.5"></div>
             @endif
-            <a class="rounded-lg p-2 px-3 bg-blue-600 text-white" href="/admin/chat?initiate={{ $user->id }}">Message</a>
+
+            @if ($user->isCompSet())
+            <a class="rounded-lg p-2 ml-2 px-3 bg-blue-600 text-white" href="/admin/chat?initiate={{ $user->id }}">Message</a>
+            @endif
         </div>
     </div>
 

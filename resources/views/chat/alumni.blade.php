@@ -76,7 +76,7 @@
                     </div>
                     <div class="px-6 py-3 flex flex-col h-full">
                         <form class="self-center mb-2" action="">
-                            <input class="border rounded-lg bg-gray-50 font-light text-sm p-2 min-w-72" placeholder="Search..." type="text" name="search">
+                            <input id="search-box" class="border rounded-lg bg-gray-50 font-light text-sm p-2 min-w-72" placeholder="Search..." type="text" name="search">
                         </form>
 
                         <div id="messageHeadersContainer">
@@ -122,14 +122,14 @@
 
     // Initial fetch for headers
     (async function loadHeaders() {
-        const headersRes = await fetch('/chat/headers');
+        const headersRes = await fetch('/chat/headers?search=' + encodeURIComponent(document.getElementById('search-box').value));
         if (headersRes.status === 200) {
             messageHeadersContainer.innerHTML = await headersRes.text();
         }
 
         // Set interval for headers
         setInterval(async () => {
-            const headersRes = await fetch('/chat/headers');
+            const headersRes = await fetch('/chat/headers?search=' + encodeURIComponent(document.getElementById('search-box').value));
             if (headersRes.status === 200) {
                 messageHeadersContainer.innerHTML = await headersRes.text();
 
@@ -192,7 +192,7 @@
                     messageHeadersContainer._hasClickListener = true;
                 }
             }
-        }, 1000);
+        }, 400);
     })();
 </script>
 <script>
@@ -257,7 +257,6 @@
     const send = document.getElementById('send');
 
     if (send) {
-
         document.addEventListener('keypress', (e) => {
             if (message.value.length < 1) return;
 

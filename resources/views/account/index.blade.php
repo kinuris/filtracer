@@ -11,7 +11,7 @@
     @if (Auth::user()->admin()->is_super)
     <div class="shadow rounded-lg p-4 mb-4 bg-white">
         <div class="flex">
-            <a href="/account" class="text-black font-semibold rounded p-2 mr-4 hover:bg-gray-200 hover:text-blue-600 {{ request()->is('account') && !request('mode') ? 'bg-gray-200 text-blue-600' : '' }}">User Accounts</a>
+            <a href="/account" class="text-black font-semibold rounded p-2 mr-4 hover:bg-gray-200 hover:text-blue-600 {{ request()->is('account') && !request('mode') ? 'bg-gray-200 text-blue-600' : '' }}">All Accounts</a>
             <a href="{{ url()->current() . '?mode=generated' }}" class="text-black font-semibold rounded p-2 mr-4 hover:bg-gray-200 hover:text-blue-600 {{ request('mode') == 'generated' ? 'bg-gray-200 text-blue-600' : '' }}">Generated Accounts</a>
             <!-- <a href="/account/verify" class="text-black font-semibold rounded p-2 hover:bg-gray-200 hover:text-blue-600">Verify Account</a> -->
 
@@ -37,11 +37,13 @@
                     <option {{ $status == 1 ? 'selected' : '' }} value="1">Verified</option>
                 </select>
 
+                @if (Auth::user()->admin()->is_super)
                 <select class="pr-1 font-thin text-gray-500" name="user_role" id="user_role">
                     @php($role = request('user_role') ?? '')
                     <option {{ $role == 'Alumni' ? 'selected' : '' }} value="Alumni">Alumni</option>
                     <option {{ $role == 'Admin' ? 'selected' : '' }} value="Admin">Admin</option>
                 </select>
+                @endif
 
                 <button type="submit" class="bg-blue-600 text-white rounded p-2 ml-6">Filter</button>
             </div>
@@ -51,7 +53,7 @@
             <thead class="bg-white text-blue-900 border-b">
                 <th class="font-thin py-3">ID</th>
                 <th class="font-thin">Name</th>
-                <th class="font-thin">Student/Company ID</th>
+                <th class="font-thin">Student/Employee No.</th>
                 <th class="font-thin">Role</th>
                 <th class="font-thin">Date Registered</th>
                 @if (request('mode') === 'generated')

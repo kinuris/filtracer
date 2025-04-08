@@ -29,6 +29,35 @@ class AdminController extends Controller
         return view('department.index');
     }
 
+    public function removeProfilePicture(User $user)
+    {
+        if (strpos($user->admin()->profile_picture, '-profile.png') !== false) {
+            return back()->with([
+                'failed_message' => 'Cannot remove default profile picture!',
+                'failed_subtitle' => 'The default profile picture cannot be removed.'
+            ]);
+        }
+
+        if ($user->role == 'Admin') {
+            if (!in_array($user->admin()->profile_picture, ['admin-profile.png', 'superadmin-profile.png'])) {
+                Storage::delete('public/user/images/' . $user->admin()->profile_picture);
+            }
+
+            $user->admin()->update(['profile_picture' => $user->admin()->is_super ? 'superadmin-profile.png' : 'admin-profile.png']);
+        } else {
+            if ($user->personalBio->profile_picture !== 'alumni-profile.png') {
+                Storage::delete('public/user/images/' . $user->personalBio->profile_picture);
+            }
+
+            $user->getPersonalBio()->update(['profile_picture' => 'alumni-profile.png']);
+        }
+
+        return back()->with([
+            'message' => 'Profile picture removed successfully!',
+            'subtitle' => 'Your profile picture has been removed from your account'
+        ]);
+    }
+
     public function alumniCoursesView(Course $course)
     {
         $users = User::query();
@@ -315,9 +344,19 @@ class AdminController extends Controller
                 ->orWhereRelation('personalBio', 'last_name', 'LIKE', '%' . $search . '%');
         }
 
-        $users = $users->paginate(7);
+        if (!User::query()->find(Auth::user()->id)->admin()->is_super) {
+            $users = $users->where('department_id', '=', User::query()->find(Auth::user()->id)->admin()->office);
+        }
 
-        return view('report.statistical')->with('users', $users);
+        $users = $users->paginate(7);
+        $view = view('report.statistical');
+
+        // $user = Auth::user();
+        // if ($user->role === 'Admin' && !User::query()->find($user->id)->admin()->is_super) {
+        //     $view->with('adminDept', Department::query()->find(User::query()->find($user->id)->admin()->office));
+        // }
+
+        return $view->with('users', $users);
     }
 
     public function reportsStatisticalGenerateView()
@@ -334,9 +373,13 @@ class AdminController extends Controller
         $profile = $request->file('profile');
 
         if ($user->role == 'Admin') {
-            Storage::delete('public/user/images/' . $user->admin()->profile_picture);
+            if (!in_array($user->admin()->profile_picture, ['admin-profile.png', 'superadmin-profile.png'])) {
+                Storage::delete('public/user/images/' . $user->admin()->profile_picture);
+            }
         } else {
-            Storage::delete('public/user/images/' . $user->personalBio->profile_picture);
+            if ($user->personalBio->profile_picture !== 'alumni-profile.png') {
+                Storage::delete('public/user/images/' . $user->personalBio->profile_picture);
+            }
         }
 
         $filename = sha1(time() . $user->name) . '.' . $profile->getClientOriginalExtension();
@@ -773,8 +816,32 @@ class AdminController extends Controller
 
         if ($selected && is_numeric($selected)) {
             $selected = User::query()->find($selected);
-        } else {
+
+            if ($selected->chatGroupWith($user) == null) {
+                return redirect($user->role === 'Admin' ? '/admin/chat' : '/alumni/chat')->with([
+                    'failed_message' => 'Chat group not found',
+                    'failed_subtitle' => 'The chat group you are trying to access does not exist'
+                ]);
+            }
+        } elseif ($selected && !is_numeric($selected)) {
             $selected = ChatGroup::query()->where('internal_id', '=', urldecode(request('initiate')))->first();
+
+            if ($selected == null) {
+                return redirect($user->role === 'Admin' ? '/admin/chat' : '/alumni/chat')->with([
+                    'failed_message' => 'Chat group not found',
+                    'failed_subtitle' => 'The chat group you are trying to access does not exist'
+                ]);
+            }
+        }
+
+        if ($selected) {
+            if ($selected instanceof ChatGroup) {
+                $view->with('association', $selected->associations()->where('user_id', '=', $user->id)->first());
+                $view->with('group', $selected);
+            } elseif ($selected instanceof User) {
+                $view->with('association', $selected->chatGroupWith($user)->associations()->where('user_id', '=', $user->id)->first());
+                $view->with('group', $selected->chatGroupWith($user));
+            }
         }
 
         return $view

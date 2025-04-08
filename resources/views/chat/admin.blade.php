@@ -28,8 +28,10 @@
                     <div class="border-b px-6 py-2 pl-4 border-l">
                         @if ($selected)
                         <div class="flex place-items-center h-full">
-                            <img class="w-9 h-9 rounded-full object-cover shadow" src="{{ $selected->image() }}" alt="">
-                            <p class="font-normal text-base tracking-normal ml-3">{{ $selected->name }}</p>
+                            <a href="/user/view/{{ $selected->id }}" class="flex place-items-center h-full">
+                                <img class="w-9 h-9 rounded-full object-cover shadow" src="{{ $selected->image() }}" alt="">
+                                <p class="font-normal text-base tracking-normal ml-3">{{ $selected->name }}</p>
+                            </a>
 
                             <div class="flex-1"></div>
 
@@ -62,6 +64,56 @@
                                         <img class="w-5" src="{{ asset('assets/leave.svg') }}" alt="Chat Members">
                                         <button class="text-left w-full block px-4 py-2 hover:bg-gray-100" id="openLeaveGroupModal">Leave Group</button>
                                     </div>
+                                    @else
+                                    <div class="flex p-2 group hover:bg-gray-100 cursor-pointer justify-center">
+                                        <svg class="w-5  text-red-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" stroke-linecap="round" stroke-linejoin="round"/>
+                                        </svg>
+                                        <button class="text-left w-full block px-4 py-2 hover:bg-gray-100 text-red-600" id="openDeleteChatModal">Delete Chat</button>
+                                    </div>
+
+                                    <!-- Delete Chat Modal -->
+                                    <div id="deleteChatModal" class="hidden fixed z-50 inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full">
+                                        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+                                            <div class="mt-3 text-center">
+                                                <h3 class="text-lg leading-6 font-medium text-gray-900">Confirm Delete</h3>
+                                                <div class="mt-2 px-7 py-3">
+                                                    <p class="text-sm text-gray-500">Are you sure you want to delete this chat? This action cannot be undone.</p>
+                                                </div>
+                                                <div class="items-center px-4 py-3">
+                                                    <button id="closeDeleteChatModal" class="px-4 py-2 bg-gray-500 text-white text-base font-medium rounded-md w-24 mr-2">Cancel</button>
+                                                    <a href="/chat/delete/{{ $group->id }}" id="confirmDeleteChat" class="px-4 py-2 bg-red-600 text-white text-base font-medium rounded-md w-24">Delete</a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <script>
+                                        const deleteChatModal = document.getElementById('deleteChatModal');
+                                        const openDeleteChatModal = document.getElementById('openDeleteChatModal');
+                                        const closeDeleteChatModal = document.getElementById('closeDeleteChatModal');
+                                        const confirmDeleteChat = document.getElementById('confirmDeleteChat');
+
+                                        openDeleteChatModal.addEventListener('click', () => {
+                                            deleteChatModal.classList.remove('hidden');
+                                        });
+
+                                        closeDeleteChatModal.addEventListener('click', () => {
+                                            deleteChatModal.classList.add('hidden');
+                                        });
+
+                                        deleteChatModal.addEventListener('click', (e) => {
+                                            if (e.target === deleteChatModal) {
+                                                deleteChatModal.classList.add('hidden');
+                                            }
+                                        });
+
+                                        confirmDeleteChat.addEventListener('click', () => {
+                                            // Add delete logic here
+                                            console.log('Delete confirmed');
+                                            deleteChatModal.classList.add('hidden');
+                                        });
+                                    </script>
                                     @endif
                                 </div>
                             </div>
@@ -76,7 +128,7 @@
                     </div>
                     <div class="px-6 py-3 flex flex-col h-full">
                         <form class="self-center mb-2" action="">
-                            <input class="border rounded-lg bg-gray-50 font-light text-sm p-2 min-w-72" placeholder="Search..." type="text" name="search">
+                            <input id="search-box" class="border rounded-lg bg-gray-50 font-light text-sm p-2 min-w-72" placeholder="Search..." type="text" name="search">
                         </form>
 
                         <div id="messageHeadersContainer">
@@ -95,14 +147,21 @@
                         </div>
                         <div class="div w-full bg-white/80 backdrop-blur-sm py-3 flex flex-col justify-end absolute px-4 right-0 bottom-0">
                             <div class="flex">
-                                <input class="border rounded-l-lg border-r-0 bg-gray-50 font-light text-sm  min-w-72 flex-1 focus:outline-none px-2" placeholder="Type something here..." type="text" name="message" id="message">
-                                <button class="bg-gray-50 border border-l-0 w-10 h-10 flex justify-center place-items-center rounded-r-lg">
-                                    <label class="cursor-pointer p-2" for="attachment">
+                                <input 
+                                    class="border rounded-l-lg border-r-0 bg-gray-50 font-light text-sm  min-w-72 flex-1 focus:outline-none px-2 @if(isset($association) && $association->status === 'pending') bg-gray-200 cursor-not-allowed @endif" 
+                                    placeholder="@if(isset($association) && $association->status === 'pending') Request Pending @else Type something here...@endif" 
+                                    type="text" 
+                                    name="message" 
+                                    id="message" 
+                                    @if(isset($association) && $association->status === 'pending') disabled @endif
+                                />
+                                <button class="bg-gray-50 border border-l-0 w-10 h-10 flex justify-center place-items-center rounded-r-lg @if(isset($association) && $association->status === 'pending') cursor-not-allowed @endif">
+                                    <label class="cursor-pointer p-2 @if(isset($association) && $association->status === 'pending') cursor-not-allowed @endif" for="attachment">
                                         <img class="w-5 h-5" src="{{ asset('assets/attachment.svg') }}" alt="Attachment">
                                     </label>
                                 </button>
-                                <input class="hidden" type="file" name="attachment" id="attachment" accept="image/png,image/jpg,image/jpeg,application/pdf">
-                                <button id="send" class="shadow bg-blue-600 w-10 h-10 flex justify-center place-items-center rounded-lg ml-3 transition-transform hover:scale-110">
+                                <input class="hidden" type="file" name="attachment" id="attachment" accept="image/png,image/jpg,image/jpeg,application/pdf" @if(isset($association) && $association->status === 'pending') disabled @endif>
+                                <button id="send" class="shadow bg-blue-600 w-10 h-10 flex justify-center place-items-center rounded-lg ml-3 transition-transform hover:scale-110 @if(isset($association) && $association->status === 'pending') opacity-50 cursor-not-allowed @endif" @if(isset($association) && $association->status === 'pending') disabled @endif>
                                     <img class="w-5 h-5" src="{{ asset('assets/send.svg') }}" alt="Send">
                                 </button>
                             </div>
@@ -122,14 +181,14 @@
 
     // Initial fetch for headers
     (async function loadHeaders() {
-        const headersRes = await fetch('/chat/headers');
+        const headersRes = await fetch('/chat/headers?search=' + encodeURIComponent(document.getElementById('search-box').value));
         if (headersRes.status === 200) {
             messageHeadersContainer.innerHTML = await headersRes.text();
         }
 
         // Set interval for headers
         setInterval(async () => {
-            const headersRes = await fetch('/chat/headers');
+            const headersRes = await fetch('/chat/headers?search=' + encodeURIComponent(document.getElementById('search-box').value));
             if (headersRes.status === 200) {
                 messageHeadersContainer.innerHTML = await headersRes.text();
 
@@ -192,7 +251,7 @@
                     messageHeadersContainer._hasClickListener = true;
                 }
             }
-        }, 1000);
+        }, 400);
     })();
 </script>
 <script>

@@ -5,23 +5,30 @@
     $isAdmin = Auth::user()->role === 'Admin';
     $baseUrl = $isAdmin ? '/admin/chat' : '/alumni/chat';
 
-    foreach (auth()->user()->chatGroups()->get() as $group) {
-    // Add the latest message to each group for sorting purposes
-    $latestMessage = $group->messages()->latest()->first();
-    $group->latestMessage = $latestMessage;
-    $group->latestMessageTime = $latestMessage ? $latestMessage->created_at : null;
+    $search = request('search');
 
-    $associations = $group->associations;
-    if ($associations->where('user_id', '=', Auth::user()->id)->where('status', '=', 'pending')->count() > 0) {
-    $pendingGroups->push($group);
-    } else {
-    $acceptedGroups->push($group);
-    }
+    foreach (auth()->user()->chatGroups()->get() as $group) {
+        // Apply search filter
+        if ($search && stripos($group->name, $search) === false) {
+            continue;
+        }
+
+        // Add the latest message to each group for sorting purposes
+        $latestMessage = $group->messages()->latest()->first();
+        $group->latestMessage = $latestMessage;
+        $group->latestMessageTime = $latestMessage ? $latestMessage->created_at : null;
+
+        $associations = $group->associations;
+        if ($associations->where('user_id', '=', Auth::user()->id)->where('status', '=', 'pending')->count() > 0) {
+            $pendingGroups->push($group);
+        } else {
+            $acceptedGroups->push($group);
+        }
     }
 
     // Sort accepted groups by latest message timestamp (newest first)
     $acceptedGroups = $acceptedGroups->sortByDesc(function($group) {
-    return $group->latestMessageTime;
+        return $group->latestMessageTime;
     });
     @endphp
 

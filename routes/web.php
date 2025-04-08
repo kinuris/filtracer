@@ -91,6 +91,7 @@ Route::controller(AlumniController::class)
 
         Route::get('/settings', 'settingsView');
         Route::get('/settings/alumni/password', 'settingsPasswordView');
+        Route::get('/settings/alumni/display', 'settingsDisplayView');
         Route::post('/settings/alumni/password/{alumni}', 'settingsPassword');
 
         Route::middleware('compset')->group(function () {
@@ -176,6 +177,7 @@ Route::controller(AdminController::class)
 
         Route::get('/account', 'accountsView');
         Route::get('/admin/profile', 'myProfileView');
+        Route::get('/admin/profilepic/{user}/remove', 'removeProfilePicture');
         Route::get('/admin/useraccount/verify/{user}', 'verifyUser');
         Route::get('/admin/useraccount/unverify/{user}', 'unverifyUser');
 
@@ -226,6 +228,7 @@ Route::controller(ChatController::class)
         Route::post('/chat/add/{roomId}', 'addMembers');
         Route::post('/chat/accept/{assoc}', 'acceptAssociation')->name('chat.accept');
 
+        Route::get('/chat/delete/{group}', 'deleteGroup');
         Route::post('/chat/makegroup', 'makeGroup');
         Route::post('/chat/send', 'send');
     });

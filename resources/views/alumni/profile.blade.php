@@ -4,11 +4,11 @@
 <div class="bg-gray-100 w-full h-full p-8 flex flex-col max-h-[calc(100%-4rem)]">
     <div class="flex justify-between">
         <h1 class="font-medium tracking-widest text-lg">Profile Details</h1>
-        <a class="text-white bg-blue-600 text-sm flex place-items-center rounded-lg px-2" href="/alumni/profile/update">Update Profile</a>
+        <a class="text-white bg-blue-600 flex place-items-center rounded-lg p-2" href="/alumni/profile/update">Update Profile</a>
     </div>
 
     <div class="flex max-h-full">
-        <div class="shadow rounded-lg h-fit mt-6 flex-1 min-w-80">
+        <div class="shadow rounded-lg h-fit mt-6 flex-1 min-w-80 overflow-scroll">
             <div class="bg-white py-4 flex flex-col px-6 border-b rounded-lg">
                 <img class="w-32 h-32 rounded-full object-cover shadow-md mr-8" src="{{ $user->image() }}" alt="Profile">
                 <p class="text-lg font-bold my-6">{{ $user->name }}</p>

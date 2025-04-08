@@ -12,6 +12,23 @@ use Illuminate\Support\Facades\Auth;
 
 class ChatController extends Controller
 {
+    public function deleteGroup(ChatGroup $group)
+    {
+        $name = $group->associations()->where('user_id', '!=', Auth::user()->id)->with('user')->first()->user->name;
+        UserAlert::query()->create([
+            'title' => 'Your chat with ' . $name . ' has been deleted',
+            'action' => (Auth::user()->role == 'Admin' ? '/admin/chat' : '/alumni/chat'),
+            'content' => 'You have deleted the group "' . $group->name . '"',
+            'user_id' => Auth::user()->id,
+        ]);
+
+        $group->delete();
+
+        return redirect(Auth::user()->role === 'Admin' ? '/admin/chat' : '/alumni/chat')
+            ->with('message', 'Chat deleted successfully!')
+            ->with('subtitle', 'Your messages with ' . $name . ' have been deleted');
+    }
+
     public function fetchHeaders()
     {
         return view('chat.snippets.message-headers');
@@ -223,7 +240,7 @@ class ChatController extends Controller
             'internal_id' => ChatGroup::genInternalNoCollision(),
             'name' => $groupName,
             'creator_id' => $request->post('creator'),
-            'image_link' => fake()->imageUrl(),
+            'image_link' => '',
         ]);
 
         foreach (array_merge($request->post('receivers'), [$request->post('creator')]) as $user) {

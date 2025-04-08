@@ -145,19 +145,40 @@
                             </div>
                         </a>
 
-                        <a href="#" class="block py-2 text-sm text-gray-700" role="menuitem" tabindex="-1" id="menu-item-3">
+                        <a href="/settings" class="block py-2 text-sm text-gray-700" role="menuitem" tabindex="-1" id="menu-item-3">
                             <div class="py-1 flex place-items-center" role="none">
                                 <img class="block h-4 mx-4" src="{{ asset('assets/settings.svg') }}" alt="Profile">
-                                Account Settings
+                                Settings
                             </div>
                         </a>
 
-                        <a href="/logout" class="block py-2 text-sm text-gray-700" role="menuitem" tabindex="-1" id="menu-item-6">
+                        <!-- Logout Link -->
+                        <a href="#" onclick="event.preventDefault(); document.getElementById('logoutModal').classList.remove('hidden');" class="block py-2 text-sm text-gray-700" role="menuitem" tabindex="-1" id="menu-item-6">
                             <div class="py-1 flex place-items-center" role="none">
                                 <img class="block w-4 mx-4" src="{{ asset('assets/logout.svg') }}" alt="Profile">
                                 Logout
                             </div>
                         </a>
+
+                        <!-- Logout Confirmation Modal -->
+                        <div id="logoutModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+                            <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+                                <div class="mt-3 text-center">
+                                    <h3 class="text-lg leading-6 font-medium text-gray-900">Confirm Logout</h3>
+                                    <div class="mt-2 px-7 py-3">
+                                        <p class="text-sm text-gray-500">Are you sure you want to logout?</p>
+                                    </div>
+                                    <div class="flex justify-center gap-4 mt-3">
+                                        <a href="/logout" class="px-4 py-2 bg-red-600 text-white text-base font-medium rounded-md shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-300">
+                                            Logout
+                                        </a>
+                                        <button onclick="document.getElementById('logoutModal').classList.add('hidden')" class="px-4 py-2 bg-gray-100 text-gray-700 text-base font-medium rounded-md shadow-sm hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-300">
+                                            Cancel
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 
                         @php($linkedAccounts = App\Models\BoundAccount::query()->where('alumni_id', '=', Auth::user()->id)->get())
                         <div class="relative group">

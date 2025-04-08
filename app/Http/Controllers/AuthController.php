@@ -103,10 +103,19 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
-        $validated = $request->validate([
+        $validator = Validator::make($request->all(), [
             'username' => ['required'],
             'password' => ['required'],
         ]);
+
+        if ($validator->fails()) {
+            return redirect('/login')
+                ->withErrors($validator)
+                ->with('failed_message', 'Invalid Credentials')
+                ->with('failed_subtitle', 'Incorrect username or password. Please try again.');
+        }
+
+        $validated = $validator->validated();
 
         if (!Auth::attempt($validated)) {
             return redirect('/login')

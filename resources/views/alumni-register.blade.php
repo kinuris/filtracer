@@ -94,7 +94,7 @@
                     <div class="flex mb-3 mt-3">
                         <div class="flex-1 relative">
                             <label for="contact_number" class="block text-sm font-semibold text-gray-700">Contact Number</label>
-                            <input class="rounded-lg border border-gray-200 p-2 w-full @error('contact_number') border-red-500 @enderror" type="text" placeholder="Contact Number" name="contact_number" id="contact_number" value="{{ old('contact_number') }}">
+                            <input class="rounded-lg border border-gray-200 p-2 w-full @error('contact_number') border-red-500 @enderror" type="number" placeholder="Contact Number" name="contact_number" id="contact_number" value="{{ old('contact_number') }}" maxlength="11" minlength="11">
                             @error('contact_number')
                             <span class="text-red-500 absolute left-0 -bottom-4 text-[11px]">{{ $message }}</span>
                             @enderror
@@ -120,7 +120,10 @@
                         <div class="mx-1"></div>
                         <div class="flex-1 relative">
                             <label for="password_confirmation" class="block text-sm font-semibold text-gray-700">Confirm Password</label>
-                            <input class="rounded-lg border border-gray-200 p-2 w-full" type="password" placeholder="Confirm Password" name="password_confirmation" id="password_confirmation">
+                            <input class="rounded-lg border border-gray-200 p-2 w-full @error('password_confirmation') border-red-500 @enderror" type="password" placeholder="Confirm Password" name="password_confirmation" id="password_confirmation">
+                            @error('password_confirmation')
+                            <span class="text-red-500 absolute left-0 -bottom-8 text-[11px]">{{ $message }}</span>
+                            @enderror
                         </div>
                     </div>
                     @endif
