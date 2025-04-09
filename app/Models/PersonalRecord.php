@@ -39,6 +39,11 @@ class PersonalRecord extends Model implements Auditable
         }
     }
 
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
     public function getFullnameAttribute()
     {
         return $this->getFullname();
@@ -61,6 +66,17 @@ class PersonalRecord extends Model implements Auditable
         return [
             'birthdate' => 'date',
         ];
+    }
+
+    protected static function booted() {
+        static::updated(function ($model) {
+            UserAlert::query()->create([
+                'title' => $model->getFullname() . ' has updated their profile',
+                'action' => '/user/view' . $model->user->id,
+                'content' => 'Alumni ' . $model->getFullname() . ' has updated their personal profile',
+                'user_id' => 1,
+            ]);
+        });
     }
 
     use HasFactory;

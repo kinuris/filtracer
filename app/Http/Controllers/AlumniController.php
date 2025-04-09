@@ -34,6 +34,15 @@ class AlumniController extends Controller
         return view('alumni.settings.display');
     }
 
+    public function deleteAttachment(Request $request, ProfessionalRecordAttachments $attachment)
+    {
+        $attachment->delete();
+
+        return back()
+            ->with('message', 'Attachment deleted successfully')
+            ->with('subtitle', 'The attachment has been removed from your profile.');
+    }
+
     public function resetAlumniPassword(Request $request, User $alumni)
     {
         $validator = Validator::make($request->all(), [

@@ -90,6 +90,7 @@ Route::controller(AlumniController::class)
         Route::post('/alumni/setup/profilepic/{alumni}', 'setupProfilepic');
 
         Route::post('/alumni/password/{alumni}/reset', 'resetAlumniPassword');
+        Route::post('/alumni/delete/attachment/{attachment}', 'deleteAttachment');
 
         Route::get('/settings', 'settingsView');
         Route::get('/settings/alumni/password', 'settingsPasswordView');

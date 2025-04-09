@@ -656,7 +656,7 @@ class AdminController extends Controller
             'phone' => ['required'],
         ]);
 
-        $validated['department_id'] = $validated['department'];
+        $validated['office'] = $validated['department'];
         $validated['email_address'] = $validated['email'];
         $validated['phone_number'] = $validated['phone'];
         $validated['position_id'] = $validated['position'];
@@ -665,7 +665,7 @@ class AdminController extends Controller
             'username' => $validated['username'],
             'email' => $validated['email_address'],
         ]);
-        
+
         $user->admin()->update($validated);
 
         return redirect('/settings/account')->with([

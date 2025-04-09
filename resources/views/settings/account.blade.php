@@ -51,7 +51,7 @@
                                 <select class="w-full text-gray-500 font-thin border rounded-md p-2 bg-gray-50" name="department" id="department">
                                     @php($depts = App\Models\Department::allValid())
                                     @foreach ($depts as $dept)
-                                    <option {{ $user->department->name === $dept->name ? 'selected' : ''}} value="{{ $dept->id }}">{{ $dept->name }}</option>
+                                    <option {{ $user->admin()->officeRelation->name === $dept->name ? 'selected' : ''}} value="{{ $dept->id }}">{{ $dept->name }}</option>
                                     @endforeach
                                 </select>
                             </div>

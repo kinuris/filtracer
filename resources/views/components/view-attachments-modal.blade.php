@@ -10,9 +10,8 @@
             <div class="bg-gray-100 border p-2 rounded-lg">
                 <div class="flex justify-between">
                     <p class="text-sm font-semibold text-slate-600">{{ $attachment->name }}</p>
-                    <form method="POST" action="" onsubmit="return confirm('Are you sure you want to delete this attachment?');">
+                    <form method="POST" action="/alumni/delete/attachment/{{ $attachment->id }}" onsubmit="return confirm('Are you sure you want to delete this attachment?');">
                         @csrf
-                        @method('DELETE')
                         <button type="submit" class="text-sm w-fit font-semibold text-red-600 flex place-items-center">
                             <span class="material-symbols-outlined text-red-600">
                                 delete
