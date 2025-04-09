@@ -118,7 +118,7 @@ class AdminController extends Controller
     public function alumniProfilesView()
     {
         $courses = Course::query()
-            ->where('department_id', '=', Auth::user()->department_id)
+            ->where('department_id', '=', Auth::user()->admin()->office)
             ->get();
 
         return view('alumni.profiles')->with('courses', $courses);
