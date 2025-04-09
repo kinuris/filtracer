@@ -15,15 +15,17 @@ class ChatMessage extends Model
         'chat_group_id'
     ];
 
-    public function getFileName() {
+    public function getFileName()
+    {
         if ($this->type === 'text') {
-           throw new \Exception('Not a file or image'); 
+            throw new \Exception('Not a file or image');
         }
 
         return base64_decode(explode('.', $this->content)[1]);
     }
 
-    public function isFile() {
+    public function isFile()
+    {
         if ($this->type === 'text') {
             return false;
         }
@@ -34,7 +36,8 @@ class ChatMessage extends Model
     }
 
 
-    public function isImage() {
+    public function isImage()
+    {
         if ($this->type === 'text') {
             return false;
         }
@@ -44,7 +47,8 @@ class ChatMessage extends Model
         return $file == 'image/png' || $file == 'image/jpg' || $file == 'image/jpeg';
     }
 
-    public function sender() {
+    public function sender()
+    {
         return $this->belongsTo(User::class, 'sender_id');
     }
 

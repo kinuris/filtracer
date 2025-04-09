@@ -73,7 +73,7 @@ class PersonalRecord extends Model implements Auditable
         static::updated(function ($model) {
             UserAlert::query()->create([
                 'title' => $model->getFullname() . ' has updated their profile',
-                'action' => '/user/view' . $model->user->id,
+                'action' => '/user/view/' . $model->user->id,
                 'content' => 'Alumni ' . $model->getFullname() . ' has updated their personal profile',
                 'user_id' => 1,
             ]);
@@ -81,7 +81,7 @@ class PersonalRecord extends Model implements Auditable
             foreach ($model->user->department->admins as $admin) {
                 useralert::query()->create([
                     'title' => $model->getfullname() . ' has updated their profile',
-                    'action' => '/user/view' . $model->user->id,
+                    'action' => '/user/view/' . $model->user->id,
                     'content' => 'alumni ' . $model->getfullname() . ' has updated their personal profile',
                     'user_id' => $admin->id,
                 ]);

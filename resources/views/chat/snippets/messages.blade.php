@@ -16,6 +16,17 @@
     </div>
     @else
     <div class="self-start mb-2 max-w-80">
+        @php
+            $senderName = '';
+            if(auth()->user()->role === 'Admin' && $message->sender->admin()){
+                $senderName = $message->sender->admin()->fullname;
+            } elseif(auth()->user()->role === 'Alumni' && $message->sender->personalBio){
+                $senderName = $message->sender->personalBio->getFullname();
+            } else {
+                $senderName = $message->sender->name; // Or any default name you want to display
+            }
+        @endphp
+        <p class="text-xs font-semibold">{{ $senderName }}</p>
         @if ($message->type === 'text')
         <p class="font-light text-base bg-gray-200 p-3 rounded-lg rounded-bl-none">{{ $message->content }}</p>
         @elseif ($message->isImage())

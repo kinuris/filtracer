@@ -47,7 +47,7 @@ class EducationRecord extends Model implements Auditable
         static::updated(function ($model) {
             UserAlert::query()->create([
                 'title' => $model->user->getPersonalBio()->getFullname() . ' has updated their rofile',
-                'action' => '/user/view' . $model->user->id,
+                'action' => '/user/view/' . $model->user->id,
                 'content' => 'Alumni ' . $model->user->getPersonalBio()->getFullname() . ' has updated their educational profile',
                 'user_id' => 1,
             ]);
@@ -55,7 +55,7 @@ class EducationRecord extends Model implements Auditable
             foreach ($model->user->department->admins as $admin) {
                 useralert::query()->create([
                     'title' => $model->getfullname() . ' has updated their profile',
-                    'action' => '/user/view' . $model->user->id,
+                    'action' => '/user/view/' . $model->user->id,
                     'content' => 'alumni ' . $model->getfullname() . ' has updated their educational profile',
                     'user_id' => $admin->id,
                 ]);
