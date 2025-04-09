@@ -56,7 +56,7 @@
 </div>
 
 <div class="bg-gray-100 w-full h-full p-8 overflow-auto max-h-[calc(100vh-64px)]">
-    <h1 class="font-medium tracking-widest text-lg mb-4">Alumni Profile Backups</h1>
+    <h1 class="font-medium tracking-widest text-lg mb-4">Database Backups</h1>
 
     <div class="bg-white shadow rounded-lg p-4 mb-4">
         <div class="flex gap-3 items-center">
