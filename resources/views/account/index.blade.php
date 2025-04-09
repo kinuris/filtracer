@@ -87,13 +87,13 @@
                     <td>{{ $user->role }}</td>
                     <td>{{ date_create($user->created_at)->format('Y-m-d') }}</td>
                     @if (request('mode') === 'generated')
-                    <td>{{ $user->username }}</td>
                     <td>
-                        <span class="blur-sm hover:blur-none transition-all duration-200 cursor-pointer" 
-                              onclick="copyToClipboard('{{ $user->adminGenerated->default_password }}', this)">
+                        <span class="blur-sm hover:blur-none transition-all duration-200 cursor-pointer"
+                            onclick="copyToClipboard('{{ $user->adminGenerated->default_password }}', this)">
                             {{ $user->adminGenerated->default_password }}
                         </span>
                     </td>
+                    <td>{{ $user->username }}</td>
                     @endif
                     <td>
                         <div class="flex justify-center w-full place-items-center">
@@ -117,19 +117,19 @@
                             @endif
                             @endif
                             @if (request('mode') === 'generated')
-                                <form method="POST" action="{{ route('sendsms.individual', $user->id) }}" class="inline">
-                                    @csrf
-                                    <input type="hidden" name="user_id" value="{{ $user->id }}">
-                                    <button type="submit" class="relative group mx-3 mt-1.5 border-0 bg-transparent cursor-pointer p-0">
-                                        <svg class="w-5 h-5 text-blue-600" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                            <path d="M22 2L11 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                                            <path d="M22 2L15 22L11 13L2 9L22 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                                        </svg>
-                                        <span class="absolute bottom-full -left-20 transform -translate-x-1/2 bg-black text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap z-10">
-                                            Click this button to send <br>the credentials of the user via SMS<br> Number: {{ $user->partialPersonal->phone_number }}
-                                        </span>
-                                    </button>
-                                </form>
+                            <form method="POST" action="{{ route('sendsms.individual', $user->id) }}" class="inline">
+                                @csrf
+                                <input type="hidden" name="user_id" value="{{ $user->id }}">
+                                <button type="submit" class="relative group mx-3 mt-1.5 border-0 bg-transparent cursor-pointer p-0">
+                                    <svg class="w-5 h-5 text-blue-600" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M22 2L11 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                        <path d="M22 2L15 22L11 13L2 9L22 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                    </svg>
+                                    <span class="absolute bottom-full -left-20 transform -translate-x-1/2 bg-black text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap z-10">
+                                        Click this button to send <br>the credentials of the user via SMS<br> Number: {{ $user->partialPersonal->phone_number }}
+                                    </span>
+                                </button>
+                            </form>
                             @endif
                             <button type="button" onclick="document.getElementById('deleteModal{{ $user->id }}').classList.remove('hidden')" class="border-0 bg-transparent cursor-pointer p-0">
                                 <img src="{{ asset('assets/trash.svg') }}" alt="Trash">
