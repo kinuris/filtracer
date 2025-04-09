@@ -95,14 +95,21 @@
                         </div>
                         <div class="div w-full bg-white/80 backdrop-blur-sm py-3 flex flex-col justify-end absolute px-4 right-0 bottom-0">
                             <div class="flex justify-end">
-                                <input class="border max-w-[calc(100%-26rem)] rounded-l-lg border-r-0 bg-gray-50 font-light text-sm  min-w-72 flex-1 focus:outline-none px-2" placeholder="Type something here..." type="text" name="message" id="message">
-                                <button class="bg-gray-50 border border-l-0 w-10 h-10 flex justify-center place-items-center rounded-r-lg">
-                                    <label class="cursor-pointer p-2" for="attachment">
+                                <input 
+                                    class="border max-w-[calc(100%-26rem)] rounded-l-lg border-r-0 bg-gray-50 font-light text-sm  min-w-72 flex-1 focus:outline-none px-2 @if(isset($association) && $association->status === 'pending') bg-gray-200 cursor-not-allowed @endif" 
+                                    placeholder="@if(isset($association) && $association->status === 'pending') Request Pending @else Type something here...@endif" 
+                                    type="text" 
+                                    name="message" 
+                                    id="message" 
+                                    @if(isset($association) && $association->status === 'pending') disabled @endif
+                                />
+                                <button class="bg-gray-50 border border-l-0 w-10 h-10 flex justify-center place-items-center rounded-r-lg @if(isset($association) && $association->status === 'pending') cursor-not-allowed @endif">
+                                    <label class="cursor-pointer p-2 @if(isset($association) && $association->status === 'pending') cursor-not-allowed @endif" for="attachment">
                                         <img class="w-5 h-5" src="{{ asset('assets/attachment.svg') }}" alt="Attachment">
                                     </label>
                                 </button>
-                                <input class="hidden" type="file" name="attachment" id="attachment" accept="image/png,image/jpg,image/jpeg,application/pdf">
-                                <button id="send" class="shadow bg-blue-600 w-10 h-10 flex justify-center place-items-center rounded-lg ml-3 transition-transform hover:scale-110">
+                                <input class="hidden" type="file" name="attachment" id="attachment" accept="image/png,image/jpg,image/jpeg,application/pdf" @if(isset($association) && $association->status === 'pending') disabled @endif>
+                                <button id="send" class="shadow bg-blue-600 w-10 h-10 flex justify-center place-items-center rounded-lg ml-3 transition-transform hover:scale-110 @if(isset($association) && $association->status === 'pending') opacity-50 cursor-not-allowed @endif" @if(isset($association) && $association->status === 'pending') disabled @endif>
                                     <img class="w-5 h-5" src="{{ asset('assets/send.svg') }}" alt="Send">
                                 </button>
                             </div>
