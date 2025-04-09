@@ -17,12 +17,6 @@
                     <option {{ $status == 1 ? 'selected' : '' }} value="1">Verified</option>
                 </select>
 
-                <select class="pr-1 font-thin text-gray-500" name="user_role" id="user_role">
-                    @php($role = request('user_role') ?? '')
-                    <option {{ $role == 'Alumni' ? 'selected' : '' }} value="Alumni">Alumni</option>
-                    <option {{ $role == 'Admin' ? 'selected' : '' }} value="Admin">Admin</option>
-                </select>
-
                 <button type="submit" class="bg-blue-600 text-white rounded p-2 ml-6">Filter</button>
             </div>
         </form>
