@@ -15,7 +15,8 @@ class Department extends Model
         'logo',
     ];
 
-    public function shortened() {
+    public function shortened()
+    {
         $result = '';
 
         foreach (str_split($this->name) as $char) {
@@ -27,17 +28,25 @@ class Department extends Model
         return $result;
     }
 
-    public function getCourses() {
+    public function admins()
+    {
+        return $this->hasMany(Admin::class, 'office');
+    }
+
+    public function getCourses()
+    {
         return Course::query()->where('department_id', '=', $this->id)->get();
     }
 
-    public function students() {
+    public function students()
+    {
         return $this->hasMany(User::class, 'department_id', 'id')->where('role', '=', 'Alumni');
     }
 
-    public static function allValid() {
+    public static function allValid()
+    {
         return Department::query()->where('name', '!=', 'Admins Assigned')->get();
-    } 
+    }
 
     use HasFactory;
 }

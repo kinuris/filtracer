@@ -51,6 +51,15 @@ class EducationRecord extends Model implements Auditable
                 'content' => 'Alumni ' . $model->user->getPersonalBio()->getFullname() . ' has updated their educational profile',
                 'user_id' => 1,
             ]);
+
+            foreach ($model->user->department->admins as $admin) {
+                useralert::query()->create([
+                    'title' => $model->getfullname() . ' has updated their profile',
+                    'action' => '/user/view' . $model->user->id,
+                    'content' => 'alumni ' . $model->getfullname() . ' has updated their educational profile',
+                    'user_id' => $admin->id,
+                ]);
+            }
         });
     }
 

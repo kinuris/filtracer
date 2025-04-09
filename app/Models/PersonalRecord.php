@@ -68,7 +68,8 @@ class PersonalRecord extends Model implements Auditable
         ];
     }
 
-    protected static function booted() {
+    protected static function booted()
+    {
         static::updated(function ($model) {
             UserAlert::query()->create([
                 'title' => $model->getFullname() . ' has updated their profile',
@@ -76,6 +77,15 @@ class PersonalRecord extends Model implements Auditable
                 'content' => 'Alumni ' . $model->getFullname() . ' has updated their personal profile',
                 'user_id' => 1,
             ]);
+
+            foreach ($model->user->department->admins as $admin) {
+                useralert::query()->create([
+                    'title' => $model->getfullname() . ' has updated their profile',
+                    'action' => '/user/view' . $model->user->id,
+                    'content' => 'alumni ' . $model->getfullname() . ' has updated their personal profile',
+                    'user_id' => $admin->id,
+                ]);
+            }
         });
     }
 

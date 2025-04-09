@@ -104,7 +104,8 @@
             <div class="shadow rounded-lg mt-4">
                 <div class="bg-white py-5 flex flex-col px-6 border-b rounded-lg">
                     <p class="text-blue-600 text-lg font-bold pb-3 border-b border-gray-100">Educational Information</p>
-                    @php ($educational = $user->getEducationalBio())
+                    @php ($educationals = $user->educationalBios)
+                    @foreach ($educationals as $educational)
                     <div class="flex justify-between mt-3">
                         <div class="flex-1 flex-col pr-4">
                             <p class="text-gray-400 text-sm">School</p>
@@ -130,6 +131,8 @@
                             <p class="font-medium">{{ $educational->end }}</p>
                         </div>
                     </div>
+                    <hr class="mt-3">
+                    @endforeach
                 </div>
             </div>
 
