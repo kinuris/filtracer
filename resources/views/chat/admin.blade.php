@@ -80,10 +80,12 @@
                                                 <div class="mt-2 px-7 py-3">
                                                     <p class="text-sm text-gray-500">Are you sure you want to delete this chat? This action cannot be undone.</p>
                                                 </div>
+                                                @if (isset($group))
                                                 <div class="items-center px-4 py-3">
                                                     <button id="closeDeleteChatModal" class="px-4 py-2 bg-gray-500 text-white text-base font-medium rounded-md w-24 mr-2">Cancel</button>
                                                     <a href="/chat/delete/{{ $group->id }}" id="confirmDeleteChat" class="px-4 py-2 bg-red-600 text-white text-base font-medium rounded-md w-24">Delete</a>
                                                 </div>
+                                                @endif
                                             </div>
                                         </div>
                                     </div>
@@ -352,7 +354,9 @@
             const msg = doc.querySelectorAll('.ind-chat-msg');
 
             if (msg && msg.length === 1) {
-                window.location.reload();
+                const url = new URL(window.location.href);
+                url.searchParams.delete('override');
+                window.location.href = url.href;
             }
 
             messages.innerHTML = text;

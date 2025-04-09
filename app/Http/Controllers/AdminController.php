@@ -824,7 +824,7 @@ class AdminController extends Controller
         if ($selected && is_numeric($selected)) {
             $selected = User::query()->find($selected);
 
-            if ($selected->chatGroupWith($user) == null) {
+            if ($selected->chatGroupWith($user) == null && request('override') == null) {
                 return redirect($user->role === 'Admin' ? '/admin/chat' : '/alumni/chat')->with([
                     'failed_message' => 'Chat group not found',
                     'failed_subtitle' => 'The chat group you are trying to access does not exist'
@@ -845,7 +845,7 @@ class AdminController extends Controller
             if ($selected instanceof ChatGroup) {
                 $view->with('association', $selected->associations()->where('user_id', '=', $user->id)->first());
                 $view->with('group', $selected);
-            } elseif ($selected instanceof User) {
+            } elseif ($selected instanceof User && request('override') == null) {
                 $view->with('association', $selected->chatGroupWith($user)->associations()->where('user_id', '=', $user->id)->first());
                 $view->with('group', $selected->chatGroupWith($user));
             }

@@ -71,7 +71,7 @@
             @endif
 
             @if ($user->isCompSet())
-            <a class="rounded-lg p-2 ml-2 px-3 bg-blue-600 text-white" href="/admin/chat?initiate={{ $user->id }}">Message</a>
+            <a class="rounded-lg p-2 ml-2 px-3 bg-blue-600 text-white" href="/admin/chat?initiate={{ $user->id }}&override=1">Message</a>
             @endif
         </div>
     </div>
