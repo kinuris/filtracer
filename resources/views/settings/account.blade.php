@@ -64,6 +64,10 @@
                             <p class="mb-1 font-thin">Email</p>
                             <input value="{{ $user->admin()->email_address }}" class="w-full text-gray-500 font-thin border rounded-md p-2 bg-gray-50" type="email" name="email" id="email">
                         </div>
+                        <div class="mt-3">
+                            <p class="mb-1 font-thin">Username</p>
+                            <input value="{{ $user->username }}" class="w-full text-gray-500 font-thin border rounded-md p-2 bg-gray-50" type="text" name="username" id="username">
+                        </div>
 
                         <div class="mt-3">
                             <p class="mb-1 font-thin">Phone Number</p>

@@ -649,6 +649,7 @@ class AdminController extends Controller
             'middle_name' => ['nullable'],
             'last_name' => ['required'],
             'suffix' => ['nullable'],
+            'username' => ['required', Rule::unique('users')->ignore($user->id)],
             'position' => ['required'],
             'department' => ['required'],
             'email' => ['required'],
@@ -660,7 +661,11 @@ class AdminController extends Controller
         $validated['phone_number'] = $validated['phone'];
         $validated['position_id'] = $validated['position'];
 
-        $user->update($validated);
+        $user->update([
+            'username' => $validated['username'],
+            'email' => $validated['email_address'],
+        ]);
+        
         $user->admin()->update($validated);
 
         return redirect('/settings/account')->with([
