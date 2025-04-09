@@ -219,7 +219,7 @@ class SuperAdminController extends Controller
         $users = User::has('importGenerated');
 
 
-        $importHistoryId = request()->query('import_history');
+        $importHistoryId = request()->query('send_sms_history');
         if ($importHistoryId && $importHistoryId != -1) {
             $userIds = ImportHistory::query()->find($importHistoryId)->importGenerateds()->pluck('user_id')->unique();
 
@@ -242,7 +242,9 @@ class SuperAdminController extends Controller
             });
         }
 
-        $users = $users->paginate(6);
+        $users = $users
+            ->orderBy('created_at', 'desc')
+            ->paginate(6);
 
         return view('superadmin.bulk-create-account')->with('users', $users);
     }

@@ -529,7 +529,9 @@ class AdminController extends Controller
             }
         }
 
-        $users = $users->paginate(6);
+        $users = $users
+            ->orderBy('created_at', 'DESC')
+            ->paginate(6);
 
         return view('account.index')->with('users', $users);
     }
