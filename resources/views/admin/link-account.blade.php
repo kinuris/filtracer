@@ -7,17 +7,6 @@
     <div class="shadow rounded-lg">
         <form action="/fullurl/{{ base64_encode(urlencode(request()->fullUrl())) }}">
             <div class="bg-white py-4 flex items-center px-6 border-b rounded-t-lg">
-                <input value="{{ request('search') ?? '' }}" class="bg-gray-100 px-2 py-1 rounded border min-w-[max(33%,270px)]" placeholder="Search..." type="text" name="search" id="search">
-
-                <div class="flex-1"></div>
-
-                <select class="pr-1 mr-8 font-thin text-gray-500" name="user_status" id="user_status">
-                    <option {{ $status == -1 ? 'selected' : '' }} value="-1">All Accounts</option>
-                    <option {{ $status == 0 ? 'selected' : '' }} value="0">Unverified</option>
-                    <option {{ $status == 1 ? 'selected' : '' }} value="1">Verified</option>
-                </select>
-
-                <button type="submit" class="bg-blue-600 text-white rounded p-2 ml-3">Filter</button>
             </div>
         </form>
 
