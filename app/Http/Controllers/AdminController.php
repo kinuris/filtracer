@@ -234,6 +234,38 @@ class AdminController extends Controller
 
     public function updateAccountFromVerify(Request $request, User $user)
     {
+        if ($user->role === 'Admin') {
+            $validated = $request->validate([
+                'first_name' => ['required', 'string', 'max:255'],
+                'middle_name' => ['nullable', 'string', 'max:255'],
+                'last_name' => ['required', 'string', 'max:255'],
+                'username' => ['required', 'string', 'max:255', Rule::unique('users')->ignore($user->id)],
+                'position_id' => ['required'],
+                'email_address' => ['required', 'string', 'email', 'max:255'],
+                'phone_number' => ['required', 'string', 'max:20'],
+                'office' => ['required', 'exists:departments,id'],
+            ]);
+
+            $user->admin()->update([
+                'first_name' => $validated['first_name'],
+                'middle_name' => $validated['middle_name'],
+                'last_name' => $validated['last_name'],
+                'phone_number' => $validated['phone_number'],
+                'position_id' => $validated['position_id'],
+                'department_id' => $validated['office'],
+            ]);
+
+            $user->update([
+                'username' => $validated['username'],
+                'email' => $validated['email_address'],
+            ]);
+
+            return back()->with([
+                'message' => 'Account updated successfully from verification',
+                'subtitle' => 'The user profile has been updated with the verified information'
+            ]);
+        }
+
         // Validate the request data
         $validated = $request->validate([
             'first_name' => ['required', 'string', 'max:255'],

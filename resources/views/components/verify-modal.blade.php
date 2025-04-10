@@ -77,11 +77,9 @@
                 <button type="button" id="closeVerifyModal" class="mr-2 px-4 py-2 bg-white text-blue-500 border border-blue-500 rounded">Cancel</button>
                 <a class="bg-blue-500 text-white px-4 py-2 rounded mr-2" href="/admin/useraccount/verify/{{ $user->id }}">Verify</a>
                 @php($user = App\Models\User::query()->find($id))
-                @if ($user->role !== 'Admin')
                 <button type="button" id="editButton" class="bg-blue-500 text-white px-4 py-2 rounded cursor-pointer">
                     Edit
                 </button>
-                @endif
             </div>
         </div>
 
@@ -123,11 +121,6 @@
                 <div>
                     <label>Last Name</label>
                     <input name="last_name" class="w-full p-2 border rounded" value="{{ $user->admin()->last_name }}">
-                </div>
-
-                <div>
-                    <label>Suffix</label>
-                    <input name="suffix" class="w-full p-2 border rounded" value="{{ $user->admin()->suffix }}">
                 </div>
                 @endif
 
@@ -278,7 +271,8 @@
 
                 <div>
                     <label>Office</label>
-                    <input name="office" class="w-full p-2 border rounded" value="{{ $user->admin()->office }}">
+                    <input type="hidden" name="office" value="{{ $user->admin()->office }}">
+                    <input readonly disabled class="w-full p-2 border rounded" value="{{ $user->admin()->officeRelation->name }}">
                 </div>
                 @endif
             </div>

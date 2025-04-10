@@ -76,12 +76,10 @@
             <div class="mt-4 flex">
                 <button type="button" id="closeUnverifyModal" class="mr-2 px-4 py-2 bg-white text-blue-500 border border-blue-500 rounded">Cancel</button>
                 <a class="bg-blue-500 text-white px-4 py-2 rounded mr-2" href="/admin/useraccount/unverify/{{ $user->id }}">Unverify</a>
-                @php($user = Auth::user())
-                @if ($user->role !== 'Admin' && $user->admin()->is_super)
+                @php($user = App\Models\User::query()->find($id))
                 <button type="button" id="unverifyEditButton" class="bg-blue-500 text-white px-4 py-2 rounded cursor-pointer">
                     Edit
                 </button>
-                @endif
             </div>
         </div>
 
@@ -123,11 +121,6 @@
                 <div>
                     <label>Last Name</label>
                     <input name="last_name" class="w-full p-2 border rounded" value="{{ $user->admin()->last_name }}">
-                </div>
-
-                <div>
-                    <label>Suffix</label>
-                    <input name="suffix" class="w-full p-2 border rounded" value="{{ $user->admin()->suffix }}">
                 </div>
                 @endif
 
@@ -278,7 +271,8 @@
 
                 <div>
                     <label>Office</label>
-                    <input name="office" class="w-full p-2 border rounded" value="{{ $user->admin()->office }}">
+                    <input type="hidden" name="office" value="{{ $user->admin()->office }}">
+                    <input readonly disabled class="w-full p-2 border rounded" value="{{ $user->admin()->officeRelation->name }}">
                 </div>
                 @endif
             </div>
@@ -286,6 +280,7 @@
             <div class="mt-4 flex">
                 <button type="button" id="cancelUnverifyEdit" class="mr-2 px-4 py-2 bg-white text-blue-500 border border-blue-500 rounded">Cancel</button>
                 <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">Save Changes</button>
+
             </div>
         </form>
     </div>
