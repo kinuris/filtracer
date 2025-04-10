@@ -35,7 +35,7 @@ class BackupController extends Controller
 
     public function startBackup()
     {
-        $databaseName = env('DB_DATABASE');
+        $databaseName = 'db_filtracer';
         $backupName = 'backup_' . date('Y_m_d_H_i_s');
 
         $sql = '';
