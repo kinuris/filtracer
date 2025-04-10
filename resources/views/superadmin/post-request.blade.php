@@ -7,7 +7,7 @@
 @php
 $post = $posts->where('id', request('view_post_modal'))->first();
 @endphp
-<div class="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center z-50 overflow-auto">
+<div class="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center z-50">
     <div class="bg-white rounded-lg shadow-lg w-1/3 min-w-[400px] max-h-[90vh]">
         <div class="p-4 flex items-center">
             <h2 class="font-semibold">Post Details</h2>
@@ -17,7 +17,7 @@ $post = $posts->where('id', request('view_post_modal'))->first();
             <p class="text-xs">{{ $post->created_at->format('Y-m-d') }}</p>
         </div>
         <hr>
-        <div class="p-4 overflow-y-auto max-h-[calc(90vh - 6rem)]">
+        <div class="p-4 overflow-y-auto max-h-[calc(90vh - 6rem)] overflow-auto">
             <div class="mb-4">
                 <label class="block font-medium text-sm">Title</label>
                 <input type="text" value="{{ $post->title }}" class="bg-gray-100 border rounded p-2 w-full" readonly>
