@@ -265,7 +265,7 @@
                 </div>
 
                 <div>
-                    <label>Position ID</label>
+                    <label>Employee No.</label>
                     <input name="position_id" class="w-full p-2 border rounded" value="{{ $user->admin()->position_id }}">
                 </div>
 

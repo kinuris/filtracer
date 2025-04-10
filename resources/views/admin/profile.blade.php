@@ -12,7 +12,7 @@
             <img class="w-32 h-32 rounded-full object-cover shadow-md mr-8" src="{{ $user->image() }}" alt="Profile">
             <div class="flex flex-col">
                 <p class="text-lg">{{ $user->name }}</p>
-                <p class="text-gray-400 text-sm">{{ $user->department->name }} / {{ $user->admin()->is_super ? 'Superadmin' : 'Admin' }}</p>
+                <p class="text-gray-400 text-sm">{{ $user->admin()->officeRelation->name }} / {{ $user->admin()->is_super ? 'Superadmin' : 'Admin' }}</p>
             </div>
 
             <div class="flex-1"></div>
@@ -41,7 +41,7 @@
 
                 <div class="flex mt-4">
                     <div class="flex flex-1">
-                        <p class="flex-[2] text-gray-500">Company ID</p>
+                        <p class="flex-[2] text-gray-500">Employee ID</p>
                         <p class="flex-[5] font-bold">{{ $user->admin()->position_id }}</p>
                     </div>
                     <div class="flex flex-1">
@@ -54,7 +54,7 @@
                     @if (!$user->admin()->is_super)
                     <div class="flex flex-1">
                         <p class="flex-[2] text-gray-500">Office</p>
-                        <p class="flex-[5] font-bold">{{ $user->department->name }}</p>
+                        <p class="flex-[5] font-bold">{{ $user->admin()->officeRelation->name }}</p>
                     </div>
                     @endif
                     <div class="flex @if($user->admin()->is_super) w-1/2 @else flex-1 @endif">

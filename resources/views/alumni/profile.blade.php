@@ -30,7 +30,7 @@
 
                 <p class="text-gray-400 mt-4">Alumni Batch</p>
                 @php($bio = $user->getEducationalBio())
-                <p>S.Y. {{ $bio->start }} - {{ $bio->end }}</p>
+                <p>{{ $bio->end }}</p>
 
                 <p class="text-gray-400 mt-4">Date Joined</p>
                 <p>{{ $user->created_at->format('M. d, Y') }}</p>
