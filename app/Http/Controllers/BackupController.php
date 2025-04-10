@@ -39,8 +39,8 @@ class BackupController extends Controller
         $backupName = 'backup_' . date('Y_m_d_H_i_s');
 
         $sql = '';
-        
-        $tables = DB::select("SHOW TABLES FROM $databaseName");
+
+        $tables = DB::select("SHOW TABLES FROM `$databaseName`");
 
         foreach ($tables as $table) {
             $tableName = array_values((array)$table)[0];
