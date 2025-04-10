@@ -138,7 +138,7 @@ class AdminController extends Controller
             TEXT;
 
         SendSMSAsyncJob::dispatch(
-            $user->partialPersonal->philSMSNum(),
+            $user->role === 'Admin' ? $user->admin()->philSMSNum() : $user->partialPersonal->philSMSNum(),
             $content,
         );
 
