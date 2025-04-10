@@ -77,13 +77,34 @@
                 </div>
 
                 <div class="flex flex-wrap -mx-2 mt-6 mb-4">
-                    <div class="w-full md:w-1/2 lg:w-1/2 px-2">
+                    <div class="w-full md:w-1/2 lg:w-1/2 px-2 relative">
                         <label for="password" class="block text-gray-700">Password</label>
                         <input type="password" name="password" id="password" class="w-full px-3 py-2 border rounded-lg @error('password') border-red-500 @enderror" placeholder="Enter your password">
+                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
+                            <span id="password-toggle" class="material-symbols-outlined cursor-pointer text-gray-500 hover:text-gray-700">
+                                visibility
+                            </span>
+                        </div>
                         @error('password')
                         <span class="text-red-500 text-sm">{{ $message }}</span>
                         @enderror
                     </div>
+                    <script>
+                        document.addEventListener('DOMContentLoaded', function() {
+                            const passwordInput = document.getElementById('password');
+                            const passwordToggle = document.getElementById('password-toggle');
+
+                            passwordToggle.addEventListener('click', function() {
+                                if (passwordInput.type === 'password') {
+                                    passwordInput.type = 'text';
+                                    passwordToggle.textContent = 'visibility_off';
+                                } else {
+                                    passwordInput.type = 'password';
+                                    passwordToggle.textContent = 'visibility';
+                                }
+                            });
+                        });
+                    </script>
                     <div class="w-full md:w-1/2 lg:w-1/2 px-2">
                         <label for="department" class="block text-gray-700">Department</label>
                         <select name="department" id="department" class="w-full px-3 py-2 border rounded-lg @error('department') border-red-500 @enderror" required>
@@ -175,13 +196,34 @@
                         <span class="text-red-500 text-sm">{{ $message }}</span>
                         @enderror
                     </div>
-                    <div class="w-full md:w-1/2 px-2 mb-4">
+                    <div class="w-full md:w-1/2 px-2 mb-4 relative">
                         <label for="password" class="block text-gray-700">Password</label>
                         <input type="password" name="password" id="password" class="w-full px-3 py-2 border rounded-lg @error('password') border-red-500 @enderror" placeholder="Enter your password">
+                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
+                            <span id="password-toggle" class="material-symbols-outlined cursor-pointer text-gray-500 hover:text-gray-700">
+                                visibility
+                            </span>
+                        </div>
                         @error('password')
                         <span class="text-red-500 text-sm">{{ $message }}</span>
                         @enderror
                     </div>
+                    <script>
+                        document.addEventListener('DOMContentLoaded', function() {
+                            const passwordInput = document.getElementById('password');
+                            const passwordToggle = document.getElementById('password-toggle');
+
+                            passwordToggle.addEventListener('click', function() {
+                                if (passwordInput.type === 'password') {
+                                    passwordInput.type = 'text';
+                                    passwordToggle.textContent = 'visibility_off';
+                                } else {
+                                    passwordInput.type = 'password';
+                                    passwordToggle.textContent = 'visibility';
+                                }
+                            });
+                        });
+                    </script>
                 </div>
 
                 <div class="flex justify-end">

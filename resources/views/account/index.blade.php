@@ -57,8 +57,8 @@
                 <th class="font-thin">Role</th>
                 <th class="font-thin">Date Registered</th>
                 @if (request('mode') === 'generated')
-                <th class="font-thin">Username</th>
                 <th class="font-thin">Password</th>
+                <th class="font-thin">Username</th>
                 @endif
                 <th class="font-thin">Action</th>
             </thead>
@@ -126,7 +126,7 @@
                                         <path d="M22 2L15 22L11 13L2 9L22 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
                                     </svg>
                                     <span class="absolute bottom-full -left-20 transform -translate-x-1/2 bg-black text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap z-10">
-                                        Click this button to send <br>the credentials of the user via SMS<br> Number: {{ $user->partialPersonal->phone_number }}
+                                        Click this button to send <br>the credentials of the user via SMS<br> Number: {{ $user->role === 'Admin' ? $user->admin()->phone_number : $user->partialPersonal->phone_number }}
                                     </span>
                                 </button>
                             </form>
