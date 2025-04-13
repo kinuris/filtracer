@@ -267,7 +267,45 @@ class AlumniController extends Controller
 
         $educ->update($validated);
 
-        return back()
+        // Get previous URL and parse it
+        $previousUrl = url()->previous();
+        $urlComponents = parse_url($previousUrl);
+        $queryParams = [];
+        if (isset($urlComponents['query'])) {
+            parse_str($urlComponents['query'], $queryParams);
+        }
+
+        // Define prefixes to remove
+        $unwantedPrefixes = ['school_', 'course_', 'degree_type_'];
+
+        // Filter out parameters starting with the unwanted prefixes
+        $filteredParams = [];
+        foreach ($queryParams as $key => $value) {
+            $remove = false;
+            foreach ($unwantedPrefixes as $prefix) {
+                if (\Illuminate\Support\Str::startsWith($key, $prefix)) {
+                    $remove = true;
+                    break;
+                }
+            }
+            if (!$remove) {
+                $filteredParams[$key] = $value;
+            }
+        }
+
+        // Rebuild the URL
+        $newQueryString = http_build_query($filteredParams);
+        $newUrl = ($urlComponents['scheme'] ?? 'http') . '://' . ($urlComponents['host'] ?? '');
+        if (isset($urlComponents['port'])) {
+            $newUrl .= ':' . $urlComponents['port'];
+        }
+        $newUrl .= ($urlComponents['path'] ?? '/');
+        if (!empty($newQueryString)) {
+            $newUrl .= '?' . $newQueryString;
+        }
+
+        // Redirect to the cleaned URL with flash messages
+        return redirect($newUrl)
             ->with('message', 'Education record updated successfully!')
             ->with('subtitle', 'Your tertiary education information has been updated in your profile.');
     }
