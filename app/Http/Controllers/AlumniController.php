@@ -467,7 +467,7 @@ class AlumniController extends Controller
             'permanent_address' => ['required'],
             'current_address' => ['required'],
             'email' => ['required', 'email'],
-            'phone_number' => ['required', 'unique:personal_records,phone_number'],
+            'phone_number' => ['required'],
             'social_link' => ['nullable'],
         ]);
 
