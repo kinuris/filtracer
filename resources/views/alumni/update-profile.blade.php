@@ -470,6 +470,30 @@ $statuses = [
 
 @section('script')
 <script>
+    // Save scroll position before page reload
+    function saveScrollPosition() {
+        sessionStorage.setItem('scrollPosition', mainContentArea.scrollTop);
+    }
+
+    // Add event listeners to all elements that trigger page reload
+    document.querySelectorAll('.sync-url-on-change').forEach(el => {
+        el.addEventListener('change', saveScrollPosition);
+    });
+
+    if (document.getElementById('clearEducationalChangesBtn')) {
+        document.getElementById('clearEducationalChangesBtn').addEventListener('click', saveScrollPosition);
+    }
+
+    // Restore scroll position after page load
+    document.addEventListener('DOMContentLoaded', () => {
+        const savedPosition = sessionStorage.getItem('scrollPosition');
+        if (savedPosition) {
+            mainContentArea.scrollTop = parseInt(savedPosition);
+            sessionStorage.removeItem('scrollPosition'); // Clear stored position
+        }
+    });
+</script>
+<script>
     const upload = document.getElementById('upload');
     const changeProfile = document.getElementById('change-profile');
     const userProfile = document.getElementById('user-profile');
