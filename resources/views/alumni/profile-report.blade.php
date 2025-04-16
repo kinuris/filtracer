@@ -77,9 +77,9 @@
                 </div>
 
                 <p class="mt-6 font-bold tracking-wider text-lg text-blue-600">Educational Information</p>
-                <div class="flex mt-4 border-b pb-4">
+                <div class="grid grid-cols-2 gap-8 mt-4 border-b pb-4">
                     @foreach($alumni->educationalBios()->get() as $educ)
-                    <div class="flex mr-8">
+                    <div class="flex p-2 @if($loop->first) border-l-4 border-blue-300 @endif @if($loop->last) border-r-4 border-green-300 @endif">
                         <div class="flex flex-col mr-8 font-semibold gap-3">
                             <p>Degree Type</p>
                             <p>Course</p>

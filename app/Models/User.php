@@ -472,7 +472,7 @@ class User extends Authenticatable
 
     public function getProfessionalBio(): null | ProfessionalRecord
     {
-        return ProfessionalRecord::query()->where('user_id', '=', $this->id)->first();
+        return ProfessionalRecord::query()->where('user_id', '=', $this->id)->latest()->first();
     }
 
     public function professionalRecords()
