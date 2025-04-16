@@ -61,9 +61,9 @@ class ProfessionalRecord extends Model implements Auditable
 
             foreach ($model->user->department->admins as $admin) {
                 useralert::query()->create([
-                    'title' => $model->getfullname() . ' has updated their profile',
+                    'title' => $model->user->personalBio->getFullname() . ' has updated their profile',
                     'action' => '/user/view/' . $model->user->id,
-                    'content' => 'alumni ' . $model->getfullname() . ' has updated their professional profile',
+                    'content' => 'alumni ' . $model->user->personalBio->getFullname() . ' has updated their professional profile',
                     'user_id' => $admin->id,
                 ]);
             }

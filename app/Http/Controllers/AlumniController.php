@@ -383,7 +383,7 @@ class AlumniController extends Controller
             ->with('subtitle', 'Your professional information has been saved to your profile.');
     }
 
-    public function updateProfBio(Request $request, User $alumni)
+    public function updateProfBio(Request $request, ProfessionalRecord $record, User $alumni)
     {
         $validated = $request->validate([
             'employment_status' => ['required'],
@@ -391,7 +391,7 @@ class AlumniController extends Controller
             'employment_type2' => ['required'],
             'industry' => ['required'],
             'job_title' => ['required'],
-            'company' => ['required'],
+            'company_name' => ['required'],
             'monthly_salary' => ['required'],
             'work_location' => ['required'],
             'waiting_time' => ['required'],
@@ -402,10 +402,8 @@ class AlumniController extends Controller
             'certs.*' => ['nullable', 'mimes:pdf']
         ]);
 
-        $validated['company_name'] = $validated['company'];
-
-        $alumni->getProfessionalBio()->update($validated);
-        $prof = $alumni->getProfessionalBio();
+        $prof = $record;
+        $prof->update($validated);
 
         if ($request->hasFile('certs')) {
             $prof->attachments()->delete();
@@ -587,6 +585,15 @@ class AlumniController extends Controller
             ->with('subtitle', 'Your professional information has been saved. Finally, let\'s add your profile picture.');
     }
 
+    public function deleteProfbio(Request $request, ProfessionalRecord $record)
+    {
+        $record->delete();
+
+        return redirect('/alumni/profile/update?type=professional')
+            ->with('message', 'Professional record deleted successfully')
+            ->with('subtitle', 'Your professional information has been removed from your profile.');
+    }
+
     public function setupProfilepicView()
     {
         if (Auth::user()->personalBio === null) {
@@ -739,5 +746,73 @@ class AlumniController extends Controller
         $posts = $posts->latest()->get();
 
         return view('post.alumni')->with('posts', $posts);
+    }
+
+    public function createProfessionalRecordView(User $alumni)
+    {
+        return view('alumni.professional-record-create')->with('user', $alumni);
+    }
+
+    public function storeProfessionalRecord(Request $request, User $alumni)
+    {
+        $validated = $request->validate([
+            'employment_status' => ['required'],
+            'employment_type1' => ['required'],
+            'employment_type2' => ['required'],
+            'industry' => ['required'],
+            'job_title' => ['required'],
+            'company_name' => ['required'],
+            'monthly_salary' => ['required'],
+            'work_location' => ['required'],
+            'waiting_time' => ['required'],
+            'hard_skills' => ['nullable', 'array'], // Validate as array
+            'soft_skills' => ['nullable', 'array'], // Validate as array
+            'methods' => ['nullable', 'array'],     // Validate as array
+            'certs' => ['nullable', 'array'],
+            'certs.*' => ['nullable', 'mimes:pdf']
+        ]);
+
+        $prof =
+            \App\Models\ProfessionalRecord::query()->create(array_merge([
+                'user_id' => $alumni->id,
+            ], $validated));
+
+        // Handle skills and methods using validated arrays
+        foreach ($validated['hard_skills'] ?? [] as $skill) {
+            if ($skill) \App\Models\ProfessionalRecordHardSkill::query()->create([
+                'professional_record_id' => $prof->id,
+                'skill' => trim($skill), // Trim potential whitespace
+            ]);
+        }
+        foreach ($validated['soft_skills'] ?? [] as $skill) {
+            if ($skill) \App\Models\ProfessionalRecordSoftSkill::query()->create([
+                'professional_record_id' => $prof->id,
+                'skill' => trim($skill), // Trim potential whitespace
+            ]);
+        }
+        foreach ($validated['methods'] ?? [] as $method) {
+            if ($method) \App\Models\ProfessionalRecordMethod::query()->create([
+                'professional_record_id' => $prof->id,
+                'method' => trim($method), // Trim potential whitespace
+            ]);
+        }
+        // Handle certifications
+        if ($request->hasFile('certs')) {
+            foreach ($request->file('certs') as $cert) {
+                $ext = $cert->extension();
+                $name = $cert->getClientOriginalName();
+                $filename = sha1(time() . $cert->getClientOriginalName());
+                $cert->storePubliclyAs('public/professional/attachments/', $filename . '.' . $ext);
+                \App\Models\ProfessionalRecordAttachments::query()->create([
+                    'professional_record_id' => $prof->id,
+                    'type' => $cert->getClientMimeType(),
+                    'name' => $name,
+                    'link' => $filename . '.' . $ext,
+                ]);
+            }
+        }
+        return redirect('/alumni/profile/update?type=professional')
+            ->with('message', 'Professional record added successfully!')
+            ->with('subtitle', 'Your professional information has been saved to your profile.');
     }
 }

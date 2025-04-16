@@ -91,6 +91,7 @@ Route::controller(AlumniController::class)
 
         Route::post('/alumni/password/{alumni}/reset', 'resetAlumniPassword');
         Route::post('/alumni/delete/attachment/{attachment}', 'deleteAttachment');
+        Route::get('/alumni/delete/attachment/{attachment}', 'deleteAttachment');
 
         Route::get('/settings', 'settingsView');
         Route::get('/settings/alumni/password', 'settingsPasswordView');
@@ -112,8 +113,12 @@ Route::controller(AlumniController::class)
 
             Route::post('/alumni/profile/update/primsec/{primsec}/{alumni}', 'updatePrimarySecondary');
 
+            Route::get('/profbio/delete/{record}', 'deleteProfBio');
             Route::post('/profbio/create/{alumni}', 'createProfBio');
-            Route::post('/profbio/update/{alumni}', 'updateProfBio');
+            Route::post('/profbio/update/{record}/{alumni}', 'updateProfBio');
+
+            Route::get('/alumni/professional/create/{alumni}', 'createProfessionalRecordView')->name('alumni.professional.create');
+            Route::post('/alumni/professional/store/{alumni}', 'storeProfessionalRecord')->name('alumni.professional.store');
 
             Route::get('/alumni/chat', 'chatView');
 

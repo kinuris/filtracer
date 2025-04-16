@@ -216,102 +216,119 @@
         @endif
 
         @if ($query === 'professional' && $user->getProfessionalBio() !== null)
-        @php($prof = $user->getProfessionalBio())
+        @php ($records = $user->professionalBios)
         <div class="flex flex-col h-full">
-            <div class="flex gap-4">
-                <div class="flex flex-col justify-between flex-1 mx-1 h-fit">
-                    <p class="text-xs font-semibold mb-1.5 tracking-wider text-gray-700">Employment Status</p>
-                    <p class="border p-2 rounded-md text-gray-800 bg-gray-50 shadow-inner">{{ $prof->employment_status }}</p>
+            @foreach($records as $prof)
+            <div class="mb-6 border-b pb-6 last:border-b-0 last:pb-0 last:mb-0">
+                <div class="flex gap-4">
+                    <div class="flex flex-col justify-between flex-1 mx-1 h-fit">
+                        <p class="text-xs font-semibold mb-1.5 tracking-wider text-gray-700">Employment Status</p>
+                        <p class="border p-2 rounded-md {{ empty($prof->employment_status) ? 'bg-gray-100 text-gray-400 italic' : 'bg-gray-50 text-gray-800' }} shadow-inner">{{ !empty($prof->employment_status) ? $prof->employment_status : 'None' }}</p>
+                    </div>
+                    <div class="flex flex-col justify-between flex-1 mx-1 h-fit">
+                        <p class="text-xs font-semibold mb-1.5 tracking-wider text-gray-700">Current Job Title</p>
+                        <p class="border p-2 rounded-md {{ empty($prof->job_title) ? 'bg-gray-100 text-gray-400 italic' : 'bg-gray-50 text-gray-800' }} shadow-inner">{{ !empty($prof->job_title) ? $prof->job_title : 'None' }}</p>
+                    </div>
                 </div>
-                <div class="flex flex-col justify-between flex-1 mx-1 h-fit">
-                    <p class="text-xs font-semibold mb-1.5 tracking-wider text-gray-700">Current Job Title</p>
-                    <p class="border p-2 rounded-md text-gray-800 bg-gray-50 shadow-inner">{{ $prof->job_title }}</p>
-                </div>
-            </div>
 
-            <div class="flex mt-4 gap-4">
-                <div class="flex flex-col justify-between flex-1 mx-1 h-fit">
-                    <p class="text-xs font-semibold mb-1.5 tracking-wider text-gray-700">Employment Type 1</p>
-                    <p class="border p-2 rounded-md text-gray-800 bg-gray-50 shadow-inner">{{ $prof->employment_type1 }}</p>
+                <div class="flex mt-4 gap-4">
+                    <div class="flex flex-col justify-between flex-1 mx-1 h-fit">
+                        <p class="text-xs font-semibold mb-1.5 tracking-wider text-gray-700">Employment Type 1</p>
+                        <p class="border p-2 rounded-md {{ empty($prof->employment_type1) ? 'bg-gray-100 text-gray-400 italic' : 'bg-gray-50 text-gray-800' }} shadow-inner">{{ !empty($prof->employment_type1) ? $prof->employment_type1 : 'None' }}</p>
+                    </div>
+                    <div class="flex flex-col justify-between flex-1 mx-1 h-fit">
+                        <p class="text-xs font-semibold mb-1.5 tracking-wider text-gray-700">Company / Employer</p>
+                        <p class="border p-2 rounded-md {{ empty($prof->company_name) ? 'bg-gray-100 text-gray-400 italic' : 'bg-gray-50 text-gray-800' }} shadow-inner">{{ !empty($prof->company_name) ? $prof->company_name : 'None' }}</p>
+                    </div>
                 </div>
-                <div class="flex flex-col justify-between flex-1 mx-1 h-fit">
-                    <p class="text-xs font-semibold mb-1.5 tracking-wider text-gray-700">Company / Employer</p>
-                    <p class="border p-2 rounded-md text-gray-800 bg-gray-50 shadow-inner">{{ $prof->company_name }}</p>
-                </div>
-            </div>
 
-            <div class="flex mt-4 gap-4">
-                <div class="flex flex-col justify-between flex-1 mx-1 h-fit">
-                    <p class="text-xs font-semibold mb-1.5 tracking-wider text-gray-700">Employment Type 2</p>
-                    <p class="border p-2 rounded-md text-gray-800 bg-gray-50 shadow-inner">{{ $prof->employment_type2 }}</p>
+                <div class="flex mt-4 gap-4">
+                    <div class="flex flex-col justify-between flex-1 mx-1 h-fit">
+                        <p class="text-xs font-semibold mb-1.5 tracking-wider text-gray-700">Employment Type 2</p>
+                        <p class="border p-2 rounded-md {{ empty($prof->employment_type2) ? 'bg-gray-100 text-gray-400 italic' : 'bg-gray-50 text-gray-800' }} shadow-inner">{{ !empty($prof->employment_type2) ? $prof->employment_type2 : 'None' }}</p>
+                    </div>
+                    <div class="flex flex-col justify-between flex-1 mx-1 h-fit">
+                        <p class="text-xs font-semibold mb-1.5 tracking-wider text-gray-700">Monthly Salary Range</p>
+                        <p class="border p-2 rounded-md {{ empty($prof->monthly_salary) ? 'bg-gray-100 text-gray-400 italic' : 'bg-gray-50 text-gray-800' }} shadow-inner">{{ !empty($prof->monthly_salary) ? $prof->monthly_salary . ' PHP' : 'None' }}</p>
+                    </div>
                 </div>
-                <div class="flex flex-col justify-between flex-1 mx-1 h-fit">
-                    <p class="text-xs font-semibold mb-1.5 tracking-wider text-gray-700">Monthly Salary Range</p>
-                    <p class="border p-2 rounded-md text-gray-800 bg-gray-50 shadow-inner">{{ $prof->monthly_salary }} PHP</p>
-                </div>
-            </div>
 
-            <div class="flex mt-4 gap-4 border-b pb-6 mb-6">
-                <div class="flex flex-col justify-between flex-1 mx-1 h-fit">
-                    <p class="text-xs font-semibold mb-1.5 tracking-wider text-gray-700">Industry</p>
-                    <p class="border p-2 rounded-md text-gray-800 bg-gray-50 shadow-inner">{{ $prof->industry }}</p>
+                <div class="flex mt-4 gap-4">
+                    <div class="flex flex-col justify-between flex-1 mx-1 h-fit">
+                        <p class="text-xs font-semibold mb-1.5 tracking-wider text-gray-700">Industry</p>
+                        <p class="border p-2 rounded-md {{ empty($prof->industry) ? 'bg-gray-100 text-gray-400 italic' : 'bg-gray-50 text-gray-800' }} shadow-inner">{{ !empty($prof->industry) ? $prof->industry : 'None' }}</p>
+                    </div>
+                    <div class="flex flex-col justify-between flex-1 mx-1 h-fit">
+                        <p class="text-xs font-semibold mb-1.5 tracking-wider text-gray-700">Location</p>
+                        <p class="border p-2 rounded-md {{ empty($prof->work_location) ? 'bg-gray-100 text-gray-400 italic' : 'bg-gray-50 text-gray-800' }} shadow-inner">{{ !empty($prof->work_location) ? $prof->work_location : 'None' }}</p>
+                    </div>
                 </div>
-                <div class="flex flex-col justify-between flex-1 mx-1 h-fit">
-                    <p class="text-xs font-semibold mb-1.5 tracking-wider text-gray-700">Location</p>
-                    <p class="border p-2 rounded-md text-gray-800 bg-gray-50 shadow-inner">{{ $prof->work_location }}</p>
-                </div>
-            </div>
 
-            <div class="flex gap-4 mb-6">
-                <div class="flex flex-col justify-between flex-1 mx-1 h-fit">
-                    <p class="text-xs font-semibold mb-1.5 tracking-wider text-gray-700">Waiting Time</p>
-                    <p class="border p-2 rounded-md text-gray-800 bg-gray-50 shadow-inner">{{ $prof->waiting_time }}</p>
+                <div class="flex mt-4 gap-4">
+                    <div class="flex flex-col justify-between flex-1 mx-1 h-fit">
+                        <p class="text-xs font-semibold mb-1.5 tracking-wider text-gray-700">Waiting Time</p>
+                        <p class="border p-2 rounded-md {{ empty($prof->waiting_time) ? 'bg-gray-100 text-gray-400 italic' : 'bg-gray-50 text-gray-800' }} shadow-inner">{{ !empty($prof->waiting_time) ? $prof->waiting_time : 'None' }}</p>
+                    </div>
+                    <div class="flex flex-col flex-1 mx-1"></div>
                 </div>
-                <div class="flex flex-col flex-1 mx-1"></div>
-            </div>
 
-            <div class="grid grid-cols-2 gap-8 mb-6">
-                <div>
-                    <h3 class="text-sm font-semibold text-gray-700 mb-3">Job Search Method(s)</h3>
-                    <ul class="list-disc pl-5 space-y-1">
-                        @php($methods = $prof->methods)
-                        @foreach ($methods as $method)
-                        <li class="text-gray-700">{{ $method->method }}</li>
-                        @endforeach
-                    </ul>
+                <div class="grid grid-cols-2 gap-8 mt-6">
+                    <div>
+                        <h3 class="text-sm font-semibold text-gray-700 mb-3">Job Search Method(s)</h3>
+                        @if($prof->methods->isNotEmpty())
+                        <ul class="list-disc pl-5 space-y-1">
+                            @foreach ($prof->methods as $method)
+                            <li class="text-gray-700">{{ $method->method }}</li>
+                            @endforeach
+                        </ul>
+                        @else
+                        <p class="text-gray-500 italic">None</p>
+                        @endif
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-semibold text-gray-700 mb-3">Attachment(s)</h3>
+                        @if($prof->attachments->isNotEmpty())
+                        <div class="space-y-2">
+                            @foreach ($prof->attachments as $attachment)
+                            <a class="text-blue-600 hover:text-blue-800 underline block" href="{{ asset('storage/professional/attachments/' . $attachment->link) }}" target="_blank">
+                                {{ $attachment->name }}
+                            </a>
+                            @endforeach
+                        </div>
+                        @else
+                        <p class="text-gray-500 italic">None</p>
+                        @endif
+                    </div>
                 </div>
-                <div>
-                    <h3 class="text-sm font-semibold text-gray-700 mb-3">Attachment(s)</h3>
-                    <div class="space-y-2">
-                        @foreach ($prof->attachments as $attachment)
-                        <a class="text-blue-600 hover:text-blue-800 underline block" href="{{ asset('storage/professional/attachments/' . $attachment->link) }}" target="_blank">
-                            {{ $attachment->name }}
-                        </a>
-                        @endforeach
+
+                <div class="grid grid-cols-2 gap-8 mt-6">
+                    <div>
+                        <h3 class="text-sm font-semibold text-gray-700 mb-3">Hard Skill(s)</h3>
+                        @if($prof->hardSkills->isNotEmpty())
+                        <ul class="list-disc pl-5 space-y-1">
+                            @foreach ($prof->hardSkills as $skill)
+                            <li class="text-gray-700">{{ $skill->skill }}</li>
+                            @endforeach
+                        </ul>
+                        @else
+                        <p class="text-gray-500 italic">None</p>
+                        @endif
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-semibold text-gray-700 mb-3">Soft Skill(s)</h3>
+                        @if($prof->softSkills->isNotEmpty())
+                        <ul class="list-disc pl-5 space-y-1">
+                            @foreach ($prof->softSkills as $skill)
+                            <li class="text-gray-700">{{ $skill->skill }}</li>
+                            @endforeach
+                        </ul>
+                        @else
+                        <p class="text-gray-500 italic">None</p>
+                        @endif
                     </div>
                 </div>
             </div>
-
-            <div class="grid grid-cols-2 gap-8">
-                <div>
-                    <h3 class="text-sm font-semibold text-gray-700 mb-3">Hard Skill(s)</h3>
-                    <ul class="list-disc pl-5 space-y-1">
-                        @php($hardSkills = $prof->hardSkills)
-                        @foreach ($hardSkills as $skill)
-                        <li class="text-gray-700">{{ $skill->skill }}</li>
-                        @endforeach
-                    </ul>
-                </div>
-                <div>
-                    <h3 class="text-sm font-semibold text-gray-700 mb-3">Soft Skill(s)</h3>
-                    <ul class="list-disc pl-5 space-y-1">
-                        @php($softSkills = $prof->softSkills)
-                        @foreach ($softSkills as $skill)
-                        <li class="text-gray-700">{{ $skill->skill }}</li>
-                        @endforeach
-                    </ul>
-                </div>
-            </div>
+            @endforeach
         </div>
         @elseif ($query === 'professional' && $user->getProfessionalBio() === null)
         <div class="flex flex-col justify-center flex-1">

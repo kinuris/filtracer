@@ -137,86 +137,100 @@
             </div>
 
             <!-- Professional Information Card -->
-            <div class="shadow rounded-lg mt-4">
+            <!-- Professional Information Card -->
+            @php ($professionals = $user->professionalBios)
+            @if ($professionals->isNotEmpty())
+            @foreach ($professionals as $index => $professional)
+            <div class="shadow rounded-lg {{ $index > 0 ? 'mt-4' : '' }}">
                 <div class="bg-white py-5 flex flex-col px-6 border-b rounded-lg">
-                    <p class="text-blue-600 text-lg font-bold pb-3 border-b border-gray-100">Professional Information</p>
-                    @php ($prof = $user->getProfessionalBio())
+                    <p class="text-blue-600 text-lg font-bold pb-3 border-b border-gray-100">Professional Information #{{ $index + 1 }}</p>
                     <div class="flex justify-between mt-3">
                         <div class="flex-1 flex-col pr-4">
                             <p class="text-gray-400 text-sm">Employment Status</p>
-                            <p class="font-medium">{{ $prof->employment_status }}</p>
+                            <p class="font-medium">{{ $professional->employment_status }}</p>
 
                             <p class="text-gray-400 text-sm mt-4">Current Job Title</p>
-                            <p class="font-medium">{{ $prof->job_title }}</p>
+                            <p class="font-medium">{{ $professional->job_title }}</p>
 
                             <p class="text-gray-400 text-sm mt-4">Monthly Salary Range</p>
-                            <p class="font-medium">{{ $prof->monthly_salary }} PHP</p>
+                            <p class="font-medium">{{ $professional->monthly_salary }} PHP</p>
                         </div>
 
                         <div class="flex-1 flex-col pr-4">
                             <p class="text-gray-400 text-sm">Employment Type</p>
-                            <p class="font-medium">{{ $prof->employment_type1 }}; {{ $prof->employment_type2 }}</p>
+                            <p class="font-medium">{{ $professional->employment_type1 }}{{ $professional->employment_type2 ? '; ' . $professional->employment_type2 : '' }}</p>
 
                             <p class="text-gray-400 text-sm mt-4">Company / Employer</p>
-                            <p class="font-medium">{{ $prof->company_name }}</p>
+                            <p class="font-medium">{{ $professional->company_name }}</p>
 
                             <p class="text-gray-400 text-sm mt-4">Waiting Time</p>
-                            <p class="font-medium">{{ $prof->waiting_time }}</p>
+                            <p class="font-medium">{{ $professional->waiting_time }}</p>
                         </div>
 
                         <div class="flex-1 flex-col">
                             <p class="text-gray-400 text-sm">Industry</p>
-                            <p class="font-medium">{{ $prof->industry }}</p>
+                            <p class="font-medium">{{ $professional->industry }}</p>
 
                             <p class="text-gray-400 text-sm mt-4">Location</p>
-                            <p class="font-medium">{{ $prof->work_location }}</p>
+                            <p class="font-medium">{{ $professional->work_location }}</p>
                         </div>
                     </div>
-                    @if ($prof)
-                    @else
-                    <p>(No professional bio)</p>
-                    @endif
                 </div>
             </div>
 
             <!-- Job Search Methods Card -->
+            @if ($professional->methods->isNotEmpty())
             <div class="shadow rounded-lg mt-4">
                 <div class="bg-white py-5 flex flex-col px-6 border-b rounded-lg">
-                    <p class="text-blue-600 text-lg font-bold pb-3 border-b border-gray-100">Job Search Methods</p>
-                    @php ($methods = $user->getProfessionalBio()->methods)
+                    <p class="text-blue-600 text-lg font-bold pb-3 border-b border-gray-100">Job Search Methods (Record #{{ $index + 1 }})</p>
                     <div class="flex flex-wrap gap-2 mt-3">
-                        @foreach ($methods as $method)
+                        @foreach ($professional->methods as $method)
                         <span class="px-3 py-1.5 bg-blue-50 text-blue-600 rounded-full text-sm">{{ $method->method }}</span>
                         @endforeach
                     </div>
                 </div>
             </div>
+            @endif
 
             <!-- Skills Cards -->
-            <div class="flex w-full gap-4 mt-4 mb-16">
+            <div class="flex w-full gap-4 mt-4 {{ $loop->last ? 'mb-16' : '' }}">
+                @if ($professional->softSkills->isNotEmpty())
                 <div class="shadow rounded-lg flex-1">
                     <div class="bg-white py-5 flex flex-col px-6 border-b rounded-lg h-full">
-                        <p class="text-blue-600 text-lg font-bold pb-3 border-b border-gray-100">Soft Skills</p>
-                        @php ($methods = $user->getProfessionalBio()->softSkills)
+                        <p class="text-blue-600 text-lg font-bold pb-3 border-b border-gray-100">Soft Skills (Record #{{ $index + 1 }})</p>
                         <div class="flex flex-wrap gap-2 mt-3">
-                            @foreach ($methods as $method)
-                            <span class="px-3 py-1.5 bg-blue-50 text-blue-600 rounded-full text-sm">{{ $method->skill }}</span>
+                            @foreach ($professional->softSkills as $skill)
+                            <span class="px-3 py-1.5 bg-blue-50 text-blue-600 rounded-full text-sm">{{ $skill->skill }}</span>
                             @endforeach
                         </div>
                     </div>
                 </div>
+                @endif
+                @if ($professional->hardSkills->isNotEmpty())
                 <div class="shadow rounded-lg flex-1">
                     <div class="bg-white py-5 flex flex-col px-6 border-b rounded-lg h-full">
-                        <p class="text-blue-600 text-lg font-bold pb-3 border-b border-gray-100">Hard Skills</p>
-                        @php ($methods = $user->getProfessionalBio()->hardSkills)
+                        <p class="text-blue-600 text-lg font-bold pb-3 border-b border-gray-100">Hard Skills (Record #{{ $index + 1 }})</p>
                         <div class="flex flex-wrap gap-2 mt-3">
-                            @foreach ($methods as $method)
-                            <span class="px-3 py-1.5 bg-blue-50 text-blue-600 rounded-full text-sm">{{ $method->skill }}</span>
+                            @foreach ($professional->hardSkills as $skill)
+                            <span class="px-3 py-1.5 bg-blue-50 text-blue-600 rounded-full text-sm">{{ $skill->skill }}</span>
                             @endforeach
                         </div>
                     </div>
+                </div>
+                @endif
+            </div>
+            @if (!$loop->last)
+            <hr class="my-4 border-gray-300">
+            @endif
+            @endforeach
+            @else
+            <div class="shadow rounded-lg mt-4">
+                <div class="bg-white py-5 flex flex-col px-6 border-b rounded-lg">
+                    <p class="text-blue-600 text-lg font-bold pb-3 border-b border-gray-100">Professional Information</p>
+                    <p class="mt-3">(No professional bio records found)</p>
                 </div>
             </div>
+            @endif
         </div>
     </div>
 </div>

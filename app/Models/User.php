@@ -475,6 +475,11 @@ class User extends Authenticatable
         return ProfessionalRecord::query()->where('user_id', '=', $this->id)->latest()->first();
     }
 
+    public function professionalBios()
+    {
+        return $this->hasMany(ProfessionalRecord::class, 'user_id')->latest();
+    }
+
     public function professionalRecords()
     {
         return $this->hasOne(ProfessionalRecord::class, 'user_id');

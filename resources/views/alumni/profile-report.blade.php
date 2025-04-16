@@ -99,80 +99,88 @@
                 </div>
 
                 <p class="mt-6 font-bold tracking-wider text-lg text-blue-600">Professional Information</p>
-                @php($prof = $alumni->getProfessionalBio())
-                <div class="flex mt-4 border-b pb-4">
-                    <div class="flex mr-16">
-                        <div class="flex flex-col mr-8 font-semibold gap-3">
-                            <p>Current Employment Status</p>
-                            <p>Employment Time</p>
-                            <p>Industry</p>
-                            <p>Current Job Title</p>
+                @foreach($alumni->professionalBios()->get() as $prof)
+                <div class="mt-4 border-b pb-4 @if(!$loop->last) mb-4 @endif">
+                    {{-- Employment Details Grid --}}
+                    <div class="grid grid-cols-2 gap-x-8 gap-y-2 mb-4">
+                        <div>
+                            <p class="font-semibold">Employment Status:</p>
+                            <p class="text-gray-700">{{ $prof->employment_status }}</p>
                         </div>
-                        <div class="flex flex-col text-gray-700 gap-3">
-                            <p>{{ $prof->employment_status }}</p>
-                            <p>{{ $prof->employment_type1 }}; {{ $prof->employment_type2 }}</p>
-                            <p>{{ $prof->industry }}</p>
-                            <p class="line-clamp-1">{{ $prof->job_title }}</p>
+                        <div>
+                            <p class="font-semibold">Company / Employer:</p>
+                            <p class="text-gray-700">{{ $prof->company_name ?: 'N/A' }}</p>
+                        </div>
+                        <div>
+                            <p class="font-semibold">Employment Time:</p>
+                            <p class="text-gray-700">{{ $prof->employment_type1 }}{{ $prof->employment_type2 ? '; ' . $prof->employment_type2 : '' }}</p>
+                        </div>
+                        <div>
+                            <p class="font-semibold">Monthly Salary Range:</p>
+                            <p class="text-gray-700">{{ $prof->monthly_salary }}</p>
+                        </div>
+                        <div>
+                            <p class="font-semibold">Industry:</p>
+                            <p class="text-gray-700">{{ $prof->industry }}</p>
+                        </div>
+                        <div>
+                            <p class="font-semibold">Work Location:</p>
+                            <p class="text-gray-700">{{ $prof->work_location }}</p>
+                        </div>
+                        <div>
+                            <p class="font-semibold">Job Title:</p>
+                            <p class="text-gray-700 line-clamp-1">{{ $prof->job_title }}</p>
+                        </div>
+                         <div>
+                            <p class="font-semibold">Waiting Time for First Job:</p>
+                            <p class="text-gray-700">{{ $prof->waiting_time }}</p>
                         </div>
                     </div>
-                    <div class="flex">
-                        <div class="flex flex-col mr-8 font-semibold gap-3">
-                            <p>Current Company / Employer</p>
-                            <p>Montly Salary Range</p>
-                            <p>Location</p>
+
+                    {{-- Job Search Methods and Skills --}}
+                    <div class="grid grid-cols-3 gap-x-8 mt-4">
+                        <div>
+                            <p class="font-semibold mb-1">Job Search Method/s:</p>
+                            @if($prof->methods()->exists())
+                                <ul class="list-disc list-inside text-gray-700">
+                                    @foreach($prof->methods()->get() as $method)
+                                        <li>{{ $method->method }}</li>
+                                    @endforeach
+                                </ul>
+                            @else
+                                <p class="text-gray-500 text-sm">Not specified</p>
+                            @endif
                         </div>
-                        <div class="flex flex-col text-gray-700 gap-3">
-                            <p>{{ $prof->company_name }}</p>
-                            <p>{{ $prof->monthly_salary }}</p>
-                            <p>{{ $prof->work_location }}</p>
+                        <div>
+                            <p class="font-semibold mb-1">Hard Skill/s:</p>
+                             @if($prof->hardSkills()->exists())
+                                <ul class="list-disc list-inside text-gray-700">
+                                    @foreach($prof->hardSkills()->get() as $skill)
+                                        <li>{{ $skill->skill }}</li>
+                                    @endforeach
+                                </ul>
+                             @else
+                                <p class="text-gray-500 text-sm">Not specified</p>
+                             @endif
+                        </div>
+                        <div>
+                            <p class="font-semibold mb-1">Soft Skill/s:</p>
+                             @if($prof->softSkills()->exists())
+                                <ul class="list-disc list-inside text-gray-700">
+                                    @foreach($prof->softSkills()->get() as $skill)
+                                        <li>{{ $skill->skill }}</li>
+                                    @endforeach
+                                </ul>
+                             @else
+                                <p class="text-gray-500 text-sm">Not specified</p>
+                             @endif
                         </div>
                     </div>
                 </div>
-
-                <div class="flex mt-4 mb-8">
-                    <div class="flex flex-col gap-4 mr-12 flex-wrap">
-                        <div class="flex gap-20">
-                            <p class="font-semibold">Waiting Time</p>
-                            <p>{{ $prof->waiting_time }}</p>
-                        </div>
-
-                        <div class="flex gap-8">
-                            <p class="font-semibold">Job Search Method/s</p>
-                            <ul>
-                                @foreach($prof->methods()->get() as $method)
-                                <li class="list-disc">{{ $method->method }}</li>
-                                @endforeach
-                            </ul>
-                        </div>
-
-                        <div class="flex gap-[5.6rem]">
-                            <p class="font-semibold">Hard Skill/s</p>
-                            <ul>
-                                @foreach($prof->hardSkills()->get() as $skill)
-                                <li class="list-disc">{{ $skill->skill }}</li>
-                                @endforeach
-                            </ul>
-                        </div>
-                    </div>
-
-                    <div class="flex flex-col gap-4 mr-8 flex-wrap">
-                        <div class="flex gap-36">
-                            <p class="font-semibold">Soft Skill/s</p>
-                            <ul>
-                                @foreach($prof->softSkills()->get() as $skill)
-                                <li class="list-disc">{{ $skill->skill }}</li>
-                                @endforeach
-                            </ul>
-                        </div>
-
-                        <div class="flex gap-8">
-                            <p class="font-semibold">Certifications and Licenses</p>
-                            <ul>
-                                
-                            </ul>
-                        </div>
-                    </div>
-                </div>
+                @endforeach
+                @if($alumni->professionalBios()->get()->isEmpty())
+                    <p class="text-gray-500 mt-4 text-center">No professional information available.</p>
+                @endif
             </div>
         </div>
     </div>
