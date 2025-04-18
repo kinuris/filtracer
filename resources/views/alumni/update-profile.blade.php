@@ -170,7 +170,7 @@ $salaryRanges = [
             <div class="shadow rounded-lg">
                 <div class="bg-white py-4 flex flex-col px-6 border-b rounded-lg" id="main-content-area">
                     {{-- Tabs --}}
-                    <div class="flex mb-4 sticky top-0 bg-white py-4 border-b z-10">
+                    <div class="flex mb-4 sticky top-0 bg-white py-4 border-b z-[5]">
                         <a class="text-gray-400 font-semibold @if($query === 'personal') pb-1 border-b-2 border-blue-500 !text-blue-500 @endif" href="?type=personal">Personal Info</a>
                         <a class="text-gray-400 font-semibold mx-4 @if($query === 'educational') pb-1 border-b-2 border-blue-500 !text-blue-500 @endif" href="?type=educational">Educational Info</a>
                         <a class="text-gray-400 font-semibold @if($query === 'professional') pb-1 border-b-2 border-blue-500 !text-blue-500 @endif" href="?type=professional">Professional Info</a>

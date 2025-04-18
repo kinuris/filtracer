@@ -161,7 +161,7 @@
                         </a>
 
                         <!-- Logout Confirmation Modal -->
-                        <div id="logoutModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+                        <div id="logoutModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-20">
                             <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
                                 <div class="mt-3 text-center">
                                     <h3 class="text-lg leading-6 font-medium text-gray-900">Confirm Logout</h3>
