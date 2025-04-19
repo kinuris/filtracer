@@ -63,7 +63,8 @@ $times = [
 'Below 3 months',
 '3-5 months',
 '6 months-1 year',
-'Over 1 year'
+'Over 1 year',
+'Job not secured' // Added this option
 ];
 @endphp
 
@@ -124,6 +125,30 @@ $salaryRanges = [
 ];
 @endphp
 
+@php
+$industries = [
+    'Education',
+    'Healthcare and Medical Services',
+    'IT and Software Development',
+    'BPO / Call Center',
+    'Engineering and Construction',
+    'Manufacturing',
+    'Banking and Financial Services',
+    'Government and Public Administration',
+    'Retail and Wholesale Trade',
+    'Hospitality and Tourism',
+    'Transportation and Logistics',
+    'Media and Communications',
+    'Legal Services',
+    'Agriculture, Forestry, and Fisheries',
+    'Real Estate',
+    'Utilities',
+    'Non-Profit',
+    'Arts, Culture, and Entertainment',
+    'Automotive',
+    'Freelancing / Entrepreneurship',
+];
+@endphp
 
 @include('components.education-modal')
 @include('components.reset-password-modal')
@@ -430,105 +455,135 @@ $salaryRanges = [
                         <form enctype="multipart/form-data" action="/profbio/update/{{ $profBio->id }}/{{ $user->id }}" method="POST" class="mb-4 border-b pb-6 last:border-b-0 last:pb-0">
                             @csrf
                             <h3 class="text-md font-semibold mb-1 text-gray-600">Professional Record #{{ $loop->iteration }}</h3>
-                            <p class="text-xs text-gray-400 mb-3">Created: {{ $profBio->created_at->format('M d, Y H:i') }}</p> {{-- Added created_at timestamp --}}
-                            <div class="flex flex-col">
-                                <div class="flex">
-                                    <div class="flex flex-col flex-1 max-w-[50%]">
-                                        <label for="employment_status_{{ $loop->index }}">Employment Status</label>
-                                        <select class="text-gray-400 border rounded-lg p-2" name="employment_status" id="employment_status_{{ $loop->index }}">
-                                            @foreach ($statuses as $status)
-                                            <option {{ $profBio->employment_status === $status ? 'selected' : '' }} value="{{ $status}}">{{ $status }}</option>
-                                            @endforeach
-                                        </select>
+                            <p class="text-xs text-gray-400 mb-3">Created: {{ $profBio->created_at->format('M d, Y H:i') }}</p>
 
-                                        <label class="mt-3" for="employment_type1_{{ $loop->index }}">Employment Type 1</label>
-                                        <select class="text-gray-400 border rounded-lg p-2" name="employment_type1" id="employment_type1_{{ $loop->index }}">
-                                            <option {{ $profBio->employment_type1 === 'Private' ? 'selected' : '' }} value="Private">Private</option>
-                                            <option {{ $profBio->employment_type1 === 'Government' ? 'selected' : '' }} value="Government">Government</option>
-                                            <option {{ $profBio->employment_type1 === 'NGO/INGO' ? 'selected' : '' }} value="NGO/INGO">NGO/INGO</option>
-                                        </select>
+                            {{-- Use Grid for layout --}}
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-3">
 
-                                        <label class="mt-3" for="employment_type2_{{ $loop->index }}">Employment Type 2</label>
-                                        <select class="text-gray-400 border rounded-lg p-2" name="employment_type2" id="employment_type2_{{ $loop->index }}">
-                                            <option {{ $profBio->employment_type2 === 'Full-Time' ? 'selected' : '' }} value="Full-Time">Full-Time</option>
-                                            <option {{ $profBio->employment_type2 === 'Part-Time' ? 'selected' : '' }} value="Part-Time">Part-Time</option>
-                                            <option {{ $profBio->employment_type2 === 'Traineeship' ? 'selected' : '' }} value="Traineeship">Traineeship</option>
-                                            <option {{ $profBio->employment_type2 === 'Internship' ? 'selected' : '' }} value="Internship">Internship</option>
-                                            <option {{ $profBio->employment_type2 === 'Contract' ? 'selected' : '' }} value="Contract">Contract</option>
-                                        </select>
-
-                                        <label class="mt-3" for="industry_{{ $loop->index }}">Industry</label>
-                                        <input value="{{ $profBio->industry ?? '' }}" class="text-gray-400 border rounded-lg p-2" type="text" name="industry" id="industry_{{ $loop->index }}">
-                                    </div>
-
-                                    <div class="mx-2"></div>
-
-                                    <div class="flex flex-col flex-1">
-                                        <label for="job-title_{{ $loop->index }}">Current Job Title</label>
-                                        <input value="{{ $profBio->job_title ?? '' }}" class="text-gray-400 border rounded-lg p-2" type="text" name="job_title" id="job-title_{{ $loop->index }}">
-
-                                        <label class="mt-3" for="company_{{ $loop->index }}">Company / Employer</label>
-                                        <input value="{{ $profBio->company_name ?? '' }}" class="text-gray-400 border rounded-lg p-2" type="text" name="company_name" id="company_{{ $loop->index }}">
-
-                                        <label class="mt-3" for="range_{{ $loop->index }}">Monthly Salary Range</label>
-                                        <select class="text-gray-400 border rounded-lg p-2" name="monthly_salary" id="range_{{ $loop->index }}">
-                                            @foreach ($salaryRanges as $range)
-                                            <option value="{{ $range }}" {{ $profBio->monthly_salary === $range ? 'selected' : '' }}>{{ $range }}</option>
-                                            @endforeach
-                                        </select>
-
-                                        <label class="mt-3" for="location_{{ $loop->index }}">Location</label>
-                                        <input value="{{ $profBio->work_location ?? '' }}" class="text-gray-400 border rounded-lg p-2" type="text" name="work_location" id="location_{{ $loop->index }}">
-                                    </div>
+                                {{-- Employment Status --}}
+                                <div class="flex flex-col">
+                                    <label for="employment_status_{{ $loop->index }}">Employment Status</label>
+                                    <select class="text-gray-400 border rounded-lg p-2" name="employment_status" id="employment_status_{{ $loop->index }}">
+                                        @foreach ($statuses as $status)
+                                        <option {{ $profBio->employment_status === $status ? 'selected' : '' }} value="{{ $status}}">{{ $status }}</option>
+                                        @endforeach
+                                    </select>
                                 </div>
 
-                                <label class="mt-5" for="waiting_{{ $loop->index }}">Waiting Time <span class="text-gray-400">(period to get a job after graduation)</span></label>
-                                <select class="text-gray-400 border rounded-lg p-2" name="waiting_time" id="waiting_{{ $loop->index }}">
-                                    @foreach ($times as $time)
-                                    <option value="{{ $time }}" {{ $profBio->waiting_time === $time ? 'selected' : '' }}>{{ $time }}</option>
-                                    @endforeach
-                                </select>
-
-                                <label class="mt-5" for="methods_{{ $loop->index }}">Job Search Methods <span class="text-gray-400">(used to find a job)</span></label>
-                                <select multiple name="methods[]" id="methods_{{ $loop->index }}" class="methods-choices"
-                                        data-selected-methods="{{ json_encode($profBio->methods->pluck('method')->toArray()) }}">
-                                    {{-- Options populated by Choices.js --}}
-                                </select>
-
-                                <div class="flex mt-3">
-                                    <div class="flex-1 flex flex-col">
-                                        <label for="hard-skills_{{ $loop->index }}">Hard Skill/s</label>
-                                        <select multiple name="hard_skills[]" id="hard-skills_{{ $loop->index }}" class="hard-skills-choices"
-                                                data-selected-hard-skills="{{ json_encode($profBio->hardSkills->pluck('skill')->toArray()) }}">
-                                            {{-- Options populated by Choices.js --}}
-                                        </select>
-                                    </div>
-
-                                    <div class="mx-2"></div>
-
-                                    <div class="flex-1 flex flex-col">
-                                        <label for="soft-skills_{{ $loop->index }}">Soft Skill/s</label>
-                                        <select multiple name="soft_skills[]" id="soft-skills_{{ $loop->index }}" class="soft-skills-choices"
-                                                data-selected-soft-skills="{{ json_encode($profBio->softSkills->pluck('skill')->toArray()) }}">
-                                            {{-- Options populated by Choices.js --}}
-                                        </select>
-                                    </div>
+                                {{-- Employment Type 1 --}}
+                                <div class="flex flex-col">
+                                    <label for="employment_type1_{{ $loop->index }}">Employment Type 1</label>
+                                    <select class="text-gray-400 border rounded-lg p-2" name="employment_type1" id="employment_type1_{{ $loop->index }}">
+                                        <option {{ $profBio->employment_type1 === 'Private' ? 'selected' : '' }} value="Private">Private</option>
+                                        <option {{ $profBio->employment_type1 === 'Government' ? 'selected' : '' }} value="Government">Government</option>
+                                        <option {{ $profBio->employment_type1 === 'NGO/INGO' ? 'selected' : '' }} value="NGO/INGO">NGO/INGO</option>
+                                    </select>
                                 </div>
 
-                                {{-- Assuming attachments are still global or linked elsewhere for now --}}
-                                {{-- If attachments are per-record, this needs significant changes --}}
-                                <label class="mt-3" for="certs_{{ $loop->index }}">
-                                    <p>Certification & Licenses (Upload New)</p>
+                                {{-- Employment Type 2 --}}
+                                <div class="flex flex-col">
+                                    <label for="employment_type2_{{ $loop->index }}">Employment Type 2</label>
+                                    <select class="text-gray-400 border rounded-lg p-2" name="employment_type2" id="employment_type2_{{ $loop->index }}">
+                                        <option {{ $profBio->employment_type2 === 'Full-Time' ? 'selected' : '' }} value="Full-Time">Full-Time</option>
+                                        <option {{ $profBio->employment_type2 === 'Part-Time' ? 'selected' : '' }} value="Part-Time">Part-Time</option>
+                                        <option {{ $profBio->employment_type2 === 'Traineeship' ? 'selected' : '' }} value="Traineeship">Traineeship</option>
+                                        <option {{ $profBio->employment_type2 === 'Internship' ? 'selected' : '' }} value="Internship">Internship</option>
+                                        <option {{ $profBio->employment_type2 === 'Contract' ? 'selected' : '' }} value="Contract">Contract</option>
+                                    </select>
+                                </div>
+
+                                {{-- Industry --}}
+                                <div class="flex flex-col">
+                                    <label for="industry_{{ $loop->index }}">Industry</label>
+                                    <select class="text-gray-400 border rounded-lg p-2" name="industry" id="industry_{{ $loop->index }}">
+                                        <option value="">Select Industry...</option>
+                                        @foreach ($industries as $industry)
+                                        <option value="{{ $industry }}" {{ $profBio->industry === $industry ? 'selected' : '' }}>{{ $industry }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+
+                                {{-- Job Title --}}
+                                <div class="flex flex-col">
+                                    <label for="job-title_{{ $loop->index }}">Current Job Title</label>
+                                    <input value="{{ $profBio->job_title ?? '' }}" class="text-gray-400 border rounded-lg p-2" type="text" name="job_title" id="job-title_{{ $loop->index }}">
+                                </div>
+
+                                {{-- Company / Employer --}}
+                                <div class="flex flex-col">
+                                    <label for="company_{{ $loop->index }}">Company / Employer</label>
+                                    <input value="{{ $profBio->company_name ?? '' }}" class="text-gray-400 border rounded-lg p-2" type="text" name="company_name" id="company_{{ $loop->index }}">
+                                </div>
+
+                                {{-- Monthly Salary Range --}}
+                                <div class="flex flex-col">
+                                    <label for="range_{{ $loop->index }}">Monthly Salary Range</label>
+                                    <select class="text-gray-400 border rounded-lg p-2" name="monthly_salary" id="range_{{ $loop->index }}">
+                                        @foreach ($salaryRanges as $range)
+                                        <option value="{{ $range }}" {{ $profBio->monthly_salary === $range ? 'selected' : '' }}>{{ $range }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+
+                                {{-- Location --}}
+                                <div class="flex flex-col">
+                                    <label for="location_{{ $loop->index }}">Location</label>
+                                    <input value="{{ $profBio->work_location ?? '' }}" class="text-gray-400 border rounded-lg p-2" type="text" name="work_location" id="location_{{ $loop->index }}">
+                                </div>
+
+                                {{-- Waiting Time (Full Width) --}}
+                                <div class="flex flex-col md:col-span-2">
+                                    <label for="waiting_{{ $loop->index }}">Waiting Time <span class="text-gray-400">(period to get a job after graduation)</span></label>
+                                    <select class="text-gray-400 border rounded-lg p-2" name="waiting_time" id="waiting_{{ $loop->index }}">
+                                        @foreach ($times as $time)
+                                        <option value="{{ $time }}" {{ $profBio->waiting_time === $time ? 'selected' : '' }}>{{ $time }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+
+                                {{-- Job Search Methods (Full Width) --}}
+                                <div class="flex flex-col md:col-span-2">
+                                    <label for="methods_{{ $loop->index }}">Job Search Methods <span class="text-gray-400">(used to find a job)</span></label>
+                                    <select multiple name="methods[]" id="methods_{{ $loop->index }}" class="methods-choices"
+                                            data-selected-methods="{{ json_encode($profBio->methods->pluck('method')->toArray()) }}">
+                                        {{-- Options populated by Choices.js --}}
+                                    </select>
+                                </div>
+
+                                {{-- Hard Skills --}}
+                                <div class="flex flex-col">
+                                    <label for="hard-skills_{{ $loop->index }}">Hard Skill/s</label>
+                                    <select multiple name="hard_skills[]" id="hard-skills_{{ $loop->index }}" class="hard-skills-choices"
+                                            data-selected-hard-skills="{{ json_encode($profBio->hardSkills->pluck('skill')->toArray()) }}">
+                                        {{-- Options populated by Choices.js --}}
+                                    </select>
+                                </div>
+
+                                {{-- Soft Skills --}}
+                                <div class="flex flex-col">
+                                    <label for="soft-skills_{{ $loop->index }}">Soft Skill/s</label>
+                                    <select multiple name="soft_skills[]" id="soft-skills_{{ $loop->index }}" class="soft-skills-choices"
+                                            data-selected-soft-skills="{{ json_encode($profBio->softSkills->pluck('skill')->toArray()) }}">
+                                        {{-- Options populated by Choices.js --}}
+                                    </select>
+                                </div>
+
+                                {{-- Attachments (Full Width) --}}
+                                <div class="flex flex-col md:col-span-2">
+                                    <label>Certification & Licenses</label>
                                     <div class="flex gap-2 mt-1">
-                                        <div class="bg-gray-500 rounded-lg text-white p-2 w-fit cursor-pointer text-sm">
+                                        {{-- Upload Button Wrapper --}}
+                                        <label class="bg-gray-500 rounded-lg text-white p-2 w-fit cursor-pointer text-sm inline-flex items-center">
                                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 inline mr-1">
                                               <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5m-13.5-9L12 3m0 0 4.5 4.5M12 3v13.5" />
                                             </svg>
-                                            Upload PDF(s)
-                                        </div>
+                                            Upload New PDF(s)
+                                            <input class="hidden" type="file" id="certs_{{ $loop->index }}" accept="application/pdf" name="certs[]" multiple>
+                                        </label>
 
+                                        {{-- View Existing Button --}}
                                         <button type="button"
-                                                class="open-view-attachments-modal bg-blue-500 rounded-lg text-white p-2 w-fit text-sm"
+                                                class="open-view-attachments-modal bg-blue-500 rounded-lg text-white p-2 w-fit text-sm inline-flex items-center"
                                                 data-modal-target="#viewAttachmentsModal_{{ $profBio->id }}">
                                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 inline mr-1">
                                               <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
@@ -539,36 +594,30 @@ $salaryRanges = [
 
                                         {{-- Modal for this specific record's attachments --}}
                                         <div id="viewAttachmentsModal_{{ $profBio->id }}" class="fixed z-50 inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center hidden">
-                                            <div class="bg-white p-6 rounded-lg shadow-lg w-1/3 max-w-lg"> {{-- Added max-width --}}
+                                            <div class="bg-white p-6 rounded-lg shadow-lg w-1/3 max-w-lg">
                                                 <div class="flex justify-between items-center mb-4">
                                                     <h2 class="text-lg font-bold">Existing Attachments (Record #{{ $loop->iteration }})</h2>
-                                                    {{-- Add a close button in the header for better UX --}}
                                                     <button type="button" class="close-view-attachments-modal text-gray-400 hover:text-gray-600">
                                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
                                                           <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
                                                         </svg>
                                                     </button>
                                                 </div>
-
-                                                <div class="gap-2 p-2 flex flex-col max-h-80 overflow-y-auto border rounded"> {{-- Added max-height, scroll, border --}}
+                                                <div class="gap-2 p-2 flex flex-col max-h-80 overflow-y-auto border rounded">
                                                     @forelse ($profBio->attachments as $attachment)
-                                                    <div class="bg-gray-50 border p-3 rounded-lg"> {{-- Adjusted padding/bg --}}
-                                                        <div class="flex justify-between items-start"> {{-- Align items start --}}
-                                                            <p class="text-sm font-semibold text-slate-700 break-all mr-2" title="{{ $attachment->name }}">{{ $attachment->name }}</p> {{-- Allow break, add margin --}}
+                                                    <div class="bg-gray-50 border p-3 rounded-lg">
+                                                        <div class="flex justify-between items-start">
+                                                            <p class="text-sm font-semibold text-slate-700 break-all mr-2" title="{{ $attachment->name }}">{{ $attachment->name }}</p>
                                                             <a href="/alumni/delete/attachment/{{ $attachment->id }}"
                                                                onclick="return confirm('Are you sure you want to delete this attachment?');"
-                                                               class="text-red-500 hover:text-red-700 flex items-center flex-shrink-0" {{-- Prevent shrinking --}}
+                                                               class="text-red-500 hover:text-red-700 flex items-center flex-shrink-0"
                                                                title="Delete Attachment">
-                                                                <span class="material-symbols-outlined text-lg"> {{-- Use text-lg for size --}}
-                                                                    delete
-                                                                </span>
+                                                                <span class="material-symbols-outlined text-lg">delete</span>
                                                             </a>
                                                         </div>
-                                                        <a class="text-sm w-fit font-semibold text-blue-600 hover:underline flex items-center mt-2" {{-- Adjusted margin, color --}}
+                                                        <a class="text-sm w-fit font-semibold text-blue-600 hover:underline flex items-center mt-2"
                                                            href="{{ asset('storage/professional/attachments/' . $attachment->link) }}" target="_blank" title="Open File">
-                                                            <span class="material-symbols-outlined text-lg mr-1"> {{-- Use text-lg, add margin --}}
-                                                                file_open
-                                                            </span>
+                                                            <span class="material-symbols-outlined text-lg mr-1">file_open</span>
                                                             Open File
                                                         </a>
                                                     </div>
@@ -576,30 +625,31 @@ $salaryRanges = [
                                                     <p class="text-gray-500 text-center py-4">No attachments found for this record.</p>
                                                     @endforelse
                                                 </div>
-                                                <div class="flex justify-end mt-4"> {{-- Align button to end --}}
-                                                    <button type="button" class="close-view-attachments-modal px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300">Close</button> {{-- Adjusted style --}}
+                                                <div class="flex justify-end mt-4">
+                                                    <button type="button" class="close-view-attachments-modal px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300">Close</button>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
-                                </label>
-                                <input class="hidden" type="file" id="certs_{{ $loop->index }}" accept="application/pdf" name="certs[]" multiple>
-
-                                <div class="flex mt-4 justify-end space-x-2">
-                                    {{-- Delete Button (GET Request) - Only show if more than 1 record exists --}}
-                                    @if (count($user->professionalBios) > 1)
-                                    <a href="/profbio/delete/{{ $profBio->id }}"
-                                       onclick="return confirm('Are you sure you want to delete this professional record? This action cannot be undone.');"
-                                       class="inline-flex items-center px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 text-sm font-medium">
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 mr-1">
-                                          <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
-                                        </svg>
-                                        Delete
-                                    </a>
-                                    @endif
-                                    {{-- Save Button --}}
-                                    <button class="text-white bg-blue-600 py-2 px-6 rounded-lg text-sm" type="submit">Save Record #{{ $loop->iteration }}</button>
                                 </div>
+
+                            </div> {{-- End Grid --}}
+
+                            {{-- Action Buttons (Full Width) --}}
+                            <div class="flex mt-4 justify-end space-x-2">
+                                {{-- Delete Button - Only show if more than 1 record exists --}}
+                                @if (count($user->professionalBios) > 1)
+                                <a href="/profbio/delete/{{ $profBio->id }}"
+                                   onclick="return confirm('Are you sure you want to delete this professional record? This action cannot be undone.');"
+                                   class="inline-flex items-center px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 text-sm font-medium">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 mr-1">
+                                      <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                                    </svg>
+                                    Delete
+                                </a>
+                                @endif
+                                {{-- Save Button --}}
+                                <button class="text-white bg-blue-600 py-2 px-6 rounded-lg text-sm" type="submit">Save Record #{{ $loop->iteration }}</button>
                             </div>
                         </form>
                         @empty

@@ -62,7 +62,8 @@ return new class extends Migration
                 'Below 3 months',
                 '3-5 months',
                 '6 months-1 year',
-                'Over 1 year'
+                'Over 1 year',
+                'Job not secured'
             ]);
 
             $table->timestamps();

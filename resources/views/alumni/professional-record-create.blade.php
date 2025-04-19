@@ -2,100 +2,50 @@
 
 @section('header')
 <style>
-    input::-webkit-file-upload-button {
-        display: none;
-        /* Keep this if you prefer custom styled upload buttons */
+    /* ... (keep existing styles) ... */
+
+    /* Style for disabled fields */
+    .form-input-disabled,
+    .form-select-disabled {
+        background-color: #f3f4f6; /* bg-gray-100 */
+        cursor: not-allowed;
+        opacity: 0.7;
     }
 
-    /* Style Choices.js elements to better match the form */
-    .choices__inner {
-        background-color: white;
-        border: 1px solid #d1d5db;
-        /* Equivalent to border-gray-300 */
-        border-radius: 0.375rem;
-        /* Equivalent to rounded-lg */
-        padding: 0.5rem;
-        /* Equivalent to p-2 */
-        font-size: 0.875rem;
-        /* Equivalent to sm:text-sm */
-        color: #6b7280;
-        /* Equivalent to text-gray-500 */
-        min-height: auto;
-        /* Adjust default min-height */
+    /* Style for Choices.js disabled state */
+    .choices[data-disabled] {
+        background-color: #f3f4f6;
+        cursor: not-allowed;
+        opacity: 0.7;
     }
-
-    .choices__list--multiple .choices__item {
-        background-color: #4f46e5;
-        /* Equivalent to bg-indigo-600 */
-        border-color: #4f46e5;
-        color: white;
-        border-radius: 0.25rem;
-        /* rounded-md */
-        margin-bottom: 0.25rem;
-        /* Add some spacing */
+    .choices[data-disabled] .choices__inner {
+        background-color: #f3f4f6;
+        cursor: not-allowed;
     }
-
-    .choices[data-type*="select-multiple"] .choices__button,
-    .choices[data-type*="text"] .choices__button {
-        border-left: 1px solid #4338ca;
-        /* Slightly darker indigo */
-        margin-left: 5px;
-    }
-
-    .choices__input {
-        background-color: transparent;
-        font-size: 0.875rem;
-        color: #6b7280;
-        margin-bottom: 0;
-        /* Reset margin */
-        padding: 0;
-        /* Reset padding */
-    }
-
-    .choices__list--dropdown .choices__item--selectable.is-highlighted {
-        background-color: #e0e7ff;
-        /* bg-indigo-100 */
-        color: #3730a3;
-        /* text-indigo-800 */
-    }
-
-    /* Style file input to match others */
-    input[type="file"].form-input {
-        border: 1px solid #d1d5db;
-        border-radius: 0.375rem;
-        padding: 0.5rem;
-        box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-        /* shadow-sm */
-        font-size: 0.875rem;
-        color: #6b7280;
-    }
-
-    input[type="file"].form-input::file-selector-button {
-        display: none;
-        /* Hide default button if using custom styling/label */
+    .choices[data-disabled] .choices__input {
+        background-color: #f3f4f6; /* Ensure input area also looks disabled */
+        cursor: not-allowed;
     }
 
     /* Custom file upload button style */
     .file-upload-label {
         display: inline-block;
         padding: 0.5rem 1rem;
-        background-color: #e0e7ff;
-        /* bg-indigo-100 */
-        color: #4338ca;
-        /* text-indigo-700 */
-        border: 1px solid transparent;
-        border-radius: 0.375rem;
-        font-size: 0.875rem;
-        font-weight: 500;
+        background-color: #4f46e5; /* indigo-600 */
+        color: white;
+        border-radius: 0.375rem; /* rounded-md */
         cursor: pointer;
-        transition: background-color 0.2s ease-in-out;
+        font-size: 0.875rem; /* text-sm */
+        font-weight: 500; /* font-medium */
+        transition: background-color 0.15s ease-in-out;
+    }
+    .file-upload-label:hover {
+        background-color: #4338ca; /* indigo-700 */
     }
 
-    .file-upload-label:hover {
-        background-color: #c7d2fe;
-        /* Slightly darker indigo */
-    }
 </style>
+{{-- Link Choices.js CSS --}}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
 @endsection
 
 @section('title', 'Add Professional Info') {{-- Changed Title --}}
@@ -106,7 +56,8 @@ $times = [
 'Below 3 months',
 '3-5 months',
 '6 months-1 year',
-'Over 1 year'
+'Over 1 year',
+'Not Applicable' // Added
 ];
 @endphp
 
@@ -130,6 +81,47 @@ $statuses = [
 'Retired'
 ];
 @endphp
+
+@php
+$industries = [
+    'Education',
+    'Healthcare and Medical Services',
+    'IT and Software Development',
+    'BPO / Call Center',
+    'Engineering and Construction',
+    'Manufacturing',
+    'Banking and Financial Services',
+    'Government and Public Administration',
+    'Retail and Wholesale Trade',
+    'Hospitality and Tourism',
+    'Transportation and Logistics',
+    'Media and Communications',
+    'Legal Services',
+    'Agriculture, Forestry, and Fisheries',
+    'Real Estate',
+    'Utilities',
+    'Non-Profit',
+    'Arts, Culture, and Entertainment',
+    'Automotive',
+    'Freelancing / Entrepreneurship',
+    'Not Applicable', // Added
+];
+@endphp
+
+@php
+$salaryRanges = [
+    'No Income',
+    'Below 10,000',
+    '10,000-20,000',
+    '20,001-40,000',
+    '40,001-60,000',
+    '60,001-80,000',
+    '80,001-100,000',
+    'Over 100,000',
+    'Not Applicable' // Added
+];
+@endphp
+
 
 <div class="bg-gray-100 w-full h-full p-8 flex flex-col max-h-[calc(100%-4rem)]">
     <h1 class="font-medium tracking-widest text-lg">Add Professional Info</h1> {{-- Changed Heading --}}
@@ -194,9 +186,10 @@ $statuses = [
                                 </select>
                             </div>
 
-                            <div>
+                            {{-- Fields affected by employment status --}}
+                            <div class="employment-field-group"> {{-- Wrap label and field together --}}
                                 <label for="employment_type1" class="block text-sm font-medium text-gray-700 mb-1">Employment Type 1</label>
-                                <select id="employment_type1" name="employment_type1" class="mt-1 block w-full border border-gray-300 rounded-lg shadow-sm p-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-gray-500" required>
+                                <select id="employment_type1" name="employment_type1" class="mt-1 block w-full border border-gray-300 rounded-lg shadow-sm p-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-gray-500 employment-field" required>
                                     <option value="">Select...</option>
                                     {{-- Removed pre-selection based on $prof --}}
                                     <option value="Private" {{ old('employment_type1') === 'Private' ? 'selected' : '' }}>Private</option>
@@ -206,9 +199,9 @@ $statuses = [
                                 </select>
                             </div>
 
-                            <div>
+                            <div class="employment-field-group"> {{-- Wrap label and field together --}}
                                 <label for="employment_type2" class="block text-sm font-medium text-gray-700 mb-1">Employment Type 2</label>
-                                <select id="employment_type2" name="employment_type2" class="mt-1 block w-full border border-gray-300 rounded-lg shadow-sm p-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-gray-500" required>
+                                <select id="employment_type2" name="employment_type2" class="mt-1 block w-full border border-gray-300 rounded-lg shadow-sm p-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-gray-500 employment-field" required>
                                     <option value="">Select...</option>
                                     {{-- Removed pre-selection based on $prof --}}
                                     <option value="Full-Time" {{ old('employment_type2') === 'Full-Time' ? 'selected' : '' }}>Full-Time</option>
@@ -220,52 +213,46 @@ $statuses = [
                                 </select>
                             </div>
 
-                            <div>
+                            <div class="employment-field-group"> {{-- Wrap label and field together --}}
                                 <label for="industry" class="block text-sm font-medium text-gray-700 mb-1">Industry</label>
-                                {{-- Removed pre-filling based on $prof --}}
-                                <input type="text" id="industry" name="industry" value="{{ old('industry') }}" class="mt-1 block w-full border border-gray-300 rounded-lg shadow-sm p-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-gray-500" required>
+                                {{-- Changed from input type="text" to select --}}
+                                <select id="industry" name="industry" class="mt-1 block w-full border border-gray-300 rounded-lg shadow-sm p-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-gray-500 employment-field" required>
+                                    <option value="">Select Industry...</option>
+                                    @foreach ($industries as $industry)
+                                    <option value="{{ $industry }}" {{ old('industry') === $industry ? 'selected' : '' }}>{{ $industry }}</option>
+                                    @endforeach
+                                </select>
                             </div>
 
-                            <div>
+                            <div class="employment-field-group"> {{-- Wrap label and field together --}}
                                 <label for="job_title" class="block text-sm font-medium text-gray-700 mb-1">Job Title</label>
                                 {{-- Removed pre-filling based on $prof --}}
-                                <input type="text" id="job_title" name="job_title" value="{{ old('job_title') }}" class="mt-1 block w-full border border-gray-300 rounded-lg shadow-sm p-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-gray-500" required>
+                                <input type="text" id="job_title" name="job_title" value="{{ old('job_title') }}" class="mt-1 block w-full border border-gray-300 rounded-lg shadow-sm p-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-gray-500 employment-field" required>
                             </div>
 
-                            <div>
+                            <div class="employment-field-group"> {{-- Wrap label and field together --}}
                                 <label for="company" class="block text-sm font-medium text-gray-700 mb-1">Company Name</label>
                                 {{-- Removed pre-filling based on $prof --}}
-                                <input type="text" id="company" name="company_name" value="{{ old('company_name') }}" class="mt-1 block w-full border border-gray-300 rounded-lg shadow-sm p-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-gray-500" required>
+                                <input type="text" id="company" name="company_name" value="{{ old('company_name') }}" class="mt-1 block w-full border border-gray-300 rounded-lg shadow-sm p-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-gray-500 employment-field" required>
                             </div>
 
-                            <div>
+                            <div class="employment-field-group"> {{-- Wrap label and field together --}}
                                 <label for="monthly_salary" class="block text-sm font-medium text-gray-700 mb-1">Monthly Salary</label>
-                                <select id="monthly_salary" name="monthly_salary" class="mt-1 block w-full border border-gray-300 rounded-lg shadow-sm p-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-gray-500" required>
-                                    @php
-                                    $ranges = [
-                                    'No Income',
-                                    'Below 10,000',
-                                    '10,000-20,000',
-                                    '20,001-40,000',
-                                    '40,001-60,000',
-                                    '60,001-80,000',
-                                    '80,001-100,000',
-                                    'Over 100,000'
-                                    ];
-                                    @endphp
+                                <select id="monthly_salary" name="monthly_salary" class="mt-1 block w-full border border-gray-300 rounded-lg shadow-sm p-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-gray-500 employment-field" required>
                                     <option value="">Select...</option>
-                                    @foreach ($ranges as $range)
+                                    @foreach ($salaryRanges as $range)
                                     {{-- Removed pre-selection based on $prof --}}
                                     <option value="{{ $range }}" {{ old('monthly_salary') === $range ? 'selected' : '' }}>{{ $range }}</option>
                                     @endforeach
                                 </select>
                             </div>
 
-                            <div>
+                            <div class="employment-field-group"> {{-- Wrap label and field together --}}
                                 <label for="work_location" class="block text-sm font-medium text-gray-700 mb-1">Work Location</label>
                                 {{-- Removed pre-filling based on $prof --}}
-                                <input type="text" id="work_location" name="work_location" value="{{ old('work_location') }}" class="mt-1 block w-full border border-gray-300 rounded-lg shadow-sm p-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-gray-500" required>
+                                <input type="text" id="work_location" name="work_location" value="{{ old('work_location') }}" class="mt-1 block w-full border border-gray-300 rounded-lg shadow-sm p-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-gray-500 employment-field" required>
                             </div>
+                            {{-- End of affected fields --}}
 
                             {{-- Span this field across both columns on medium screens and up --}}
                             <div class="md:col-span-2">
@@ -297,7 +284,7 @@ $statuses = [
                             {{-- Span this field across both columns on medium screens and up --}}
                             <div class="md:col-span-2">
                                 <label for="methods" class="block text-sm font-medium text-gray-700 mb-1">Job Search Methods Used</label>
-                                <select multiple name="methods[]" id="methods" class="mt-1 block w-full"></select>
+                                <select multiple name="methods[]" id="methods" class="mt-1 block w-full"></select> {{-- Choices.js will target this --}}
                                 <p class="mt-1 text-xs text-gray-500">Select or type to add new methods.</p>
                             </div>
 
@@ -332,7 +319,11 @@ $statuses = [
 @endsection
 
 @section('script')
+{{-- Choices.js Script --}}
+<script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+
 <script>
+    // --- Profile Picture Upload ---
     const upload = document.getElementById('upload');
     const changeProfile = document.getElementById('change-profile');
     const userProfile = document.getElementById('user-profile');
@@ -340,13 +331,8 @@ $statuses = [
     if (upload && changeProfile && userProfile) {
         upload.addEventListener('change', (e) => {
             const file = e.target.files[0];
-
-            if (!file) {
-                return;
-            }
-
+            if (!file) return;
             const reader = new FileReader();
-
             reader.readAsDataURL(file);
             reader.addEventListener('load', () => {
                 changeProfile.submit();
@@ -354,7 +340,7 @@ $statuses = [
         });
     }
 
-    // Function to update the file name display for custom file input
+    // --- File Name Display ---
     function updateFileName(inputElement) {
         const displayElement = document.getElementById('file-name-display');
         if (inputElement.files.length > 0) {
@@ -364,17 +350,6 @@ $statuses = [
             displayElement.textContent = 'No files selected.';
         }
     }
-</script>
-
-{{-- Removed Personal Info Script --}}
-{{-- Removed Educational Info Script --}}
-
-{{-- Professional Info Script --}}
-<script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
-{{-- Link is already in @section('header') --}}
-{{-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" /> --}}
-<script>
-    // --- Removed View Attachments Modal Script ---
 
     // --- Choices.js Initialization ---
     const methodsSelect = document.querySelector('#methods');
@@ -389,8 +364,10 @@ $statuses = [
         // You can add custom templates or classes here if needed
     };
 
+    let methodsChoicesInstance = null; // Store instance to enable/disable later
+
     if (methodsSelect) {
-        const methodsChoices = new Choices(methodsSelect, {
+        methodsChoicesInstance = new Choices(methodsSelect, { // Assign to instance variable
             ...choicesConfig,
             choices: [
                 @php
@@ -487,5 +464,97 @@ $statuses = [
             ]
         });
     }
+
+
+    // --- Employment Status Logic ---
+    document.addEventListener('DOMContentLoaded', function() {
+        const employmentStatusSelect = document.getElementById('employment_status');
+        const employmentFields = document.querySelectorAll('.employment-field'); // Select input/select fields directly
+        const notApplicableStatuses = ['Student', 'Retired', 'Unemployed'];
+        const studentRetiredStatuses = ['Student', 'Retired']; // For disabling methods
+
+        function toggleEmploymentFields() {
+            const selectedStatus = employmentStatusSelect.value;
+            const isDisabled = notApplicableStatuses.includes(selectedStatus);
+
+            employmentFields.forEach(field => {
+                const fieldWrapper = field.closest('.employment-field-group'); // Find the wrapping div if needed for styling
+
+                // field.disabled = isDisabled;
+                // field.required = !isDisabled; // Toggle required attribute
+
+                if (isDisabled) {
+                    // Add disabled style class to the field itself
+                    if (field.tagName === 'SELECT') {
+                        field.classList.add('form-select-disabled');
+                        field.classList.remove('form-input-disabled'); // Ensure correct class
+                    } else {
+                        field.classList.add('form-input-disabled');
+                        field.classList.remove('form-select-disabled'); // Ensure correct class
+                    }
+
+                    // Set default 'Not Applicable' / 'N/A' / 'No Income' values
+                    if (field.tagName === 'SELECT') {
+                        let defaultValue = 'Not Applicable';
+                        if (field.id === 'monthly_salary') {
+                             // Check if 'No Income' option exists, otherwise use 'Not Applicable'
+                             const noIncomeOption = Array.from(field.options).find(opt => opt.value === 'No Income');
+                             defaultValue = noIncomeOption ? 'No Income' : 'Not Applicable';
+                        }
+                        // Check if the default value exists as an option before setting it
+                        const optionExists = Array.from(field.options).some(opt => opt.value === defaultValue);
+                        if (optionExists) {
+                            field.value = defaultValue;
+                        } else {
+                            field.value = ''; // Fallback if 'Not Applicable' isn't an option
+                        }
+                    } else if (field.tagName === 'INPUT') {
+                        field.value = 'N/A';
+                    }
+                } else {
+                    // Remove disabled style class from the field
+                    field.classList.remove('form-input-disabled', 'form-select-disabled');
+
+                    // Clear the field ONLY if its current value is one of the defaults we set
+                    // This prevents clearing user input or old() values when switching back to 'Employed' etc.
+                    const defaultValues = ['N/A', 'Not Applicable', 'No Income'];
+                    if (defaultValues.includes(field.value)) {
+                         field.value = ''; // Clear the default value
+                    }
+                    // If using old() values, they should repopulate automatically if validation failed previously
+                }
+            });
+        }
+
+        function toggleMethodsField() {
+            if (!methodsChoicesInstance) return; // Check if Choices instance exists
+
+            const selectedStatus = employmentStatusSelect.value;
+            // Disable methods only for Student or Retired, not Unemployed
+            const isDisabled = studentRetiredStatuses.includes(selectedStatus);
+
+            if (isDisabled) {
+                methodsChoicesInstance.disable();
+                // Optionally clear selected items if needed when disabled
+                // methodsChoicesInstance.removeActiveItems(); // Removes highlighted items
+                // methodsChoicesInstance.clearStore(); // Clears all options and selections - use with caution
+                // methodsChoicesInstance.clearInput(); // Clears the text input
+                // methodsChoicesInstance.setValue([]); // Clears selected values
+            } else {
+                methodsChoicesInstance.enable();
+            }
+        }
+
+        // Add event listener to employment status select
+        employmentStatusSelect.addEventListener('change', () => {
+            toggleEmploymentFields();
+            toggleMethodsField(); // Also toggle methods field on status change
+        });
+
+        // Run on page load to set initial state based on current/old value
+        toggleEmploymentFields();
+        toggleMethodsField();
+    });
+
 </script>
 @endsection

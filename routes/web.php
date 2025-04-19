@@ -174,7 +174,8 @@ Route::controller(AdminController::class)
         Route::get('/profiles', 'alumniProfilesView')->name('profiles.index');
         Route::get('/profiles/{course}', 'alumniCoursesView')->name('profiles.courses');
 
-        Route::get('/user/view/{user}', 'userView');
+        Route::get('/user/view/{user}', 'userView')->name('admin.alumni.profile.view');
+        Route::post('/user/update/{dept}/{user}', 'updateAlumniProfile')->name('admin.alumni.profile.update');
         Route::get('/user/delete/{user}', 'userDelete');
         Route::get('/user/delete/{user}/department', 'userDeleteDepartment');
 

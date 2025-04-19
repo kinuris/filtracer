@@ -70,5 +70,33 @@ class ProfessionalRecord extends Model implements Auditable
         });
     }
 
+    public static function getIndustries()
+    {
+        // Define the list of industries here
+        // This could also be fetched from a config file or another source
+        return [
+            'Education',
+            'Healthcare and Medical Services',
+            'IT and Software Development',
+            'BPO / Call Center',
+            'Engineering and Construction',
+            'Manufacturing',
+            'Banking and Financial Services',
+            'Government and Public Administration',
+            'Retail and Wholesale Trade',
+            'Hospitality and Tourism',
+            'Transportation and Logistics',
+            'Media and Communications',
+            'Legal Services',
+            'Agriculture, Forestry, and Fisheries',
+            'Real Estate',
+            'Utilities',
+            'Non-Profit',
+            'Arts, Culture, and Entertainment',
+            'Automotive',
+            'Freelancing / Entrepreneurship',
+        ];
+    }
+
     use HasFactory;
 }

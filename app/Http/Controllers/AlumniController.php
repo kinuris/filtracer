@@ -334,50 +334,85 @@ class AlumniController extends Controller
 
     public function createProfBio(Request $request, User $alumni)
     {
+        // Validation rules adjusted based on the view and JS logic
         $validated = $request->validate([
-            'employment_status' => ['required'],
-            'employment_type1' => ['required'],
-            'employment_type2' => ['required'],
-            'industry' => ['required'],
-            'job_title' => ['required'],
-            'company' => ['required'],
-            'monthly_salary' => ['required'],
-            'work_location' => ['required'],
-            'waiting_time' => ['required'],
-            'hard_skills' => ['required', 'array', 'min:0'],
-            'soft_skills' => ['required', 'array', 'min:0'],
-            'methods' => ['required', 'array', 'min:0'],
-            'certs' => ['nullable', 'array'],
-            'certs.*' => ['nullable', 'mimes:pdf']
+            'employment_status' => ['required', 'string'],
+            'employment_type1' => ['required', 'string'], // JS sets 'Not Applicable' if needed
+            'employment_type2' => ['required', 'string'], // JS sets 'Not Applicable' if needed
+            'industry' => ['required', 'string'],         // JS sets 'Not Applicable' if needed
+            'job_title' => ['required', 'string'],        // JS sets 'N/A' if needed
+            'company_name' => ['required', 'string'],     // Field name corrected from 'company', JS sets 'N/A' if needed
+            'monthly_salary' => ['required', 'string'],   // JS sets 'No Income'/'Not Applicable' if needed
+            'work_location' => ['required', 'string'],    // JS sets 'N/A' if needed
+            'waiting_time' => ['required', 'string'],
+            'hard_skills' => ['nullable', 'array'], // Changed from required
+            'soft_skills' => ['nullable', 'array'], // Changed from required
+            'methods' => ['nullable', 'array'],     // Changed from required
+            'certs' => ['nullable', 'array'],       // Added for file uploads
+            'certs.*' => ['nullable', 'mimes:pdf', 'max:5120'] // Added PDF validation with size limit (5MB)
         ]);
 
-        $validated['company_name'] = $validated['company'];
+        // Create the main professional record
+        // Note: 'company_name' is already validated with the correct key
+        $prof = ProfessionalRecord::query()->create(array_merge(
+            ['user_id' => $alumni->id],
+            $validated // Pass all validated data directly
+        ));
 
-        $prof = ProfessionalRecord::query()->create(array_merge([
-            'user_id' => $alumni->id,
-        ], $validated));
-
-        foreach ($validated['hard_skills'] as $skill) {
-            ProfessionalRecordHardSkill::query()->create([
-                'professional_record_id' => $prof->id,
-                'skill' => $skill,
-            ]);
+        // Handle skills and methods using validated arrays, checking for null and trimming
+        foreach ($validated['hard_skills'] ?? [] as $skill) {
+            if ($skill) { // Ensure skill is not empty/null
+                ProfessionalRecordHardSkill::query()->create([
+                    'professional_record_id' => $prof->id,
+                    'skill' => trim($skill),
+                ]);
+            }
         }
 
-        foreach ($validated['soft_skills'] as $skill) {
-            ProfessionalRecordSoftSkill::query()->create([
-                'professional_record_id' => $prof->id,
-                'skill' => $skill,
-            ]);
+        foreach ($validated['soft_skills'] ?? [] as $skill) {
+            if ($skill) { // Ensure skill is not empty/null
+                ProfessionalRecordSoftSkill::query()->create([
+                    'professional_record_id' => $prof->id,
+                    'skill' => trim($skill),
+                ]);
+            }
         }
 
-        foreach ($validated['methods'] as $method) {
-            ProfessionalRecordMethod::query()->create([
-                'professional_record_id' => $prof->id,
-                'method' => $method,
-            ]);
+        foreach ($validated['methods'] ?? [] as $method) {
+            if ($method) { // Ensure method is not empty/null
+                ProfessionalRecordMethod::query()->create([
+                    'professional_record_id' => $prof->id,
+                    'method' => trim($method),
+                ]);
+            }
         }
 
+        // Handle certifications file uploads
+        if ($request->hasFile('certs')) {
+            foreach ($request->file('certs') as $cert) {
+                if ($cert->isValid()) { // Check if file is valid
+                    $ext = $cert->extension();
+                    $name = $cert->getClientOriginalName();
+                    // Generate a more unique filename
+                    $filename = sha1(time() . '_' . $cert->getClientOriginalName()) . '.' . $ext;
+                    // Store the file
+                    $path = $cert->storePubliclyAs('public/professional/attachments', $filename);
+
+                    if ($path) { // Check if storage was successful
+                        ProfessionalRecordAttachments::query()->create([
+                            'professional_record_id' => $prof->id,
+                            'type' => $cert->getClientMimeType(),
+                            'name' => $name,
+                            'link' => $filename, // Store only the filename, path is known
+                        ]);
+                    } else {
+                        // Optional: Log error or return with specific file upload error
+                    }
+                }
+            }
+        }
+
+        // Redirect back to the previous page (likely the form page)
         return back()
             ->with('message', 'Professional record created successfully')
             ->with('subtitle', 'Your professional information has been saved to your profile.');

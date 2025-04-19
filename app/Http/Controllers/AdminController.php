@@ -7,13 +7,19 @@ use App\Models\BindingRequest;
 use App\Models\ChatGroup;
 use App\Models\Course;
 use App\Models\Department;
+use App\Models\EducationRecord;
 use App\Models\Major;
+use App\Models\PersonalRecord;
 use App\Models\Post;
+use App\Models\ProfessionalRecord;
 use App\Models\User;
 use App\Models\UserAlert;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use OwenIt\Auditing\Models\Audit;
 
@@ -334,9 +340,146 @@ class AdminController extends Controller
 
     public function userView(User $user)
     {
+        // Ensure the admin belongs to the same department unless superadmin
+        $admin = Auth::user();
+        if (!$admin->admin()->is_super && $admin->department_id !== $user->department_id) {
+            abort(403, 'Unauthorized access to this user profile.');
+        }
+
         return view('alumni.view')
             ->with('dept', Department::query()->find($user->department_id))
             ->with('user', $user);
+    }
+
+    public function updateAlumniProfile(Request $request, Department $dept, User $user)
+    {
+        // Authorization check (redundant if route middleware is used, but good practice)
+        $admin = Auth::user();
+        if (!$admin->admin()->is_super && $admin->department_id !== $user->department_id) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        // --- Validation --- 
+        $personalData = $request->only([
+            'first_name', 'middle_name', 'last_name', 'suffix', 'student_id', 
+            'gender', 'birthdate', 'civil_status', 'phone_number', 'email_address',
+            'permanent_address', 'current_address', 'social_link'
+        ]);
+        $userData = $request->only(['username']);
+        $educationData = $request->input('educ', []);
+        $professionalData = $request->input('prof', []);
+
+        // Basic User Validation
+        $userValidator = Validator::make($userData, [
+            'username' => ['required', 'string', 'max:255', Rule::unique('users')->ignore($user->id)],
+        ]);
+
+        // Personal Info Validation
+        $personalValidator = Validator::make($personalData, [
+            'first_name' => ['required', 'string', 'max:255'],
+            'middle_name' => ['nullable', 'string', 'max:255'],
+            'last_name' => ['required', 'string', 'max:255'],
+            'suffix' => ['nullable', 'string', 'max:10'],
+            'student_id' => ['required', 'string', 'max:50'],
+            'gender' => ['required', Rule::in(['Male', 'Female', 'Other'])],
+            'birthdate' => ['required', 'date'],
+            'civil_status' => ['required', Rule::in(['Single', 'Married', 'Divorced', 'Widowed'])],
+            'phone_number' => ['required', 'string', 'max:20'],
+            'email_address' => ['required', 'string', 'email', 'max:255'],
+            'permanent_address' => ['nullable', 'string', 'max:500'],
+            'current_address' => ['nullable', 'string', 'max:500'],
+            'social_link' => ['nullable', 'url', 'max:255'],
+        ]);
+
+        // Education Info Validation (Iterate through each record)
+        $educationValidators = [];
+        foreach ($educationData as $id => $data) {
+            $educationValidators[$id] = Validator::make($data, [
+                'school' => ['required', 'string', 'max:255'],
+                'degree_type' => ['required', 'string', 'max:100'],
+                'course_id' => ['required', 'exists:courses,id'],
+                'school_location' => ['nullable', 'string', 'max:255'],
+                'start' => ['required', 'integer', 'min:1900', 'max:' . date('Y')],
+                'end' => ['required', 'string', 'max:10'], // Allow 'Present' or year
+            ]);
+        }
+
+        // Professional Info Validation (Iterate through each record)
+        $professionalValidators = [];
+        foreach ($professionalData as $id => $data) {
+            $professionalValidators[$id] = Validator::make($data, [
+                'employment_status' => ['required'], // Assuming a static method
+                'job_title' => ['required', 'string', 'max:255'],
+                'employment_type1' => ['required'], // Assuming a static method
+                'company_name' => ['required', 'string', 'max:255'],
+                'employment_type2' => ['required'], // Assuming a static method
+                'monthly_salary' => ['required'], // Assuming a static method
+                'industry' => ['required'],
+                'work_location' => ['nullable', 'string', 'max:255'],
+                'waiting_time' => ['required'], // Assuming a static method
+            ]);
+        }
+
+        // Combine validation errors
+        $errors = $userValidator->errors()->merge($personalValidator->errors());
+        foreach ($educationValidators as $id => $validator) {
+            $errors = $errors->merge($validator->errors()->messages(), "educ.{$id}.");
+        }
+        foreach ($professionalValidators as $id => $validator) {
+            $errors = $errors->merge($validator->errors()->messages(), "prof.{$id}.");
+        }
+
+        if ($errors->isNotEmpty()) {
+            return back()->withErrors($errors)->withInput()->with('edit', 'true'); // Redirect back with errors and input
+        }
+
+        // --- Update Logic --- 
+        try {
+            DB::beginTransaction();
+
+            // Update User model
+            $user->update($userData);
+
+            // Update PersonalRecord
+            $personalRecord = $user->getPersonalBio() ?? $user->partialPersonal;
+            if ($personalRecord) {
+                // Ensure birthdate is formatted correctly if needed (depends on model casting)
+                // $personalData['birthdate'] = \Carbon\Carbon::parse($personalData['birthdate'])->format('Y-m-d');
+                $personalRecord->update($personalData);
+            }
+
+            // Update EducationRecords
+            foreach ($educationData as $id => $data) {
+                $educRecord = EducationRecord::find($id);
+                if ($educRecord && $educRecord->user_id === $user->id) { // Ensure record belongs to user
+                    $educRecord->update($data);
+                }
+            }
+
+            // Update ProfessionalRecords
+            foreach ($professionalData as $id => $data) {
+                $profRecord = ProfessionalRecord::find($id);
+                if ($profRecord && $profRecord->user_id === $user->id) { // Ensure record belongs to user
+                    $profRecord->update($data);
+                }
+            }
+
+            DB::commit();
+
+            return redirect()->route('admin.alumni.profile.view', [$dept->id, $user->id])->with([
+                'message' => 'Profile updated successfully!',
+                'subtitle' => $user->name . '\'s profile has been updated.'
+            ]);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            // Log the error
+            Log::error("Error updating profile for user {$user->id}: " . $e->getMessage());
+            return back()->withInput()->with('edit', 'true')->with([
+                'failed_message' => 'Profile update failed!',
+                'failed_subtitle' => 'An unexpected error occurred. Please try again.'
+            ]);
+        }
     }
 
     public function auditView()

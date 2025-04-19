@@ -20,6 +20,8 @@ return new class extends Migration
 
         // Finally, update the monthly_salary enum to match form options case
         DB::statement("ALTER TABLE professional_records MODIFY COLUMN monthly_salary ENUM('No Income', 'Below 10,000', '10,000-20,000', '20,001-40,000', '40,001-60,000', '60,001-80,000', '80,001-100,000', 'Over 100,000')");
+
+        // Removed 'Job not secured' addition from waiting_time enum
     }
 
     /**
@@ -31,5 +33,7 @@ return new class extends Migration
         DB::statement("ALTER TABLE professional_records MODIFY COLUMN employment_type1 ENUM('Private', 'Government', 'NGO/INGO')");
         DB::statement("ALTER TABLE professional_records MODIFY COLUMN employment_type2 ENUM('Full-Time', 'Part-Time', 'Traineeship', 'Internship', 'Contract')");
         DB::statement("ALTER TABLE professional_records MODIFY COLUMN monthly_salary ENUM('no income', 'below 10,000', '10,000-20,000', '20,001-40,000', '40,001-60,000', '60,001-80,000', '80,001-100,000', 'over 100,000')");
+
+        // Removed revert for waiting_time enum
     }
 };
