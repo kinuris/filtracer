@@ -26,7 +26,7 @@
                 <tr class="border-b">
                     <td class="py-4 pl-4">{{ $audit->id }}</td>
                     <td>{{ $audit->created_at->format('Y-m-d H:i:s') }}</td>
-                    <td class="text-sm">{{ $audit->user->name }}</td>
+                    <td class="text-sm">{{ $audit->user?->name ?? 'System' }}</td>
                     @php($modified = $audit->getModified())
                     <td>
                         @foreach ($modified as $key => $value)
