@@ -489,6 +489,69 @@
             }]
         },
         options: {
+            onClick: (event, elements, chart) => {
+                if (elements.length > 0) {
+                    const elementIndex = elements[0].index;
+                    const clickedLabel = chart.data.labels[elementIndex];
+
+                    // Don't navigate if the label is 'N/A'
+                    if (clickedLabel === 'N/A') {
+                        return;
+                    }
+
+                    const currentParams = new URLSearchParams(window.location.search);
+                    const statisticalParams = new URLSearchParams();
+
+                    // Preserve existing relevant filters
+                    if (currentParams.has('category')) {
+                        statisticalParams.set('category', currentParams.get('category'));
+                    }
+                    if (currentParams.has('batch')) {
+                        statisticalParams.set('batch', currentParams.get('batch'));
+                    }
+                     if (currentParams.has('department') && '{{ $subCategory }}' === 'Batch') { // Only carry over department if subcategory was Batch
+                        statisticalParams.set('department', currentParams.get('department'));
+                    }
+
+
+                    // Add filter based on the clicked bar and current subcategory
+                    const subCategoryValue = '{{ $subCategory }}';
+                    let filterKey = '';
+                    let filterValue = clickedLabel;
+
+                    switch (subCategoryValue) {
+                        case 'Department': filterKey = 'department_id';
+                            // Need to map department name back to ID if possible, otherwise skip this filter for now
+                            // This requires passing department IDs along with names to the JS, or making an AJAX call.
+                            // For simplicity, we'll skip adding this specific filter on click for now.
+                            // TODO: Implement department name to ID mapping if required for statistical view filtering.
+                            break;
+                        case 'Batch': filterKey = 'batch'; break;
+                        case 'Course': filterKey = 'course_id';
+                            // Similar to department, mapping name to ID might be needed.
+                            // TODO: Implement course name to ID mapping if required.
+                             break;
+                        case 'Jobs': filterKey = 'job_title'; break;
+                        case 'Industry': filterKey = 'industry'; break;
+                        case 'Employment Type 1': filterKey = 'employment_type1'; break;
+                        case 'Employment Type 2': filterKey = 'employment_type2'; break;
+                        case 'Monthly Salary': filterKey = 'monthly_salary'; break;
+                        case 'Waiting Time': filterKey = 'waiting_time'; break;
+                        case 'Job Search Method': filterKey = 'job_search_method'; break;
+                    }
+
+                    if (filterKey && filterKey !== 'department_id' && filterKey !== 'course_id') { // Add filter if key is determined and not needing ID mapping for now
+                         statisticalParams.set(filterKey, filterValue);
+                    } else if (filterKey) {
+                        console.warn(`Filter key '${filterKey}' requires mapping name ('${filterValue}') to ID. Navigation will proceed without this specific filter.`);
+                    }
+
+
+                    // Construct the target URL
+                    const targetUrl = `/report/statistical?${statisticalParams.toString()}`;
+                    window.location.href = targetUrl;
+                }
+            },
             scales: {
                 y: {
                     beginAtZero: true,
