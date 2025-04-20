@@ -361,9 +361,19 @@ class AdminController extends Controller
 
         // --- Validation --- 
         $personalData = $request->only([
-            'first_name', 'middle_name', 'last_name', 'suffix', 'student_id', 
-            'gender', 'birthdate', 'civil_status', 'phone_number', 'email_address',
-            'permanent_address', 'current_address', 'social_link'
+            'first_name',
+            'middle_name',
+            'last_name',
+            'suffix',
+            'student_id',
+            'gender',
+            'birthdate',
+            'civil_status',
+            'phone_number',
+            'email_address',
+            'permanent_address',
+            'current_address',
+            'social_link'
         ]);
         $userData = $request->only(['username']);
         $educationData = $request->input('educ', []);
@@ -470,7 +480,6 @@ class AdminController extends Controller
                 'message' => 'Profile updated successfully!',
                 'subtitle' => $user->name . '\'s profile has been updated.'
             ]);
-
         } catch (\Exception $e) {
             DB::rollBack();
             // Log the error
@@ -505,6 +514,110 @@ class AdminController extends Controller
 
     public function reportsStatisticalView()
     {
+        $departmentQuery = request()->query('department');
+        $departmentIdToFilter = null;
+        $departmentToFilter = null;
+        $coursesQuery = request()->query('courses'); // Changed 'course' to 'courses'
+        $courseIdToFilter = null;
+        $courseToFilter = null;
+
+        $needsRedirect = false;
+        $queryParams = request()->query();
+
+        // --- Process Department Parameter ---
+        if ($departmentQuery) {
+            if (!is_numeric($departmentQuery)) {
+            // Input is a string (name)
+            $foundDepartment = Department::where('name', $departmentQuery)->first();
+            if ($foundDepartment) {
+                // Found by name: Replace name with ID in query and mark for redirect
+                $queryParams['department'] = $foundDepartment->id;
+                $departmentIdToFilter = $foundDepartment->id; // Also set filter vars
+                $departmentToFilter = $foundDepartment;
+                $needsRedirect = true;
+            } else {
+                // Not found by name: Remove parameter and mark for redirect
+                unset($queryParams['department']);
+                $needsRedirect = true;
+            }
+            } else {
+            // Input is numeric (ID)
+            $departmentIdToFilter = (int) $departmentQuery;
+            $foundDepartment = Department::find($departmentIdToFilter);
+            if ($foundDepartment) {
+                // Found by ID: Set the filter variable (no redirect needed for this parameter specifically)
+                $departmentToFilter = $foundDepartment;
+            } else {
+                // Not found by ID: Remove parameter and mark for redirect
+                unset($queryParams['department']);
+                $departmentIdToFilter = null; // Reset since it's invalid
+                $needsRedirect = true;
+            }
+            }
+        }
+
+        // --- Process Course Parameter ---
+        if ($coursesQuery) { // Changed $courseQuery to $coursesQuery
+            if (!is_numeric($coursesQuery)) { // Changed $courseQuery to $coursesQuery
+            // Input is a string (name)
+            $foundCourse = Course::where('name', $coursesQuery)->first(); // Changed $courseQuery to $coursesQuery
+            if ($foundCourse) {
+                // Found by name: Replace name with ID in query and mark for redirect
+                $queryParams['courses'] = $foundCourse->id; // Changed 'course' to 'courses'
+                $courseIdToFilter = $foundCourse->id; // Also set filter vars
+                $courseToFilter = $foundCourse;
+
+                // --- Add/Update Department Parameter ---
+                if ($foundCourse->department_id) {
+                $queryParams['department'] = $foundCourse->department_id;
+                $departmentIdToFilter = $foundCourse->department_id;
+                $departmentToFilter = $foundCourse->department; // Eager load if needed or fetch separately
+                }
+                // --- End Add/Update Department ---
+
+                $needsRedirect = true;
+            } else {
+                // Not found by name: Remove parameter and mark for redirect
+                unset($queryParams['courses']); // Changed 'course' to 'courses'
+                $needsRedirect = true;
+            }
+            } else {
+            // Input is numeric (ID)
+            $courseIdToFilter = (int) $coursesQuery; // Changed $courseQuery to $coursesQuery
+            $foundCourse = Course::find($courseIdToFilter);
+            if ($foundCourse) {
+                // Found by ID: Set the filter variable
+                $courseToFilter = $foundCourse;
+
+                // --- Add/Update Department Parameter if not already set or different ---
+                if ($foundCourse->department_id && (!isset($queryParams['department']) || $queryParams['department'] != $foundCourse->department_id)) {
+                $queryParams['department'] = $foundCourse->department_id;
+                $departmentIdToFilter = $foundCourse->department_id;
+                $departmentToFilter = $foundCourse->department; // Eager load if needed or fetch separately
+                $needsRedirect = true; // Redirect needed as we modified department param
+                }
+                // --- End Add/Update Department ---
+
+            } else {
+                // Not found by ID: Remove parameter and mark for redirect
+                unset($queryParams['courses']); // Changed 'course' to 'courses'
+                $courseIdToFilter = null; // Reset since it's invalid
+                $needsRedirect = true;
+            }
+            }
+        }
+
+        // --- Perform Redirect if Necessary ---
+        if ($needsRedirect) {
+            // Rebuild query string preserving other parameters
+            $redirectUrl = request()->url() . (!empty($queryParams) ? '?' . http_build_query($queryParams) : '');
+            return redirect($redirectUrl);
+        }
+
+        // --- At this point, $departmentIdToFilter, $departmentToFilter, ---
+        // --- $courseIdToFilter, and $courseToFilter are set correctly ---
+        // --- if valid IDs were provided or derived from names. ---
+
         $users = User::compSet()
             ->where('role', '=', 'Alumni')
             ->orderBy('created_at', 'DESC');

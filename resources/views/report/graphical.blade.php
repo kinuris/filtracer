@@ -520,14 +520,14 @@
                     let filterValue = clickedLabel;
 
                     switch (subCategoryValue) {
-                        case 'Department': filterKey = 'department_id';
+                        case 'Department': filterKey = 'department';
                             // Need to map department name back to ID if possible, otherwise skip this filter for now
                             // This requires passing department IDs along with names to the JS, or making an AJAX call.
                             // For simplicity, we'll skip adding this specific filter on click for now.
                             // TODO: Implement department name to ID mapping if required for statistical view filtering.
                             break;
                         case 'Batch': filterKey = 'batch'; break;
-                        case 'Course': filterKey = 'course_id';
+                        case 'Course': filterKey = 'courses';
                             // Similar to department, mapping name to ID might be needed.
                             // TODO: Implement course name to ID mapping if required.
                              break;
