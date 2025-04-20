@@ -46,34 +46,45 @@
                     <div class="flex flex-col">
                         <label for="subcategory" class="text-sm font-medium text-gray-700 mb-0.5">Group By</label>
                         @php
-                        $subCategory = request('subcategory') ?? 'Department'
+                        // Default to Department for super admin, Batch otherwise, matching statistical view
+                        $subCategory = request('subcategory') ?? (Auth::user()->admin()->is_super ? 'Department' : 'Batch'); // Reverted
                         @endphp
                         <select class="border p-1.5 rounded-lg bg-white text-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-blue-500" name="subcategory" id="subcategory">
-                            @if (Auth::user()->admin()->is_super)
+                            @if (Auth::user()->admin()->is_super) // Reverted
                             <option {{ $subCategory == 'Department' ? 'selected' : '' }} value="Department">Department</option>
                             @endif
                             <option {{ $subCategory == 'Batch' ? 'selected' : '' }} value="Batch">Batch</option>
                             <option {{ $subCategory == 'Course' ? 'selected' : '' }} value="Course">Course</option>
+                            {{-- Hide options irrelevant for Unemployed Alumni --}}
                             @if ($category !== 'Unemployed Alumni')
-                            <option {{ $subCategory == 'Jobs' ? 'selected' : '' }} value="Jobs">Jobs</option>
+                            <option {{ $subCategory == 'Jobs' ? 'selected' : '' }} value="Jobs">Job Title</option>
+                            <option {{ $subCategory == 'Industry' ? 'selected' : '' }} value="Industry">Industry</option>
+                            <option {{ $subCategory == 'Employment Type 1' ? 'selected' : '' }} value="Employment Type 1">Employment Type (Sector)</option>
+                            <option {{ $subCategory == 'Employment Type 2' ? 'selected' : '' }} value="Employment Type 2">Employment Type (Nature)</option>
+                            <option {{ $subCategory == 'Monthly Salary' ? 'selected' : '' }} value="Monthly Salary">Monthly Salary</option>
+                            <option {{ $subCategory == 'Waiting Time' ? 'selected' : '' }} value="Waiting Time">Waiting Time for First Job</option>
+                            <option {{ $subCategory == 'Job Search Method' ? 'selected' : '' }} value="Job Search Method">Job Search Method</option>
                             @endif
                         </select>
                     </div>
 
                     <!-- Conditional third filter -->
-                    @if ($subCategory == 'Course' || $subCategory == 'Department')
+                    @php
+                    $professionalSubcategories = ['Jobs', 'Industry', 'Employment Type 1', 'Employment Type 2', 'Monthly Salary', 'Waiting Time', 'Job Search Method'];
+                    $showBatchFilter = in_array($subCategory, ['Course', 'Department']) || in_array($subCategory, $professionalSubcategories);
+                    $showDepartmentFilter = $subCategory == 'Batch' && Auth::user()->admin()->is_super; // Reverted
+                    @endphp
+
+                    @if ($showBatchFilter)
                     <div class="flex flex-col">
                         <label for="batch" class="text-sm font-medium text-gray-700 mb-0.5">Batch</label>
                         @php
-                        $batches = [];
-                        foreach (App\Models\User::all() as $user) {
-                        if ($user->isCompSet() && $user->getEducationalBio()->end) {
-                        $batches[$user->getEducationalBio()->end] = true;
-                        }
-                        }
-
-                        $batches = array_keys($batches);
-                        sort($batches);
+                        // Optimized batch fetching
+                        $batches = App\Models\EducationRecord::whereNotNull('end')
+                                    ->distinct()
+                                    ->orderBy('end', 'asc') // Sort ascending
+                                    ->pluck('end')
+                                    ->unique(); // Ensure uniqueness after plucking
                         $selectedBatch = request('batch') ?? '';
                         @endphp
                         <select class="border p-1.5 rounded-lg bg-white text-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-blue-500" name="batch" id="batch">
@@ -83,8 +94,7 @@
                             @endforeach
                         </select>
                     </div>
-                    @elseif ($subCategory == 'Batch')
-                    @if (Auth::user()->admin()->is_super)
+                    @elseif ($showDepartmentFilter)
                     <div class="flex flex-col">
                         <label for="department" class="text-sm font-medium text-gray-700 mb-0.5">Department</label>
                         @php
@@ -98,7 +108,7 @@
                         </select>
                     </div>
                     @endif
-                    @endif
+                    {{-- No third filter needed otherwise --}}
                 </div>
 
                 <!-- Generate Report Button -->
@@ -116,15 +126,53 @@
 
     <div class="shadow rounded-lg mt-4 flex-1 h-full max-h-full overflow-auto">
         <div class="bg-white py-4 flex flex-col px-6 border-b rounded-lg min-h-full">
-            <div class="flex justify-between">
-                @if (Auth::user()->admin()->is_super)
-                <h1 class="font-medium text-lg h-12">All Registered Alumni by Department</h1>
-                @else
-                <h1 class="font-medium text-lg h-12">All Registered Alumni by {{ Auth::user()->admin()->officeRelation->name }}</h1>
-                @endif
+            <div class="flex justify-between items-center">
+                @php
+                // Construct the dynamic title
+                $titleParts = [];
+
+                // Start with the base category description
+                if ($category === 'All Users') {
+                    $titleParts[] = 'All Registered Users';
+                } else {
+                    $titleParts[] = $category; // e.g., 'Employed Alumni'
+                }
+
+                // Add the subcategory (Group By)
+                // Map internal subcategory value to a more readable name if needed
+                $subCategoryDisplay = match($subCategory) {
+                    'Employment Type 1' => 'Employment Type (Sector)',
+                    'Employment Type 2' => 'Employment Type (Nature)',
+                    'Jobs' => 'Job Title',
+                    'Monthly Salary' => 'Monthly Salary',
+                    'Waiting Time' => 'Waiting Time for First Job',
+                    'Job Search Method' => 'Job Search Method',
+                    default => $subCategory, // Keep original for Department, Batch, Course, Industry
+                };
+                $titleParts[] = 'by ' . $subCategoryDisplay;
+
+
+                // Add the third filter if applicable and selected
+                if ($showBatchFilter && !empty($selectedBatch)) {
+                    $titleParts[] = 'from Batch ' . $selectedBatch;
+                } elseif ($showDepartmentFilter && !empty($selectedDepartment)) {
+                    // Fetch department name for the title
+                    $deptName = App\Models\Department::find($selectedDepartment)?->name ?? 'Selected Department';
+                    $titleParts[] = 'in ' . $deptName;
+                } elseif (!$showBatchFilter && !$showDepartmentFilter && !Auth::user()->admin()->is_super) { // Reverted
+                    // If no third filter and not super admin, add their office
+                    $titleParts[] = 'in ' . Auth::user()->admin()->officeRelation->name; // Reverted
+                }
+
+                $dynamicTitle = implode(' ', $titleParts);
+
+                // No need for complex default checks anymore with this structure
+
+                @endphp
+                <h1 class="font-medium text-lg h-12 flex items-center">{{ $dynamicTitle }}</h1>
 
                 <div class="text-sm text-gray-600">
-                    Total Alumni: <span class="font-semibold" id="totalAlumni"></span>
+                    Total Count: <span class="font-semibold" id="totalAlumni"></span>
                 </div>
             </div>
             <canvas id="graphical"></canvas>
@@ -177,9 +225,11 @@
         if (params.has('category')) {
             params.delete('category');
         }
-
         params.append('category', e.target.value);
-        if (params.get('category') === 'Unemployed Alumni' && params.get('subcategory') === 'Jobs') {
+
+        // Ensure professional-related subcategories are deselected if 'Unemployed Alumni' is chosen
+        const professionalSubcats = ['Jobs', 'Industry', 'Employment Type 1', 'Employment Type 2', 'Monthly Salary', 'Waiting Time', 'Job Search Method'];
+        if (params.get('category') === 'Unemployed Alumni' && professionalSubcats.includes(params.get('subcategory'))) {
             params.delete('subcategory');
         }
 
@@ -188,13 +238,30 @@
 
     subCategory.addEventListener('change', (e) => {
         const params = new URLSearchParams(window.location.search);
-        if (params.has('subcategory')) {
-            params.delete('subcategory');
+        const newSubCatValue = e.target.value;
+
+        // Update subcategory param
+        params.delete('subcategory');
+        params.append('subcategory', newSubCatValue);
+
+        // Define which subcategories use which third filter
+        const professionalSubcats = ['Jobs', 'Industry', 'Employment Type 1', 'Employment Type 2', 'Monthly Salary', 'Waiting Time', 'Job Search Method'];
+        const usesBatchFilter = ['Course', 'Department', ...professionalSubcats].includes(newSubCatValue);
+        const usesDepartmentFilter = newSubCatValue === 'Batch'; // Assuming only 'Batch' uses Department filter
+
+        // Remove conflicting third filter parameters
+        if (!usesBatchFilter) {
+            params.delete('batch');
+        }
+        if (!usesDepartmentFilter) {
+             params.delete('department');
         }
 
-        params.append('subcategory', e.target.value);
-        if (params.get('category') === 'Unemployed Alumni' && params.get('subcategory') === 'Jobs') {
-            params.delete('subcategory');
+        // Double-check: Ensure professional subcats are removed if category is 'Unemployed Alumni'
+        const currentCategory = params.get('category') ?? 'All Users';
+        if (currentCategory === 'Unemployed Alumni' && professionalSubcats.includes(newSubCatValue)) {
+            params.delete('subcategory'); // Reset subcategory if incompatible
+            params.delete('batch'); // Also remove batch if subcategory is reset
         }
 
         window.location.search = params.toString();
@@ -210,64 +277,98 @@
     use App\Models\User;
     use Illuminate\Support\Facades\Auth;
 
-    // $groups = User::groupBy($subCategory);
+    // Get base users (partial or complete setup)
     $users = User::partialSet()->get()->merge(User::compSet()->get());
+
     $groups = $users
         ->filter(function ($user) use ($subCategory, $category) {
-            if ($subCategory === 'Department' || $subCategory === 'Course') {
-                $admin = User::query()->find(Auth::user()->id);
-                if (!$admin->admin()->is_super) {
-                    if (!empty(request('batch'))) {
-                        return $user->isCompSet() && $user->department_id == $admin->admin()->office &&
-                            $user->getEducationalBio()->end == request('batch');
-                    }
+            // Initial filter: Most categories/subcategories require completed setup
+            $needsCompSet = $category !== 'All Users';
 
-                    return $user->isCompSet() && $user->department_id == $admin->admin()->office;
-                }
-
-                if (empty(request('batch'))) {
-                    return $user->isCompSet();
-                }
-
-                return $user->isCompSet() && $user->getEducationalBio()->end === request('batch');
-            } else if ($subCategory === 'Batch') {
-                $admin = User::query()->find(Auth::user()->id);
-                if (!$admin->admin()->is_super) {
-                    return $user->isCompSet() && $user->department_id == $admin->admin()->office;
-                }
-
-                if (empty(request('department'))) {
-                    return $user->isCompSet();
-                }
-
-                return $user->isCompSet() && $user->department_id == request('department');
+            // Define subcategories requiring professional bio
+            $profBioSubcategories = ['Jobs', 'Industry', 'Employment Type 1', 'Employment Type 2', 'Monthly Salary', 'Waiting Time', 'Job Search Method'];
+            if (in_array($subCategory, $profBioSubcategories)) {
+                $needsCompSet = true; // These always require a professional bio
+            }
+            // Batch and Course also require completed educational bio (implied by compSet)
+            if ($subCategory === 'Batch' || $subCategory === 'Course') {
+                 $needsCompSet = true;
             }
 
-            $admin = User::query()->find(Auth::user()->id);
-            if (!$admin->admin()->is_super) {
-                return $user->isCompSet() && $user->department_id == $admin->admin()->office;
+            // Exclude if complete setup is needed but not present
+            if ($needsCompSet && !$user->isCompSet()) {
+                return false;
             }
 
-            return $user->isCompSet();
+            // Apply department filtering based on admin role
+            $admin = Auth::user()->admin(); // Reverted: Access relationship via method
+            if (!$admin->is_super) {
+                if ($user->department_id != $admin->office) {
+                    return false; // Non-super admin sees only their department
+                }
+            } elseif (!empty(request('department')) && $subCategory === 'Batch') {
+                 // Super admin filtering by department when grouping by Batch
+                 if ($user->department_id != request('department')) {
+                     return false;
+                 }
+            }
+
+            // Define subcategories where batch filtering is applicable
+            $professionalSubcategories = ['Jobs', 'Industry', 'Employment Type 1', 'Employment Type 2', 'Monthly Salary', 'Waiting Time', 'Job Search Method'];
+            $batchFilterApplicable = in_array($subCategory, ['Course', 'Department']) || in_array($subCategory, $professionalSubcategories);
+
+            // Apply batch filtering if selected and applicable
+            if (!empty(request('batch')) && $batchFilterApplicable) {
+                // Ensure educational bio exists before checking 'end'
+                $eduBio = $user->getEducationalBio();
+                if (!$eduBio || $eduBio->end != request('batch')) {
+                    return false;
+                }
+            }
+
+            // If we reach here, the user passes the filters
+            return true;
+
         })
         ->groupBy(function ($user) use ($subCategory) {
+            // Ensure related records exist before accessing properties
+            $profBio = $user->getProfessionalBio(); // Can be null
+            $eduBio = $user->getEducationalBio();   // Can be null
+
             switch ($subCategory) {
                 case 'Department':
-                    return $user->department->name;
+                    return $user->department?->name ?? 'N/A';
                 case 'Batch':
-                    return $user->getEducationalBio()->end;
+                    return $eduBio?->end ?? 'N/A';
                 case 'Course':
-                    return $user->course->name;
+                    return $user->course?->name ?? 'N/A';
                 case 'Jobs':
-                    return $user->getProfessionalBio()->job_title;
+                    return $profBio?->job_title ?? 'N/A';
+                case 'Industry':
+                    return $profBio?->industry ?? 'N/A';
+                case 'Employment Type 1':
+                    return $profBio?->employment_type1 ?? 'N/A';
+                case 'Employment Type 2':
+                    return $profBio?->employment_type2 ?? 'N/A';
+                case 'Monthly Salary':
+                    // Handle 'no income' explicitly if needed, otherwise use value or N/A
+                    return $profBio?->monthly_salary ?? 'N/A';
+                case 'Waiting Time':
+                    return $profBio?->waiting_time ?? 'N/A';
+                case 'Job Search Method':
+                    // Group by the first method found, or 'N/A' if none or no profBio
+                    return $profBio?->methods->first()?->method ?? 'N/A';
+                default:
+                    return 'N/A'; // Fallback for unexpected subcategory
             }
         })->all();
 
     $xAxis = array_keys($groups);
+    // Ensure yAxis calculation uses the filtered $groups
     $yAxis = array_map(fn($group) => User::countFromGroup($category, $group), $groups);
     ?>
 
-    <?php $total = 0; ?>
+    <?php $total = array_sum($yAxis); // Calculate total based on the final grouped data ?>
 
     new Chart(ctx, {
         type: 'bar',
@@ -284,7 +385,6 @@
                 data: [
                     <?php
                     foreach ($yAxis as $value) {
-                        $total += $value;
                         echo $value . ',';
                     }
                     ?>
@@ -403,7 +503,9 @@
                 },
                 datalabels: {
                     formatter: (value, ctx) => {
-                        return `${value} (${(value / <?php echo $total ?> * 100).toFixed(2)}%)`;
+                        // Avoid division by zero if total is 0
+                        let percentage = <?php echo $total > 0 ? '(value / ' . $total . ' * 100).toFixed(2)' : '0'; ?>;
+                        return `${value} (${percentage}%)`;
                     },
                     display: ctx => {
                         return ctx.chart.data.datasets[0].data[ctx.dataIndex] > 0

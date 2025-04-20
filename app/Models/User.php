@@ -376,6 +376,11 @@ class User extends Authenticatable
         }
     }
 
+    public function educationalRecord()
+    {
+        return $this->hasMany(EducationRecord::class, 'user_id');
+    } 
+
     public static function isCourse(int $course): Builder
     {
         $users = self::hasBio('educational');
