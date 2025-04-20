@@ -376,10 +376,15 @@ class User extends Authenticatable
         }
     }
 
+    /**
+     * Get the latest educational record associated with the user.
+     */
     public function educationalRecord()
     {
-        return $this->hasMany(EducationRecord::class, 'user_id');
-    } 
+        // Assuming 'end' column determines the latest record.
+        // Adjust the column name if necessary, or remove it to use the primary key.
+        return $this->hasOne(EducationRecord::class, 'user_id')->latestOfMany();
+    }
 
     public static function isCourse(int $course): Builder
     {

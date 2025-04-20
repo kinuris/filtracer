@@ -181,8 +181,8 @@ Route::controller(AdminController::class)
 
         Route::get('/report/graphical', 'reportsGraphicalView');
 
-        Route::get('/report/statistical', 'reportsStatisticalView');
-        Route::get('/report/statistical/generate', 'reportsStatisticalGenerateView');
+        Route::get('/report/statistical', 'reportsStatisticalView')->name('report.statistical');
+        Route::get('/report/statistical/generate', 'reportsStatisticalGenerateView')->name('report.statistical.generate');
 
         Route::get('/account', 'accountsView');
         Route::get('/admin/profile', 'myProfileView');
