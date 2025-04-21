@@ -87,7 +87,7 @@ class SuperAdminController extends Controller
             'middle_name' => ['nullable'],
             'last_name' => ['required'],
             'suffix' => ['nullable'],
-            'student_id' => ['required'],
+            'student_id' => ['nullable'],
             'email' => ['required', 'email'],
             'contact_number' => ['required'],
             'username' => ['required', 'unique:users,username'],

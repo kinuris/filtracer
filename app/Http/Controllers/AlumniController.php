@@ -496,7 +496,7 @@ class AlumniController extends Controller
             'middle_name' => ['nullable'],
             'last_name' => ['required'],
             // Ignore current record's student_id if updating
-            'student_id' => ['required', 'unique:personal_records,student_id' . ($existingRecord ? ',' . $existingRecord->id : '')],
+            'student_id' => ['nullable', 'unique:personal_records,student_id' . ($existingRecord ? ',' . $existingRecord->id : '')],
             'gender' => ['required'],
             'civil_status' => ['required'],
             'birthdate' => ['required', 'date'],
