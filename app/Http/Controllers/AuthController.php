@@ -286,11 +286,11 @@ class AuthController extends Controller
                 'department' => ['required'],
             ]);
 
-            if ($validated['student_id'] && PartialPersonalRecord::query()->where('student_id', '=', $validated['student_id'])->exists() || PersonalRecord::query()->where('student_id', '=', $validated['student_id'])->exists()) {
+            if ($validated['student_id'] && (PartialPersonalRecord::query()->where('student_id', '=', $validated['student_id'])->exists() || PersonalRecord::query()->where('student_id', '=', $validated['student_id'])->exists())) {
                 session()->flashInput($request->input());
 
                 return view('alumni-register')
-                    ->withErrors(['student_id' => 'Studnet ID already taken.']);
+                    ->withErrors(['student_id' => 'Student ID already taken.']);
             }
 
             return view('alumni-register', [
@@ -305,7 +305,7 @@ class AuthController extends Controller
                 'middle_name' => ['nullable'],
                 'last_name' => ['required'],
                 'suffix' => ['nullable'],
-                'student_id' => ['required'],
+                'student_id' => ['nullable'],
                 'department' => ['required'],
             ]);
 
@@ -320,7 +320,7 @@ class AuthController extends Controller
                 'department' => ['required'],
                 'email' => ['required', 'email'],
                 'contact_number' => ['required'],
-                'student_id' => ['required'],
+                'student_id' => ['nullable'],
             ]);
 
             if ($validator->fails()) {
