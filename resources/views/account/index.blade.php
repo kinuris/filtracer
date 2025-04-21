@@ -64,6 +64,9 @@
             </thead>
             <tbody class="bg-white text-center">
                 @foreach ($users as $user)
+                @if ($user->personalBio === null && $user->partialPersonal === null)
+                    @continue
+                @endif
                 <tr class="border-b">
                     <td class="text-blue-900 py-4">{{ $user->id }}</td>
                     @if (request('mode') === 'generated')
