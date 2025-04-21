@@ -282,7 +282,7 @@ class AuthController extends Controller
                 'middle_name' => ['nullable'],
                 'last_name' => ['required'],
                 'suffix' => ['nullable'],
-                'student_id' => ['required'],
+                'student_id' => ['nullable'],
                 'department' => ['required'],
             ]);
 
