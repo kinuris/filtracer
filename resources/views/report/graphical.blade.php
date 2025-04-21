@@ -306,11 +306,10 @@
                 if ($user->department_id != $admin->office) {
                     return false; // Non-super admin sees only their department
                 }
-            } elseif (!empty(request('department')) && $subCategory === 'Batch') {
-                 // Super admin filtering by department when grouping by Batch
-                 if ($user->department_id != request('department')) {
-                     return false;
-                 }
+            } elseif (!empty(request('department')) && $subCategory === 'Batch') { // Super admin filtering by department when grouping by Batch
+                if ($user->department_id != request('department')) {
+                    return false;
+                }
             }
 
             // Define subcategories where batch filtering is applicable
@@ -494,58 +493,65 @@
                     const elementIndex = elements[0].index;
                     const clickedLabel = chart.data.labels[elementIndex];
 
-                    // Don't navigate if the label is 'N/A'
-                    if (clickedLabel === 'N/A') {
-                        return;
-                    }
-
                     const currentParams = new URLSearchParams(window.location.search);
                     const statisticalParams = new URLSearchParams();
 
-                    // Preserve existing relevant filters
+                    // 1. Preserve base category filter
                     if (currentParams.has('category')) {
                         statisticalParams.set('category', currentParams.get('category'));
                     }
-                    if (currentParams.has('batch')) {
-                        statisticalParams.set('batch', currentParams.get('batch'));
-                    }
-                     if (currentParams.has('department') && '{{ $subCategory }}' === 'Batch') { // Only carry over department if subcategory was Batch
-                        statisticalParams.set('department', currentParams.get('department'));
-                    }
 
-
-                    // Add filter based on the clicked bar and current subcategory
+                    // 2. Preserve relevant third-level filter (Batch or Department)
                     const subCategoryValue = '{{ $subCategory }}';
-                    let filterKey = '';
-                    let filterValue = clickedLabel;
+                    const professionalSubcats = ['Jobs', 'Industry', 'Employment Type 1', 'Employment Type 2', 'Monthly Salary', 'Waiting Time', 'Job Search Method'];
+                    const usesBatchFilter = ['Course', 'Department', ...professionalSubcats].includes(subCategoryValue);
+                    const usesDepartmentFilter = subCategoryValue === 'Batch'; // Reverted
+
+                    if (usesBatchFilter && currentParams.has('batch')) {
+                         statisticalParams.set('batch', currentParams.get('batch'));
+                    }
+                    if (usesDepartmentFilter && currentParams.has('department')) {
+                         statisticalParams.set('department', currentParams.get('department'));
+                    }
+                    // If not super admin and no specific department filter was applied (e.g., grouping by Course),
+                    // the statistical view will automatically scope to their department based on server-side logic.
+
+                    // 3. Determine filter based on clicked bar (Subcategory)
+                    let withFieldKey = '';
+                    let withFieldValue = clickedLabel;
+                    let directFilterKey = ''; // For Batch, Department, Course
 
                     switch (subCategoryValue) {
-                        case 'Department': filterKey = 'department';
-                            // Need to map department name back to ID if possible, otherwise skip this filter for now
-                            // This requires passing department IDs along with names to the JS, or making an AJAX call.
-                            // For simplicity, we'll skip adding this specific filter on click for now.
-                            // TODO: Implement department name to ID mapping if required for statistical view filtering.
+                        case 'Department':
+                            // Need ID mapping - skip adding filter for now
+                            directFilterKey = 'department';
                             break;
-                        case 'Batch': filterKey = 'batch'; break;
-                        case 'Course': filterKey = 'courses';
-                            // Similar to department, mapping name to ID might be needed.
-                            // TODO: Implement course name to ID mapping if required.
-                             break;
-                        case 'Jobs': filterKey = 'job_title'; break;
-                        case 'Industry': filterKey = 'industry'; break;
-                        case 'Employment Type 1': filterKey = 'employment_type1'; break;
-                        case 'Employment Type 2': filterKey = 'employment_type2'; break;
-                        case 'Monthly Salary': filterKey = 'monthly_salary'; break;
-                        case 'Waiting Time': filterKey = 'waiting_time'; break;
-                        case 'Job Search Method': filterKey = 'job_search_method'; break;
+                        case 'Batch':
+                            directFilterKey = 'batch';
+                            break;
+                        case 'Course':
+                            directFilterKey = 'courses';
+                            break;
+                        // These map to 'with_field' and 'with_value'
+                        case 'Jobs': withFieldKey = 'job_title'; break;
+                        case 'Industry': withFieldKey = 'industry'; break;
+                        case 'Employment Type 1': withFieldKey = 'employment_type1'; break;
+                        case 'Employment Type 2': withFieldKey = 'employment_type2'; break;
+                        case 'Monthly Salary': withFieldKey = 'monthly_salary'; break;
+                        case 'Waiting Time': withFieldKey = 'waiting_time'; break;
+                        case 'Job Search Method': withFieldKey = 'job_search_method'; break;
                     }
 
-                    if (filterKey && filterKey !== 'department_id' && filterKey !== 'course_id') { // Add filter if key is determined and not needing ID mapping for now
-                         statisticalParams.set(filterKey, filterValue);
-                    } else if (filterKey) {
-                        console.warn(`Filter key '${filterKey}' requires mapping name ('${filterValue}') to ID. Navigation will proceed without this specific filter.`);
+                    // 4. Add the determined filter to params
+                    if (directFilterKey) {
+                        // If it's Batch, set the 'batch' param directly
+                        statisticalParams.set(directFilterKey, withFieldValue);
+                    } else if (withFieldKey) {
+                        // If it's a professional field, set 'with_field' and 'with_value'
+                        statisticalParams.set('with_field', withFieldKey);
+                        statisticalParams.set('with_value', withFieldValue);
                     }
-
+                    // If it was Department or Course, no filter is added due to ID mapping issue
 
                     // Construct the target URL
                     const targetUrl = `/report/statistical?${statisticalParams.toString()}`;
