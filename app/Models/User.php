@@ -67,6 +67,10 @@ class User extends Authenticatable
                 return $personal->getFullname();
             }
 
+            if (!$this->partialPersonal) {
+                return "Warning: No Personal Record";
+            }
+
             return $this->partialPersonal->fullname;
         } else if ($this->role == 'Admin') {
             return $this->admin()->getFullnameAttribute();
