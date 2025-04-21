@@ -57,7 +57,7 @@
         '3-5 months',
         '6 months-1 year',
         'Over 1 year',
-        'Not Applicable' // Added
+        'Job not secured' // Added
     ];
 @endphp
 
