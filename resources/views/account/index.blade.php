@@ -64,27 +64,24 @@
             </thead>
             <tbody class="bg-white text-center">
                 @foreach ($users as $user)
-                @if ($user->personalBio === null && $user->partialPersonal === null)
-                    @continue
-                @endif
                 <tr class="border-b">
                     <td class="text-blue-900 py-4">{{ $user->id }}</td>
                     @if (request('mode') === 'generated')
                     @if ($user->role === 'Admin')
-                    <td class="text-blue-900">{{ $user->adminRelation->fullname }}</td>
+                    <td class="text-blue-900">{{ $user->adminRelation?->fullname }}</td>
                     @else
-                    <td class="text-blue-900">{{ $user->partialPersonal->fullname }}</td>
+                    <td class="text-blue-900">{{ $user->partialPersonal?->fullname }}</td>
                     @endif
                     @else
                     <td class="text-blue-900">{{ $user->name }}</td>
                     @endif
                     @if ($user->role === 'Admin')
-                    <td>{{ $user->admin()->position_id }}</td>
+                    <td>{{ $user->admin()?->position_id }}</td>
                     @else
                     @if (request('mode') === 'generated')
-                    <td>{{ $user->partialPersonal->student_id }}</td>
+                    <td>{{ $user->partialPersonal?->student_id }}</td>
                     @else
-                    <td>{{ ($user->personalBio ?? $user->partialPersonal)->student_id }}</td>
+                    <td>{{ ($user->personalBio ?? $user->partialPersonal)?->student_id }}</td>
                     @endif
                     @endif
                     <td>{{ $user->role }}</td>
@@ -92,8 +89,8 @@
                     @if (request('mode') === 'generated')
                     <td>
                         <span class="blur-sm hover:blur-none transition-all duration-200 cursor-pointer"
-                            onclick="copyToClipboard('{{ $user->adminGenerated->default_password }}', this)">
-                            {{ $user->adminGenerated->default_password }}
+                            onclick="copyToClipboard('{{ $user->adminGenerated?->default_password }}', this)">
+                            {{ $user->adminGenerated?->default_password }}
                         </span>
                     </td>
                     <td>{{ $user->username }}</td>
@@ -105,9 +102,9 @@
                             <button data-user-id="{{ $user->id }}" class="openUnverifyModal w-6"><img class="w-5" src="{{ asset('/assets/verified_user.svg') }}" alt="Verified"></button>
                             @elseif ($personal !== null && $personal->status == 0)
                             <button data-user-id="{{ $user->id }}" class="openVerifyModal w-6"><img class="w-5" src="{{ asset('/assets/unverified_user.svg') }}" alt="Verified"></button>
-                            @elseif ($user->role === 'Admin' && !$user->admin()->is_verified)
+                            @elseif ($user->role === 'Admin' && !$user->admin()?->is_verified)
                             <button data-user-id="{{ $user->id }}" class="openVerifyModal w-6"><img class="w-5" src="{{ asset('/assets/unverified_user.svg') }}" alt="Verified"></button>
-                            @elseif ($user->role === 'Admin' && $user->admin()->is_verified)
+                            @elseif ($user->role === 'Admin' && $user->admin()?->is_verified)
                             <button data-user-id="{{ $user->id }}" class="openUnverifyModal w-6"><img class="w-5" src="{{ asset('/assets/verified_user.svg') }}" alt="Verified"></button>
                             @else
                             <div class="w-5"></div>
@@ -129,7 +126,7 @@
                                         <path d="M22 2L15 22L11 13L2 9L22 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
                                     </svg>
                                     <span class="absolute bottom-full -left-20 transform -translate-x-1/2 bg-black text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap z-10">
-                                        Click this button to send <br>the credentials of the user via SMS<br> Number: {{ $user->role === 'Admin' ? $user->admin()->phone_number : $user->partialPersonal->phone_number }}
+                                        Click this button to send <br>the credentials of the user via SMS<br> Number: {{ $user->role === 'Admin' ? $user->admin()?->phone_number : $user->partialPersonal?->phone_number }}
                                     </span>
                                 </button>
                             </form>
