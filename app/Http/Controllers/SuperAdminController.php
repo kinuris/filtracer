@@ -284,9 +284,9 @@ class SuperAdminController extends Controller
 
         $department = $departments[0];
 
-        if (ImportHistory::query()->where('filename', $filename)->exists()) {
-            return response()->json(['status' => 'fexist'], 400);
-        }
+        // if (ImportHistory::query()->where('filename', $filename)->exists()) {
+        //     return response()->json(['status' => 'fexist'], 400);
+        // }
 
         DB::beginTransaction();
 
