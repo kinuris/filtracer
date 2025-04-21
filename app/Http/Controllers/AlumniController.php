@@ -489,30 +489,45 @@ class AlumniController extends Controller
 
     public function setupPersonal(Request $request, User $alumni)
     {
-        $validated = $request->validate([
+        $existingRecord = $alumni->personalBio;
+
+        $validator = Validator::make($request->all(), [
             'first_name' => ['required'],
             'middle_name' => ['nullable'],
             'last_name' => ['required'],
-            'student_id' => ['required', 'unique:personal_records,student_id'],
+            // Ignore current record's student_id if updating
+            'student_id' => ['required', 'unique:personal_records,student_id' . ($existingRecord ? ',' . $existingRecord->id : '')],
             'gender' => ['required'],
             'civil_status' => ['required'],
-            'birthdate' => ['required'],
+            'birthdate' => ['required', 'date'],
             'permanent_address' => ['required'],
             'current_address' => ['required'],
             'email' => ['required', 'email'],
             'phone_number' => ['required'],
-            'social_link' => ['nullable'],
+            'social_link' => ['nullable', 'url'],
         ]);
 
+        if ($validator->fails()) {
+            return back()->withErrors($validator)->withInput();
+        }
+
+        $validated = $validator->validated();
         $validated['email_address'] = $validated['email'];
         $validated['user_id'] = $alumni->id;
 
-
-        PersonalRecord::query()->create($validated);
+        if ($existingRecord) {
+            $existingRecord->update($validated);
+            $message = 'Personal record updated successfully';
+            $subtitle = 'Your personal information has been updated. Proceeding to education details.';
+        } else {
+            PersonalRecord::query()->create($validated);
+            $message = 'Personal record created successfully';
+            $subtitle = 'Your personal information has been saved. Now let\'s set up your education details.';
+        }
 
         return redirect('/alumni/setup/educational')
-            ->with('message', 'Personal record created successfully')
-            ->with('subtitle', 'Your personal information has been saved. Now let\'s set up your education details.');
+            ->with('message', $message)
+            ->with('subtitle', $subtitle);
     }
 
     public function setupEducationalView()
@@ -520,36 +535,48 @@ class AlumniController extends Controller
         if (Auth::user()->personalBio === null) {
             return redirect('/alumni/setup/personal');
         }
-
-        if (Auth::user()->educationalBios()->exists()) {
-            return redirect('/alumni/setup/professional');
-        }
-
-        return view('setup.educational-info');
+        // Fetch the first educational record for setup purposes
+        $educationalRecord = Auth::user()->educationalBios()->first();
+        return view('setup.educational-info')->with('educationalRecord', $educationalRecord);
     }
 
     public function setupEducational(Request $request, User $alumni)
     {
-        $validated = $request->validate([
+        $existingRecord = $alumni->educationalBios()->first(); // Assuming one record during setup
+
+        $validator = Validator::make($request->all(), [
             'school' => ['required'],
             'location' => ['required'],
             'degree_type' => ['required'],
             'course' => ['required'],
-            'major' => ['nullable'],
-            'start' => ['required'],
-            'end' => ['nullable'],
+            'major' => ['nullable'], // Major might not exist for all courses
+            'start' => ['required', 'digits:4', 'integer', 'min:1900'],
+            'end' => ['nullable', 'digits:4', 'integer', 'min:1900', 'gte:start'],
         ]);
 
+        if ($validator->fails()) {
+            return back()->withErrors($validator)->withInput();
+        }
+
+        $validated = $validator->validated();
         $validated['school_location'] = $validated['location'];
         $validated['course_id'] = $validated['course'];
-        $validated['major_id'] =  isset($validated['major']) ? $validated['major'] : null;
+        $validated['major_id'] = $validated['major'] ?? null; // Use null if major is not provided
         $validated['user_id'] = $alumni->id;
 
-        EducationRecord::query()->create($validated);
+        if ($existingRecord) {
+            $existingRecord->update($validated);
+            $message = 'Educational record updated successfully';
+            $subtitle = 'Your educational information has been updated. Proceeding to professional details.';
+        } else {
+            EducationRecord::query()->create($validated);
+            $message = 'Educational record created successfully';
+            $subtitle = 'Your educational information has been saved. Now let\'s set up your professional details.';
+        }
 
         return redirect('/alumni/setup/professional')
-            ->with('message', 'Educational record created successfully')
-            ->with('subtitle', 'Your educational information has been saved. Now let\'s set up your professional details.');
+            ->with('message', $message)
+            ->with('subtitle', $subtitle);
     }
 
     public function setupProfessionalView()
@@ -562,62 +589,105 @@ class AlumniController extends Controller
             return redirect('/alumni/setup/educational');
         }
 
-        if (!is_null(Auth::user()->getProfessionalBio())) {
-            return redirect('/alumni/setup/profilepic');
-        }
-
-        return view('setup.professional-info');
+        $professionalRecord = Auth::user()->getProfessionalBio(); // Fetches the single professional record
+        return view('setup.professional-info')->with('professionalRecord', $professionalRecord);
     }
 
     public function setupProfessional(Request $request, User $alumni)
     {
-        $validated = $request->validate([
-            'employment_status' => ['required'],
-            'employment_type1' => ['required'],
-            'employment_type2' => ['required'],
-            'industry' => ['required'],
-            'job_title' => ['required'],
-            'company' => ['required'],
-            'monthly_salary' => ['required'],
-            'work_location' => ['required'],
-            'waiting_time' => ['required'],
-            'hard_skills' => ['nullable', 'array', 'min:1'],
-            'soft_skills' => ['nullable', 'array', 'min:1'],
-            'methods' => ['nullable', 'array', 'min:1'],
+        $existingRecord = $alumni->getProfessionalBio();
+
+        $validator = Validator::make($request->all(), [
+            'employment_status' => ['required', 'string'],
+            'employment_type1' => ['required', 'string'],
+            'employment_type2' => ['required', 'string'],
+            'industry' => ['required', 'string'],
+            'job_title' => ['required', 'string'],
+            'company_name' => ['required', 'string'], // Assuming 'company' is the input name
+            'monthly_salary' => ['required', 'string'],
+            'work_location' => ['required', 'string'],
+            'waiting_time' => ['required', 'string'],
+            'hard_skills' => ['nullable', 'array'],
+            'soft_skills' => ['nullable', 'array'],
+            'methods' => ['nullable', 'array'],
             'certs' => ['nullable', 'array'],
-            'certs.*' => ['nullable', 'mimes:pdf']
+            'certs.*' => ['nullable', 'mimes:pdf', 'max:5120'] // 5MB limit per file
         ]);
 
-        $validated['company_name'] = $validated['company'];
+         if ($validator->fails()) {
+            return back()->withErrors($validator)->withInput();
+        }
 
-        $prof = ProfessionalRecord::query()->create(array_merge([
-            'user_id' => $alumni->id,
-        ], $validated));
+        $validated = $validator->validated();
+        unset($validated['company']); // Remove original key if different
 
+        if ($existingRecord) {
+            // Update existing record
+            $prof = $existingRecord;
+            $prof->update($validated);
+
+            // Clear existing related data before adding new ones
+            $prof->hardSkills()->delete();
+            $prof->softSkills()->delete();
+            $prof->methods()->delete();
+            // Optionally handle attachments: delete old ones if new ones are uploaded?
+            // If new certs are uploaded, delete old ones first
+            if ($request->hasFile('certs')) {
+                 // Delete old attachments from storage and DB
+                foreach ($prof->attachments as $attachment) {
+                    Storage::delete('public/professional/attachments/' . $attachment->link);
+                    $attachment->delete();
+                }
+            }
+
+            $message = 'Professional record updated successfully';
+            $subtitle = 'Your professional information has been updated. Finally, let\'s add your profile picture.';
+
+        } else {
+            // Create new record
+            $prof = ProfessionalRecord::query()->create(array_merge(
+                ['user_id' => $alumni->id],
+                $validated
+            ));
+            $message = 'Professional record created successfully';
+            $subtitle = 'Your professional information has been saved. Finally, let\'s add your profile picture.';
+        }
+
+        // Add/Re-add skills and methods
         foreach ($validated['hard_skills'] ?? [] as $skill) {
-            ProfessionalRecordHardSkill::query()->create([
-                'professional_record_id' => $prof->id,
-                'skill' => $skill,
-            ]);
+            if ($skill) ProfessionalRecordHardSkill::query()->create(['professional_record_id' => $prof->id, 'skill' => trim($skill)]);
         }
-
         foreach ($validated['soft_skills'] ?? [] as $skill) {
-            ProfessionalRecordSoftSkill::query()->create([
-                'professional_record_id' => $prof->id,
-                'skill' => $skill,
-            ]);
+            if ($skill) ProfessionalRecordSoftSkill::query()->create(['professional_record_id' => $prof->id, 'skill' => trim($skill)]);
+        }
+        foreach ($validated['methods'] ?? [] as $method) {
+            if ($method) ProfessionalRecordMethod::query()->create(['professional_record_id' => $prof->id, 'method' => trim($method)]);
         }
 
-        foreach ($validated['methods'] ?? [] as $method) {
-            ProfessionalRecordMethod::query()->create([
-                'professional_record_id' => $prof->id,
-                'method' => $method,
-            ]);
+        // Handle file uploads (for both create and update if new files are present)
+        if ($request->hasFile('certs')) {
+            foreach ($request->file('certs') as $cert) {
+                if ($cert->isValid()) {
+                    $ext = $cert->extension();
+                    $name = $cert->getClientOriginalName();
+                    $filename = sha1(time() . '_' . $cert->getClientOriginalName()) . '.' . $ext;
+                    $path = $cert->storePubliclyAs('public/professional/attachments', $filename);
+
+                    if ($path) {
+                        ProfessionalRecordAttachments::query()->create([
+                            'professional_record_id' => $prof->id,
+                            'type' => $cert->getClientMimeType(),
+                            'name' => $name,
+                            'link' => $filename,
+                        ]);
+                    }
+                }
+            }
         }
 
         return redirect('/alumni/setup/profilepic')
-            ->with('message', 'Professional record created successfully')
-            ->with('subtitle', 'Your professional information has been saved. Finally, let\'s add your profile picture.');
+            ->with('message', $message)
+            ->with('subtitle', $subtitle);
     }
 
     public function deleteProfbio(Request $request, ProfessionalRecord $record)
@@ -728,11 +798,8 @@ class AlumniController extends Controller
 
     public function setupPersonalView()
     {
-        if (!is_null(Auth::user()->personalBio)) {
-            return redirect('/alumni/setup/educational');
-        }
-
-        return view('setup.personal-info');
+        $personalRecord = Auth::user()->personalBio;
+        return view('setup.personal-info')->with('personalRecord', $personalRecord);
     }
 
     public function chatView()

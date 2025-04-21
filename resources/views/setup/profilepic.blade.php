@@ -36,7 +36,11 @@
             </label>
             <input class="w-fit" type="file" name="profile_picture" id="profile_pic" accept="image/jpg,image/jpeg,image/png">
 
-            <button class="p-2 self-end mt-4 bg-blue-600 text-white rounded" type="submit">Save & Finish</button>
+            {{-- Wrap buttons in a div for alignment --}}
+            <div class="flex justify-end gap-2 mt-4">
+                <a href="/alumni/setup/professional" class="p-2 bg-gray-400 text-white rounded w-fit self-end">Back</a>
+                <button class="p-2 bg-blue-600 text-white rounded w-fit self-end" type="submit">Save & Finish</button>
+            </div>
         </form>
     </div>
 </div>

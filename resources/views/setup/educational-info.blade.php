@@ -48,7 +48,7 @@
                     <label for="school">School</label>
                     <select class="text-gray-400 border rounded-lg p-2" name="school" id="school">
                         @foreach ($schools as $school)
-                        <option value="{{ $school }}">{{ $school }}</option>
+                        <option value="{{ $school }}" {{ old('school', $educationalRecord->school ?? '') == $school ? 'selected' : '' }}>{{ $school }}</option>
                         @endforeach
                     </select>
                 </div>
@@ -58,7 +58,7 @@
                     <label for="course">Course</label>
                     <select class="text-gray-400 border rounded-lg p-2" name="course" id="course">
                         @foreach (App\Models\Course::query()->where('department_id', '=', Auth::user()->department_id)->get() as $course)
-                        <option value="{{ $course->id }}">{{ $course->name }}</option>
+                        <option value="{{ $course->id }}" {{ old('course', $educationalRecord->course_id ?? '') == $course->id ? 'selected' : '' }}>{{ $course->name }}</option>
                         @endforeach
                     </select>
                 </div>
@@ -66,7 +66,7 @@
                 {{-- Column 1 --}}
                 <div class="flex flex-col">
                     <label for="location">Location</label>
-                    <input class="text-gray-400 border rounded-lg p-2 @error('location') border-red-500 @enderror" type="text" name="location" value="{{ old('location') }}">
+                    <input class="text-gray-400 border rounded-lg p-2 @error('location') border-red-500 @enderror" type="text" name="location" value="{{ old('location', $educationalRecord->school_location ?? '') }}">
                     @error('location')
                     <span class="text-red-500 text-sm block">{{ $message }}</span>
                     @enderror
@@ -76,16 +76,16 @@
                 <div class="flex flex-col">
                     <label for="degree">Degree Type</label>
                     <select class="text-gray-400 border rounded-lg p-2" name="degree_type" id="degree">
-                        <option value="Bachelor">Bachelor</option>
-                        <option value="Masteral">Masteral</option>
-                        <option value="Doctoral">Doctoral</option>
+                        <option value="Bachelor" {{ old('degree_type', $educationalRecord->degree_type ?? '') == 'Bachelor' ? 'selected' : '' }}>Bachelor</option>
+                        <option value="Masteral" {{ old('degree_type', $educationalRecord->degree_type ?? '') == 'Masteral' ? 'selected' : '' }}>Masteral</option>
+                        <option value="Doctoral" {{ old('degree_type', $educationalRecord->degree_type ?? '') == 'Doctoral' ? 'selected' : '' }}>Doctoral</option>
                     </select>
                 </div>
 
                 {{-- Column 1 --}}
                 <div class="flex flex-col">
                     <label for="start">Year Started</label>
-                    <input class="text-gray-400 border rounded-lg p-2 @error('start') border-red-500 @enderror" type="number" name="start" id="start" value="{{ old('start') }}">
+                    <input class="text-gray-400 border rounded-lg p-2 @error('start') border-red-500 @enderror" type="number" name="start" id="start" value="{{ old('start', $educationalRecord->start ?? '') }}">
                     @error('start')
                     <span class="text-red-500 text-sm block">{{ $message }}</span>
                     @enderror
@@ -94,7 +94,7 @@
                 {{-- Column 2 --}}
                 <div class="flex flex-col">
                     <label for="end">Year Graduated</label>
-                    <input class="text-gray-400 border rounded-lg p-2 @error('end') border-red-500 @enderror" type="number" name="end" value="{{ old('end') }}">
+                    <input class="text-gray-400 border rounded-lg p-2 @error('end') border-red-500 @enderror" type="number" name="end" value="{{ old('end', $educationalRecord->end ?? '') }}">
                     @error('end')
                     <span class="text-red-500 text-sm block">{{ $message }}</span>
                     @enderror
@@ -102,9 +102,8 @@
 
                 {{-- Major Selection - Conditionally Displayed - Spanning both columns --}}
                 @php
-                    // Get the selected course ID from the request (driven by JS reload)
-                    $selectedCourseId = request('course');
-                    // Fetch majors only if a course ID is present and valid
+                    // Use existing record's course ID or the request's course ID for fetching majors
+                    $selectedCourseId = old('course', $educationalRecord->course_id ?? request('course'));
                     $majors = $selectedCourseId ? App\Models\Major::query()->where('course_id', $selectedCourseId)->get() : collect();
                 @endphp
 
@@ -113,11 +112,8 @@
                     <div class="flex flex-col col-span-2"> {{-- Span 2 columns --}}
                         <label for="major">Major</label>
                         <select class="text-gray-400 border rounded-lg p-2 @error('major') border-red-500 @enderror" name="major" id="major">
-                            {{-- Optional: Add a default placeholder --}}
-                            {{-- <option value="">-- Select Major --</option> --}}
                             @foreach ($majors as $major)
-                                {{-- Pre-select based on old input or current request parameter 'major' --}}
-                                <option value="{{ $major->id }}" {{ old('major', request('major')) == $major->id ? 'selected' : '' }}>
+                                <option value="{{ $major->id }}" {{ old('major', $educationalRecord->major_id ?? request('major')) == $major->id ? 'selected' : '' }}>
                                     {{ $major->name }}
                                 </option>
                             @endforeach
@@ -130,14 +126,13 @@
                      {{-- Display message only if a course is selected but has no majors --}}
                      <div class="col-span-2 pt-1"> {{-- Span 2 columns and add padding for alignment --}}
                         <span class="text-gray-500 text-sm italic">No majors available for the selected course.</span>
-                        {{-- If 'major' is sometimes required, you might need a hidden input when none are available --}}
-                        {{-- <input type="hidden" name="major" value=""> --}}
                      </div>
                 @endif
                 {{-- If no course is selected yet ($selectedCourseId is null), this section remains empty --}}
 
                 {{-- Submit Button - Spanning both columns and aligned right --}}
-                <div class="col-span-2 flex justify-end mt-4">
+                <div class="col-span-2 flex justify-end gap-2 mt-4">
+                    <a href="/alumni/setup/personal" class="p-2 bg-gray-400 text-white rounded w-fit self-end">Back</a>
                     <button class="text-white bg-blue-600 p-2 rounded" type="submit">Save & Next</button>
                 </div>
             </div>
