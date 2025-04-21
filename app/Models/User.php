@@ -62,6 +62,11 @@ class User extends Authenticatable
         if ($this->role === 'Alumni' && $this->isCompSet()) {
             return $this->getPersonalBio()->getFullname();
         } else if ($this->role === 'Alumni' && $this->partialSet()) {
+            $personal = $this->getPersonalBio();
+            if ($personal) {
+                return $personal->getFullname();
+            }
+
             return $this->partialPersonal->fullname;
         } else if ($this->role == 'Admin') {
             return $this->admin()->getFullnameAttribute();
