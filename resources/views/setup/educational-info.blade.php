@@ -46,7 +46,7 @@
                 {{-- Column 1 --}}
                 <div class="flex flex-col">
                     <label for="school">School</label>
-                    <select class="text-gray-400 border rounded-lg p-2" name="school" id="school">
+                    <select class="border rounded-lg p-2" name="school" id="school">
                         @foreach ($schools as $school)
                         <option value="{{ $school }}" {{ old('school', $educationalRecord->school ?? '') == $school ? 'selected' : '' }}>{{ $school }}</option>
                         @endforeach
@@ -56,7 +56,7 @@
                 {{-- Column 2 --}}
                 <div class="flex flex-col">
                     <label for="course">Course</label>
-                    <select class="text-gray-400 border rounded-lg p-2" name="course" id="course">
+                    <select class="border rounded-lg p-2" name="course" id="course">
                         @foreach (App\Models\Course::query()->where('department_id', '=', Auth::user()->department_id)->get() as $course)
                         <option value="{{ $course->id }}" {{ old('course', $educationalRecord->course_id ?? '') == $course->id ? 'selected' : '' }}>{{ $course->name }}</option>
                         @endforeach
@@ -75,7 +75,7 @@
                 {{-- Column 2 --}}
                 <div class="flex flex-col">
                     <label for="degree">Degree Type</label>
-                    <select class="text-gray-400 border rounded-lg p-2" name="degree_type" id="degree">
+                    <select class="border rounded-lg p-2" name="degree_type" id="degree">
                         <option value="Bachelor" {{ old('degree_type', $educationalRecord->degree_type ?? '') == 'Bachelor' ? 'selected' : '' }}>Bachelor</option>
                         <option value="Masteral" {{ old('degree_type', $educationalRecord->degree_type ?? '') == 'Masteral' ? 'selected' : '' }}>Masteral</option>
                         <option value="Doctoral" {{ old('degree_type', $educationalRecord->degree_type ?? '') == 'Doctoral' ? 'selected' : '' }}>Doctoral</option>
@@ -111,7 +111,7 @@
                     {{-- Display Major dropdown if majors exist for the selected course --}}
                     <div class="flex flex-col col-span-2"> {{-- Span 2 columns --}}
                         <label for="major">Major</label>
-                        <select class="text-gray-400 border rounded-lg p-2 @error('major') border-red-500 @enderror" name="major" id="major">
+                        <select class="border rounded-lg p-2 @error('major') border-red-500 @enderror" name="major" id="major">
                             @foreach ($majors as $major)
                                 <option value="{{ $major->id }}" {{ old('major', $educationalRecord->major_id ?? request('major')) == $major->id ? 'selected' : '' }}>
                                     {{ $major->name }}

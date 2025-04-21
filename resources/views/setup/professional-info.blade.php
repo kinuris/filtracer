@@ -44,6 +44,34 @@
     .file-upload-label:hover {
         background-color: #4b5563; /* gray-600 */
     }
+
+    /* Ensure select text is black */
+    select {
+        color: black !important; /* Force black text color */
+    }
+    /* Ensure Choices.js text is black */
+    .choices__inner,
+    .choices__list--single .choices__item,
+    .choices__list--dropdown .choices__item {
+        color: black !important;
+    }
+    /* Ensure placeholder text is not black if desired, otherwise remove this */
+    .choices__list--single .choices__item.choices__placeholder {
+        color: #6b7280 !important; /* Keep placeholder gray */
+    }
+    select option {
+        color: black; /* Ensure options are black */
+    }
+    select:disabled,
+    .form-select-disabled {
+        color: #6b7280 !important; /* Gray text when disabled */
+    }
+    .choices[data-disabled] .choices__inner,
+    .choices[data-disabled] .choices__list--single .choices__item {
+        color: #6b7280 !important; /* Gray text for disabled Choices.js */
+    }
+
+
 </style>
 @endsection
 
@@ -141,7 +169,8 @@
                     {{-- Employment Status --}}
                     <div class="md:col-span-2"> {{-- Span full width initially or adjust as needed --}}
                         <label for="employment_status" class="block text-sm font-medium text-gray-700 mb-1">Employment Status</label>
-                        <select class="block w-full border border-gray-300 rounded-lg shadow-sm p-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-gray-500" name="employment_status" id="employment_status" required>
+                        {{-- Removed text-gray-500 --}}
+                        <select class="block w-full border border-gray-300 rounded-lg shadow-sm p-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" name="employment_status" id="employment_status" required>
                             <option value="">Select...</option>
                             @foreach ($statuses as $status)
                             <option value="{{ $status}}" {{ old('employment_status', $professionalRecord->employment_status ?? '') == $status ? 'selected' : '' }}>{{ $status }}</option>
@@ -152,7 +181,8 @@
                     {{-- Employment Type 1 --}}
                     <div class="employment-field-group">
                         <label for="employment_type1" class="block text-sm font-medium text-gray-700 mb-1">Employment Type 1</label>
-                        <select class="employment-field block w-full border border-gray-300 rounded-lg shadow-sm p-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-gray-500" name="employment_type1" id="employment_type1">
+                        {{-- Removed text-gray-500 --}}
+                        <select class="employment-field block w-full border border-gray-300 rounded-lg shadow-sm p-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" name="employment_type1" id="employment_type1">
                             <option value="">Select...</option>
                             <option value="Private" {{ old('employment_type1', $professionalRecord->employment_type1 ?? '') == 'Private' ? 'selected' : '' }}>Private</option>
                             <option value="Government" {{ old('employment_type1', $professionalRecord->employment_type1 ?? '') == 'Government' ? 'selected' : '' }}>Government</option>
@@ -164,7 +194,8 @@
                     {{-- Employment Type 2 --}}
                     <div class="employment-field-group">
                         <label for="employment_type2" class="block text-sm font-medium text-gray-700 mb-1">Employment Type 2</label>
-                        <select class="employment-field block w-full border border-gray-300 rounded-lg shadow-sm p-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-gray-500" name="employment_type2" id="employment_type2">
+                        {{-- Removed text-gray-500 --}}
+                        <select class="employment-field block w-full border border-gray-300 rounded-lg shadow-sm p-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" name="employment_type2" id="employment_type2">
                              <option value="">Select...</option>
                             <option value="Full-Time" {{ old('employment_type2', $professionalRecord->employment_type2 ?? '') == 'Full-Time' ? 'selected' : '' }}>Full-Time</option>
                             <option value="Part-Time" {{ old('employment_type2', $professionalRecord->employment_type2 ?? '') == 'Part-Time' ? 'selected' : '' }}>Part-Time</option>
@@ -178,7 +209,8 @@
                     {{-- Industry --}}
                     <div class="employment-field-group">
                         <label for="industry" class="block text-sm font-medium text-gray-700 mb-1">Industry</label>
-                        <select class="employment-field block w-full border border-gray-300 rounded-lg shadow-sm p-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-gray-500 @error('industry') border-red-500 @enderror" name="industry" id="industry">
+                        {{-- Removed text-gray-500 --}}
+                        <select class="employment-field block w-full border border-gray-300 rounded-lg shadow-sm p-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm @error('industry') border-red-500 @enderror" name="industry" id="industry">
                             <option value="">Select Industry...</option>
                             @foreach ($industries as $industry)
                             <option value="{{ $industry }}" {{ old('industry', $professionalRecord->industry ?? '') == $industry ? 'selected' : '' }}>{{ $industry }}</option>
@@ -192,7 +224,8 @@
                     {{-- Current Job Title --}}
                     <div class="employment-field-group">
                         <label for="job_title" class="block text-sm font-medium text-gray-700 mb-1">Current Job Title</label>
-                        <input class="employment-field block w-full border border-gray-300 rounded-lg shadow-sm p-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-gray-500 @error('job_title') border-red-500 @enderror" type="text" name="job_title" id="job_title" value="{{ old('job_title', $professionalRecord->job_title ?? '') }}">
+                        {{-- Removed text-gray-500 --}}
+                        <input class="employment-field block w-full border border-gray-300 rounded-lg shadow-sm p-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm @error('job_title') border-red-500 @enderror" type="text" name="job_title" id="job_title" value="{{ old('job_title', $professionalRecord->job_title ?? '') }}">
                         @error('job_title')
                         <span class="text-red-500 text-sm">{{ $message }}</span>
                         @enderror
@@ -201,7 +234,8 @@
                     {{-- Company / Employer --}}
                     <div class="employment-field-group">
                         <label for="company" class="block text-sm font-medium text-gray-700 mb-1">Company / Employer</label>
-                        <input class="employment-field block w-full border border-gray-300 rounded-lg shadow-sm p-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-gray-500 @error('company_name') border-red-500 @enderror" type="text" name="company_name" id="company" value="{{ old('company_name', $professionalRecord->company_name ?? '') }}">
+                        {{-- Removed text-gray-500 --}}
+                        <input class="employment-field block w-full border border-gray-300 rounded-lg shadow-sm p-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm @error('company_name') border-red-500 @enderror" type="text" name="company_name" id="company" value="{{ old('company_name', $professionalRecord->company_name ?? '') }}">
                          {{-- Changed name to company_name to match reference --}}
                         @error('company_name')
                         <span class="text-red-500 text-sm">{{ $message }}</span>
@@ -211,7 +245,8 @@
                     {{-- Monthly Salary Range --}}
                     <div class="employment-field-group">
                         <label for="monthly_salary" class="block text-sm font-medium text-gray-700 mb-1">Monthly Salary Range</label>
-                        <select class="employment-field block w-full border border-gray-300 rounded-lg shadow-sm p-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-gray-500" name="monthly_salary" id="monthly_salary">
+                        {{-- Removed text-gray-500 --}}
+                        <select class="employment-field block w-full border border-gray-300 rounded-lg shadow-sm p-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" name="monthly_salary" id="monthly_salary">
                             <option value="">Select...</option>
                             @foreach ($salaryRanges as $range)
                             <option value="{{ $range }}" {{ old('monthly_salary', $professionalRecord->monthly_salary ?? '') == $range ? 'selected' : '' }}>{{ $range }}</option>
@@ -222,7 +257,8 @@
                     {{-- Location --}}
                     <div class="employment-field-group">
                         <label for="work_location" class="block text-sm font-medium text-gray-700 mb-1">Location</label>
-                        <input class="employment-field block w-full border border-gray-300 rounded-lg shadow-sm p-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-gray-500 @error('work_location') border-red-500 @enderror" type="text" name="work_location" id="work_location" value="{{ old('work_location', $professionalRecord->work_location ?? '') }}">
+                        {{-- Removed text-gray-500 --}}
+                        <input class="employment-field block w-full border border-gray-300 rounded-lg shadow-sm p-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm @error('work_location') border-red-500 @enderror" type="text" name="work_location" id="work_location" value="{{ old('work_location', $professionalRecord->work_location ?? '') }}">
                         @error('work_location')
                         <span class="text-red-500 text-sm">{{ $message }}</span>
                         @enderror
@@ -231,7 +267,8 @@
                     {{-- Waiting Time --}}
                     <div class="md:col-span-2">
                         <label for="waiting_time" class="block text-sm font-medium text-gray-700 mb-1">Waiting Time <span class="text-gray-400">(period to get first job after graduation)</span></label>
-                        <select class="block w-full border border-gray-300 rounded-lg shadow-sm p-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-gray-500" name="waiting_time" id="waiting_time">
+                        {{-- Removed text-gray-500 --}}
+                        <select class="block w-full border border-gray-300 rounded-lg shadow-sm p-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" name="waiting_time" id="waiting_time">
                             <option value="">Select...</option>
                             @foreach ($times as $time)
                             <option value="{{ $time }}" {{ old('waiting_time', $professionalRecord->waiting_time ?? '') == $time ? 'selected' : '' }}>{{ $time }}</option>
@@ -349,6 +386,35 @@
         shouldSort: false,
         placeholder: true,
         placeholderValue: 'Select or type to add...',
+        // Ensure Choices.js text color is handled by CSS
+        // classNames: {
+        //     containerOuter: 'choices',
+        //     containerInner: 'choices__inner', // Default class, CSS targets this
+        //     input: 'choices__input',
+        //     inputCloned: 'choices__input--cloned',
+        //     list: 'choices__list',
+        //     listItems: 'choices__list--multiple',
+        //     listSingle: 'choices__list--single',
+        //     listDropdown: 'choices__list--dropdown',
+        //     item: 'choices__item', // Default class, CSS targets this
+        //     itemSelectable: 'choices__item--selectable',
+        //     itemDisabled: 'choices__item--disabled',
+        //     itemChoice: 'choices__item--choice', // Default class, CSS targets this
+        //     placeholder: 'choices__placeholder', // Default class, CSS targets this
+        //     group: 'choices__group',
+        //     groupHeading: 'choices__heading',
+        //     button: 'choices__button',
+        //     activeState: 'is-active',
+        //     focusState: 'is-focused',
+        //     openState: 'is-open',
+        //     disabledState: 'is-disabled',
+        //     highlightedState: 'is-highlighted',
+        //     selectedState: 'is-selected',
+        //     flippedState: 'is-flipped',
+        //     loadingState: 'is-loading',
+        //     noResults: 'has-no-results',
+        //     noChoices: 'has-no-choices'
+        //   }
     };
 
     let methodsChoicesInstance = null; // Store instance to enable/disable later
@@ -403,8 +469,7 @@
             const isDisabled = notApplicableStatuses.includes(selectedStatus);
 
             employmentFields.forEach(field => {
-                // field.disabled = isDisabled; // Disable the field
-                // field.required = !isDisabled; // Toggle required attribute - Be careful with validation logic
+                 field.disabled = isDisabled; // Disable the field directly
 
                 if (isDisabled) {
                     // Add disabled style class
@@ -412,7 +477,6 @@
                     field.classList.remove(field.tagName === 'SELECT' ? 'form-input-disabled' : 'form-select-disabled');
 
                     // Set default 'Not Applicable' / 'N/A' / 'No Income' values ONLY IF the field is currently empty or has an old default value
-                    // This prevents overwriting valid data if the user switches back and forth
                     const currentVal = field.value.trim();
                     const defaultValuesToOverwrite = ['', 'N/A', 'Not Applicable', 'No Income']; // Values that can be safely overwritten
 
@@ -439,7 +503,7 @@
                 } else {
                     // Remove disabled style class
                     field.classList.remove('form-input-disabled', 'form-select-disabled');
-                    // field.disabled = false; // Re-enable the field
+                    field.disabled = false; // Re-enable the field
 
                     // Clear the field ONLY if its current value is one of the defaults we set
                     const defaultValuesToClear = ['N/A', 'Not Applicable', 'No Income'];
@@ -447,7 +511,10 @@
                          field.value = ''; // Clear the default value
                     }
                     // Re-add required attribute if it was originally required (assuming all these fields are required when enabled)
-                    field.setAttribute('required', 'required');
+                    // Check if the field is not an optional one before adding required
+                    if (!field.classList.contains('optional-when-enabled')) { // Add this class to fields that shouldn't be required
+                         field.setAttribute('required', 'required');
+                    }
                 }
             });
         }
