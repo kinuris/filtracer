@@ -286,7 +286,7 @@ class AuthController extends Controller
                 'department' => ['required'],
             ]);
 
-            if (PartialPersonalRecord::query()->where('student_id', '=', $validated['student_id'])->exists() || PersonalRecord::query()->where('student_id', '=', $validated['student_id'])->exists()) {
+            if ($validated['student_id'] && PartialPersonalRecord::query()->where('student_id', '=', $validated['student_id'])->exists() || PersonalRecord::query()->where('student_id', '=', $validated['student_id'])->exists()) {
                 session()->flashInput($request->input());
 
                 return view('alumni-register')
