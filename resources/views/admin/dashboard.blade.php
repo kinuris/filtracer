@@ -293,6 +293,7 @@ $viewPost = App\Models\Post::find(request('view'));
 <script>
     const ctx = document.getElementById('summary');
     const statCtx = document.getElementById('employement_stats');
+    const isSuperAdmin = {{ Auth::user()->admin()->is_super ? 'true' : 'false' }}; // Flag for super admin status
 
     ctx.height = parseInt(getComputedStyle(ctx.parentNode.parentNode).getPropertyValue('height'), 10) - 30;
 
@@ -302,88 +303,69 @@ $viewPost = App\Models\Post::find(request('view'));
     use App\Models\User;
 
     $depts = Department::allValid();
+    $deptData = [];
+    foreach ($depts as $dept) {
+        $deptData[] = [
+            'id' => $dept->id,
+            'shortened' => $dept->shortened(),
+            'count' => $dept->students->count(),
+            'bgColor' => match ($dept->shortened()) {
+                'CAS' => 'rgba(153, 102, 255, 0.4)', // Purple
+                'CBA' => 'rgba(255, 255, 204, 0.8)', // Light Yellow
+                'CCS' => 'rgba(0, 255, 255, 0.4)',   // Cyan / Teal Blue
+                'CCJE' => 'rgba(255, 99, 132, 0.4)',  // Red
+                'CHTM' => 'rgba(255, 0, 255, 0.4)',   // Magenta / Pink
+                'CON' => 'rgba(0, 255, 0, 0.4)',     // Green
+                'COE' => 'rgba(255, 165, 0, 0.4)',   // Orange
+                'CTE' => 'rgba(0, 0, 255, 0.4)',     // Blue
+                'GS' => 'rgba(204, 153, 0, 0.4)',    // Gold / Yellow Ochre
+                default => 'rgba(128, 128, 128, 0.4)', // Gray
+            },
+            'borderColor' => match ($dept->shortened()) {
+                'CAS' => 'rgba(153, 102, 255, 1)',   // Purple
+                'CBA' => 'rgba(255, 255, 204, 1)',   // Light Yellow
+                'CCS' => 'rgba(0, 255, 255, 1)',     // Cyan / Teal Blue
+                'CCJE' => 'rgba(255, 99, 132, 1)',    // Red
+                'CHTM' => 'rgba(255, 0, 255, 1)',     // Magenta / Pink
+                'CON' => 'rgba(0, 255, 0, 1)',       // Green
+                'COE' => 'rgba(255, 165, 0, 1)',     // Orange
+                'CTE' => 'rgba(0, 0, 255, 1)',       // Blue
+                'GS' => 'rgba(204, 153, 0, 1)',      // Gold / Yellow Ochre
+                default => 'rgba(128, 128, 128, 1)',   // Gray
+            }
+        ];
+    }
     ?>
+
+    const departmentData = @json($deptData); // Pass department data to JS
 
     new Chart(ctx, {
         type: 'bar',
         plugins: [ChartDataLabels],
         data: {
-            labels: [
-                <?php
-                foreach ($depts as $dept) {
-                    echo '"' . $dept->shortened() . '",';
-                }
-                ?>
-            ],
+            labels: departmentData.map(d => d.shortened),
             datasets: [{
                 label: '# of Users',
-                data: [
-                    <?php
-                    foreach ($depts as $dept) {
-                        echo $dept->students->count() . ',';
-                    }
-                    ?>
-                ],
-                backgroundColor: [
-                    <?php
-                    foreach ($depts as $dept) {
-                        $shortened = $dept->shortened();
-                        if ($shortened == 'CAS') {
-                            echo "'rgba(153, 102, 255, 0.4)',"; // Purple
-                        } elseif ($shortened == 'CBA') {
-                            echo "'rgba(255, 255, 204, 0.8)',"; // Light Yellow
-                        } elseif ($shortened == 'CCS') {
-                            echo "'rgba(0, 255, 255, 0.4)',";   // Cyan / Teal Blue
-                        } elseif ($shortened == 'CCJE') {
-                            echo "'rgba(255, 99, 132, 0.4)',";  // Red
-                        } elseif ($shortened == 'CHTM') {
-                            echo "'rgba(255, 0, 255, 0.4)',";   // Magenta / Pink
-                        } elseif ($shortened == 'CON') {
-                            echo "'rgba(0, 255, 0, 0.4)',";     // Green
-                        } elseif ($shortened == 'COE') {
-                            echo "'rgba(255, 165, 0, 0.4)',";   // Orange
-                        } elseif ($shortened == 'CTE') {
-                            echo "'rgba(0, 0, 255, 0.4)',";     // Blue
-                        } elseif ($shortened == 'GS') {
-                            echo "'rgba(204, 153, 0, 0.4)',";    // Gold / Yellow Ochre
-                        } else {
-                            echo "'rgba(128, 128, 128, 0.4)',"; // Gray as default
-                        }
-                    }
-                    ?>
-                ],
-                borderColor: [
-                    <?php
-                    foreach ($depts as $dept) {
-                        $shortened = $dept->shortened();
-                        if ($shortened == 'CAS') {
-                            echo "'rgba(153, 102, 255, 1)',";   // Purple
-                        } elseif ($shortened == 'CBA') {
-                            echo "'rgba(255, 255, 204, 1)',";   // Light Yellow
-                        } elseif ($shortened == 'CCS') {
-                            echo "'rgba(0, 255, 255, 1)',";     // Cyan / Teal Blue
-                        } elseif ($shortened == 'CCJE') {
-                            echo "'rgba(255, 99, 132, 1)',";    // Red
-                        } elseif ($shortened == 'CHTM') {
-                            echo "'rgba(255, 0, 255, 1)',";     // Magenta / Pink
-                        } elseif ($shortened == 'CON') {
-                            echo "'rgba(0, 255, 0, 1)',";       // Green
-                        } elseif ($shortened == 'COE') {
-                            echo "'rgba(255, 165, 0, 1)',";     // Orange
-                        } elseif ($shortened == 'CTE') {
-                            echo "'rgba(0, 0, 255, 1)',";       // Blue
-                        } elseif ($shortened == 'GS') {
-                            echo "'rgba(204, 153, 0, 1)',";      // Gold / Yellow Ochre
-                        } else {
-                            echo "'rgba(128, 128, 128, 1)',";   // Gray as default
-                        }
-                    }
-                    ?>
-                ],
+                data: departmentData.map(d => d.count),
+                backgroundColor: departmentData.map(d => d.bgColor),
+                borderColor: departmentData.map(d => d.borderColor),
                 borderWidth: 1
             }]
         },
         options: {
+            onClick: (event, elements) => {
+                if (!isSuperAdmin || elements.length === 0) {
+                    return; // Do nothing if not super admin or no element clicked
+                }
+                const elementIndex = elements[0].index;
+                const clickedDeptId = departmentData[elementIndex].id;
+                // Redirect to statistical report with filters
+                window.location.href = `/report/statistical?category=All+Users&department=${clickedDeptId}`;
+            },
+            onHover: (event, chartElement) => {
+                // Change cursor to pointer on hover for super admins
+                event.native.target.style.cursor = (isSuperAdmin && chartElement.length > 0) ? 'pointer' : 'default';
+            },
             plugins: {
                 legend: {
                     display: false,
@@ -395,7 +377,8 @@ $viewPost = App\Models\Post::find(request('view'));
                         dataArr.map(data => {
                             sum += data;
                         });
-                        let percentage = (value * 100 / sum).toFixed(2) + "%";
+                        // Avoid division by zero if sum is 0
+                        let percentage = sum > 0 ? (value * 100 / sum).toFixed(2) + "%" : "0.00%";
                         return percentage;
                     },
                 }
