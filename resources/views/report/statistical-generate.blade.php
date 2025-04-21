@@ -7,21 +7,50 @@
 use App\Models\Department;
 use App\Models\Course;
 use App\Models\User;
-use App\Models\EducationalRecord;
+use App\Models\EducationalRecord; // Keep this if used elsewhere, though not directly in batch filter now
+use App\Models\ProfessionalRecord; // Add this for 'With' filter
 
 $department = Department::find(request('department') ?? -1);
 $course = Course::find(request('courses') ?? -1);
 $category = request('category');
 $selectedBatch = request('batch') ?? '';
+$withField = request('with_field') ?? ''; // Get selected 'With' field
+$withValue = request('with_value') ?? ''; // Get selected 'With' value
+
+// Define mappable fields for the 'With' filter (Copied from statistical.blade.php)
+$withFieldsMap = [
+    'job_title' => 'Job', // Added
+    'waiting_time' => 'Waiting Time',
+    'industry' => 'Industry',
+    'employment_type1' => 'Employment Type 1',
+    'employment_type2' => 'Employment Type 2',
+    'monthly_salary' => 'Monthly Salary',
+    'job_search_method' => 'Job Search Method', // Added
+];
 
 // Helper function to add batch filter if selected (Copied from statistical.blade.php)
 function applyBatchFilter($query, $selectedBatch) {
     if ($selectedBatch !== '') {
-        // Use whereHas to filter users who have at least one education record
-        // where the 'end' year matches the selected batch.
         $query = $query->whereHas('educationalRecord', function ($subQuery) use ($selectedBatch) {
             $subQuery->where('end', '=', $selectedBatch);
         });
+    }
+    return $query;
+}
+
+// Helper function to add 'With' filter if selected (Copied from statistical.blade.php)
+function applyWithFilter($query, $withField, $withValue)
+{
+    if ($withField && $withValue && $withValue !== '') {
+        if ($withField === 'job_search_method') {
+            $query->whereHas('professionalRecords.methods', function ($subQuery) use ($withValue) {
+                $subQuery->where('method', '=', $withValue);
+            });
+        } else {
+            $query->whereHas('professionalRecords', function ($subQuery) use ($withField, $withValue) {
+                $subQuery->where($withField, '=', $withValue);
+            });
+        }
     }
     return $query;
 }
@@ -49,14 +78,12 @@ $baseQueryConditions = function ($query) use ($department, $course) {
 $adminQueryConditions = function ($query) use ($department, $course) {
     $query->where('role', '=', 'Admin');
     if ($department) {
-        $query->where('department_id', '=', $department->id); // Assuming admins belong to dept
+        $query->where('department_id', '=', $department->id);
     }
     if ($course) {
-        // Adjust if admin course relation differs or isn't applicable
         $query->whereRelation('course', 'courses.id', '=', $course->id);
     }
 };
-
 
 $users = collect(); // Initialize as empty collection
 
@@ -66,22 +93,23 @@ if ($department && $course) {
     $query = User::query();
     $baseQueryConditions($query); // Apply base conditions
     $query = applyBatchFilter($query, $selectedBatch); // Apply batch filter
+    $query = applyWithFilter($query, $withField, $withValue); // Apply 'With' filter
 
     switch ($category) {
         case "All Entities":
             $alumniQuery = User::query();
             $baseQueryConditions($alumniQuery); // Apply base conditions
             $alumniQuery = applyBatchFilter($alumniQuery, $selectedBatch); // Apply batch filter
+            $alumniQuery = applyWithFilter($alumniQuery, $withField, $withValue); // Apply 'With' filter
             $alumniIds = $alumniQuery->pluck('id');
 
             $adminQuery = User::query();
-            $adminQueryConditions($adminQuery); // Apply admin conditions (no batch filter for admins)
+            $adminQueryConditions($adminQuery); // Apply admin conditions (no batch or 'With' filter for admins)
             $adminIds = $adminQuery->pluck('id');
 
             $users = User::query()->whereIn('id', $alumniIds->merge($adminIds))->get();
             break;
         case "All Users":
-            // Base query already includes batch filter
             break; // Will use $query->get() later
         case "Working Student":
         case "Employed Alumni":
@@ -96,15 +124,12 @@ if ($department && $course) {
                 case "Self-Employed Alumni": $dbCategory = "Self-Employed"; break;
                 case "Student Alumni": $dbCategory = "Student"; break;
                 case "Retired Alumni": $dbCategory = "Retired"; break;
-                // Working Student maps directly
             }
             $query->whereRelation('professionalRecords', 'employment_status', '=', $dbCategory);
-            // Base query already includes batch filter
             break; // Will use $query->get() later
         case "Verified Alumni":
         case "Unverified Alumni":
             $query->whereRelation('personalRecords', 'status', '=', $category === "Verified Alumni" ? 1 : 0);
-            // Base query already includes batch filter
             break; // Will use $query->get() later
         case "Verified Admin":
         case "Unverified Admin":
@@ -112,44 +137,42 @@ if ($department && $course) {
             $adminQueryConditions($adminQuery); // Apply admin conditions
             $adminQuery->whereRelation('adminRelation', 'is_verified', '=', $category === "Verified Admin" ? 1 : 0)
                        ->whereRelation('adminRelation', 'is_super', '=', 0);
-            $users = $adminQuery->get(); // Admins not filtered by batch
+            $users = $adminQuery->get();
             break;
         case "Verified User":
         case "Unverified User":
             $alumniQuery = User::query();
             $baseQueryConditions($alumniQuery); // Apply base conditions
             $alumniQuery = applyBatchFilter($alumniQuery, $selectedBatch); // Apply batch filter
+            $alumniQuery = applyWithFilter($alumniQuery, $withField, $withValue); // Apply 'With' filter
             $alumniQuery->where(function ($q_inner) use ($category) {
-                 // Refined verification logic
-                 if ($category === "Verified User") {
+                if ($category === "Verified User") {
                     $q_inner->where(function ($q_status) {
-                              $q_status->whereHas('personalRecords', fn($pr) => $pr->where('status', 1))
-                                       ->orWhereHas('partialPersonal'); // Consider partial as verified for this context
-                          });
-                } else { // Unverified User
+                        $q_status->whereHas('personalRecords', fn($pr) => $pr->where('status', 1))
+                                 ->orWhereHas('partialPersonal');
+                    });
+                } else {
                     $q_inner->where(function ($q_status) {
-                            $q_status->whereDoesntHave('personalRecords', fn($pr) => $pr->where('status', 1))
-                                     ->whereDoesntHave('partialPersonal'); // Must lack both full and partial records
-                        });
+                        $q_status->whereDoesntHave('personalRecords', fn($pr) => $pr->where('status', 1))
+                                 ->whereDoesntHave('partialPersonal');
+                    });
                 }
             });
             $alumniIds = $alumniQuery->pluck('id');
 
             $adminQuery = User::query();
             $adminQueryConditions($adminQuery); // Apply admin conditions
-            $adminQuery->whereRelation('adminRelation', 'is_verified', '=', $category === "Verified User" ? 1 : 0) // Match user verification status
+            $adminQuery->whereRelation('adminRelation', 'is_verified', '=', $category === "Verified User" ? 1 : 0)
                        ->whereRelation('adminRelation', 'is_super', '=', 0);
-            $adminIds = $adminQuery->pluck('id'); // Admins not filtered by batch
+            $adminIds = $adminQuery->pluck('id');
 
             $users = User::query()->whereIn('id', $alumniIds->merge($adminIds))->get();
             break;
         default:
-            // Fallback: Use the base query (already filtered by batch)
             break;
     }
 
-    // If $users wasn't set by a specific case, get results from the main query
-    if ($users->isEmpty()) {
+    if ($users->isEmpty() && isset($query)) {
         $users = $query->get();
     }
 
@@ -157,29 +180,32 @@ if ($department && $course) {
     $query = User::query();
     $baseQueryConditions($query); // Apply base conditions (dept only)
     $query = applyBatchFilter($query, $selectedBatch); // Apply batch filter
+    $query = applyWithFilter($query, $withField, $withValue); // Apply 'With' filter
 
     switch ($category) {
         case "All Entities":
             $alumniQuery = User::query();
             $baseQueryConditions($alumniQuery); // Apply base conditions (dept only)
             $alumniQuery = applyBatchFilter($alumniQuery, $selectedBatch); // Apply batch filter
+            $alumniQuery = applyWithFilter($alumniQuery, $withField, $withValue); // Apply 'With' filter
             $alumniIds = $alumniQuery->pluck('id');
 
             $adminQuery = User::query();
             $adminQueryConditions($adminQuery); // Apply admin conditions (dept only)
-            $adminIds = $adminQuery->pluck('id'); // Admins not filtered by batch
+            $adminIds = $adminQuery->pluck('id');
 
             $users = User::query()->whereIn('id', $alumniIds->merge($adminIds))->get();
             break;
-         case "All Users": break; // Uses base query ->get()
-         case "Working Student":
-         case "Employed Alumni":
-         case "Unemployed Alumni":
-         case "Self-Employed Alumni":
-         case "Student Alumni":
-         case "Retired Alumni":
+        case "All Users":
+            break; // Uses base query ->get()
+        case "Working Student":
+        case "Employed Alumni":
+        case "Unemployed Alumni":
+        case "Self-Employed Alumni":
+        case "Student Alumni":
+        case "Retired Alumni":
             $dbCategory = $category;
-             switch ($category) {
+            switch ($category) {
                 case "Employed Alumni": $dbCategory = "Employed"; break;
                 case "Unemployed Alumni": $dbCategory = "Unemployed"; break;
                 case "Self-Employed Alumni": $dbCategory = "Self-Employed"; break;
@@ -188,67 +214,67 @@ if ($department && $course) {
             }
             $query->whereRelation('professionalRecords', 'employment_status', '=', $dbCategory);
             break; // Uses base query ->get()
-         case "Verified Alumni":
-         case "Unverified Alumni":
+        case "Verified Alumni":
+        case "Unverified Alumni":
             $query->whereRelation('personalRecords', 'status', '=', $category === "Verified Alumni" ? 1 : 0);
             break; // Uses base query ->get()
-         case "Verified Admin":
-         case "Unverified Admin":
+        case "Verified Admin":
+        case "Unverified Admin":
             $adminQuery = User::query();
             $adminQueryConditions($adminQuery); // Apply admin conditions (dept only)
             $adminQuery->whereRelation('adminRelation', 'is_verified', '=', $category === "Verified Admin" ? 1 : 0)
                        ->whereRelation('adminRelation', 'is_super', '=', 0);
-            $users = $adminQuery->get(); // Admins not filtered by batch
+            $users = $adminQuery->get();
             break;
-         case "Verified User":
-         case "Unverified User":
-             $alumniQuery = User::query();
-             $baseQueryConditions($alumniQuery); // Apply base conditions (dept only)
-             $alumniQuery = applyBatchFilter($alumniQuery, $selectedBatch); // Apply batch filter
-             $alumniQuery->where(function ($q_inner) use ($category) {
-                 // Refined verification logic
-                 if ($category === "Verified User") {
+        case "Verified User":
+        case "Unverified User":
+            $alumniQuery = User::query();
+            $baseQueryConditions($alumniQuery); // Apply base conditions (dept only)
+            $alumniQuery = applyBatchFilter($alumniQuery, $selectedBatch); // Apply batch filter
+            $alumniQuery = applyWithFilter($alumniQuery, $withField, $withValue); // Apply 'With' filter
+            $alumniQuery->where(function ($q_inner) use ($category) {
+                if ($category === "Verified User") {
                     $q_inner->where(function ($q_status) {
-                              $q_status->whereHas('personalRecords', fn($pr) => $pr->where('status', 1))
-                                       ->orWhereHas('partialPersonal');
-                          });
-                } else { // Unverified User
+                        $q_status->whereHas('personalRecords', fn($pr) => $pr->where('status', 1))
+                                 ->orWhereHas('partialPersonal');
+                    });
+                } else {
                     $q_inner->where(function ($q_status) {
-                            $q_status->whereDoesntHave('personalRecords', fn($pr) => $pr->where('status', 1))
-                                     ->whereDoesntHave('partialPersonal');
-                        });
+                        $q_status->whereDoesntHave('personalRecords', fn($pr) => $pr->where('status', 1))
+                                 ->whereDoesntHave('partialPersonal');
+                    });
                 }
-             });
-             $alumniIds = $alumniQuery->pluck('id');
+            });
+            $alumniIds = $alumniQuery->pluck('id');
 
-             $adminQuery = User::query();
-             $adminQueryConditions($adminQuery); // Apply admin conditions (dept only)
-             $adminQuery->whereRelation('adminRelation', 'is_verified', '=', $category === "Verified User" ? 1 : 0) // Match user verification status
-                        ->whereRelation('adminRelation', 'is_super', '=', 0);
-             $adminIds = $adminQuery->pluck('id'); // Admins not filtered by batch
+            $adminQuery = User::query();
+            $adminQueryConditions($adminQuery); // Apply admin conditions (dept only)
+            $adminQuery->whereRelation('adminRelation', 'is_verified', '=', $category === "Verified User" ? 1 : 0)
+                       ->whereRelation('adminRelation', 'is_super', '=', 0);
+            $adminIds = $adminQuery->pluck('id');
 
-             $users = User::query()->whereIn('id', $alumniIds->merge($adminIds))->get();
-             break;
-         default:
-             break; // Uses base query ->get()
+            $users = User::query()->whereIn('id', $alumniIds->merge($adminIds))->get();
+            break;
+        default:
+            break; // Uses base query ->get()
     }
 
-    // If $users wasn't set in a specific case, get results from the main query
-    if ($users->isEmpty()) {
+    if ($users->isEmpty() && isset($query)) {
         $users = $query->get();
     }
 
-} else { // No specific department or course
+} else {
     switch ($category) {
         case "All Entities":
             $alumniQuery = User::query();
             $baseQueryConditions($alumniQuery); // Apply base conditions (no dept/course)
             $alumniQuery = applyBatchFilter($alumniQuery, $selectedBatch); // Apply batch filter
+            $alumniQuery = applyWithFilter($alumniQuery, $withField, $withValue); // Apply 'With' filter
             $alumniIds = $alumniQuery->pluck('id');
 
             $adminQuery = User::query();
             $adminQueryConditions($adminQuery); // Apply admin conditions (no dept/course)
-            $adminIds = $adminQuery->pluck('id'); // Admins not filtered by batch
+            $adminIds = $adminQuery->pluck('id');
 
             $users = User::query()->whereIn('id', $alumniIds->merge($adminIds))->get();
             break;
@@ -256,6 +282,7 @@ if ($department && $course) {
             $query = User::query();
             $baseQueryConditions($query); // Apply base conditions (no dept/course)
             $query = applyBatchFilter($query, $selectedBatch); // Apply batch filter
+            $query = applyWithFilter($query, $withField, $withValue); // Apply 'With' filter
             $users = $query->get();
             break;
         case "Working Student":
@@ -265,7 +292,7 @@ if ($department && $course) {
         case "Student Alumni":
         case "Retired Alumni":
             $dbCategory = $category;
-             switch ($category) {
+            switch ($category) {
                 case "Employed Alumni": $dbCategory = "Employed"; break;
                 case "Unemployed Alumni": $dbCategory = "Unemployed"; break;
                 case "Self-Employed Alumni": $dbCategory = "Self-Employed"; break;
@@ -275,6 +302,7 @@ if ($department && $course) {
             $query = User::query();
             $baseQueryConditions($query); // Apply base conditions (no dept/course)
             $query = applyBatchFilter($query, $selectedBatch); // Apply batch filter
+            $query = applyWithFilter($query, $withField, $withValue); // Apply 'With' filter
             $query->whereRelation('professionalRecords', 'employment_status', '=', $dbCategory);
             $users = $query->get();
             break;
@@ -283,6 +311,7 @@ if ($department && $course) {
             $query = User::query();
             $baseQueryConditions($query); // Apply base conditions (no dept/course)
             $query = applyBatchFilter($query, $selectedBatch); // Apply batch filter
+            $query = applyWithFilter($query, $withField, $withValue); // Apply 'With' filter
             $query->whereRelation('personalRecords', 'status', '=', $category === "Verified Alumni" ? 1 : 0);
             $users = $query->get();
             break;
@@ -292,34 +321,34 @@ if ($department && $course) {
             $adminQueryConditions($adminQuery); // Apply admin conditions (no dept/course)
             $adminQuery->whereRelation('adminRelation', 'is_verified', '=', $category === "Verified Admin" ? 1 : 0)
                        ->whereRelation('adminRelation', 'is_super', '=', 0);
-            $users = $adminQuery->get(); // Admins not filtered by batch
+            $users = $adminQuery->get();
             break;
         case "Verified User":
         case "Unverified User":
             $alumniQuery = User::query();
             $baseQueryConditions($alumniQuery); // Apply base conditions (no dept/course)
             $alumniQuery = applyBatchFilter($alumniQuery, $selectedBatch); // Apply batch filter
-             $alumniQuery->where(function ($q_inner) use ($category) {
-                 // Refined verification logic
-                 if ($category === "Verified User") {
+            $alumniQuery = applyWithFilter($alumniQuery, $withField, $withValue); // Apply 'With' filter
+            $alumniQuery->where(function ($q_inner) use ($category) {
+                if ($category === "Verified User") {
                     $q_inner->where(function ($q_status) {
-                              $q_status->whereHas('personalRecords', fn($pr) => $pr->where('status', 1))
-                                       ->orWhereHas('partialPersonal');
-                          });
-                } else { // Unverified User
+                        $q_status->whereHas('personalRecords', fn($pr) => $pr->where('status', 1))
+                                 ->orWhereHas('partialPersonal');
+                    });
+                } else {
                     $q_inner->where(function ($q_status) {
-                            $q_status->whereDoesntHave('personalRecords', fn($pr) => $pr->where('status', 1))
-                                     ->whereDoesntHave('partialPersonal');
-                        });
+                        $q_status->whereDoesntHave('personalRecords', fn($pr) => $pr->where('status', 1))
+                                 ->whereDoesntHave('partialPersonal');
+                    });
                 }
-             });
+            });
             $alumniIds = $alumniQuery->pluck('id');
 
             $adminQuery = User::query();
             $adminQueryConditions($adminQuery); // Apply admin conditions (no dept/course)
-            $adminQuery->whereRelation('adminRelation', 'is_verified', '=', $category === "Verified User" ? 1 : 0) // Match user verification status
+            $adminQuery->whereRelation('adminRelation', 'is_verified', '=', $category === "Verified User" ? 1 : 0)
                        ->whereRelation('adminRelation', 'is_super', '=', 0);
-            $adminIds = $adminQuery->pluck('id'); // Admins not filtered by batch
+            $adminIds = $adminQuery->pluck('id');
 
             $users = User::query()->whereIn('id', $alumniIds->merge($adminIds))->get();
             break;
@@ -327,10 +356,44 @@ if ($department && $course) {
             $query = User::query();
             $baseQueryConditions($query); // Apply base conditions (no dept/course)
             $query = applyBatchFilter($query, $selectedBatch); // Apply batch filter
+            $query = applyWithFilter($query, $withField, $withValue); // Apply 'With' filter
             $users = $query->get();
             break;
     }
 }
+
+// Apply search filter if present, after all other filters
+if (request()->filled('search') && isset($users) && $users->isNotEmpty()) {
+    $searchTerm = '%' . request('search') . '%';
+    $userIds = $users->pluck('id');
+
+    $query = App\Models\User::whereIn('id', $userIds)
+        ->where(function ($q) use ($searchTerm) {
+            $q->whereHas('personalBio', function ($pb) use ($searchTerm) {
+                  $pb->where('first_name', 'like', $searchTerm)
+                     ->orWhere('last_name', 'like', $searchTerm)
+                     ->orWhere('student_id', 'like', $searchTerm)
+                     ->orWhere('email_address', 'like', $searchTerm)
+                     ->orWhere('phone_number', 'like', $searchTerm);
+              })
+              ->orWhereHas('partialPersonal', function ($pp) use ($searchTerm) {
+                  $pp->where('first_name', 'like', $searchTerm)
+                     ->orWhere('last_name', 'like', $searchTerm)
+                     ->orWhere('student_id', 'like', $searchTerm)
+                     ->orWhere('email_address', 'like', $searchTerm)
+                     ->orWhere('phone_number', 'like', $searchTerm);
+              })
+              ->orWhereHas('adminRelation', function ($ar) use ($searchTerm) {
+                  $ar->where('first_name', 'like', $searchTerm)
+                     ->orWhere('last_name', 'like', $searchTerm)
+                     ->orWhere('position_id', 'like', $searchTerm)
+                     ->orWhere('email_address', 'like', $searchTerm)
+                     ->orWhere('phone_number', 'like', $searchTerm);
+              });
+        });
+    $users = $query->get();
+}
+
 ?>
 
 @section('content')
@@ -426,6 +489,10 @@ if ($department && $course) {
                         $courseNameForTitle = $course->name;
                     }
                     $titleParts[] = e($courseNameForTitle);
+
+                    if ($withField && $withValue && array_key_exists($withField, $withFieldsMap)) {
+                        $titleParts[] = 'with ' . e($withFieldsMap[$withField]) . ' = "' . e($withValue) . '"';
+                    }
 
                     $reportTitle = implode(' ', $titleParts);
 
