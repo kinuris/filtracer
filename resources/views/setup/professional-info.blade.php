@@ -469,8 +469,6 @@
             const isDisabled = notApplicableStatuses.includes(selectedStatus);
 
             employmentFields.forEach(field => {
-                 field.disabled = isDisabled; // Disable the field directly
-
                 if (isDisabled) {
                     // Add disabled style class
                     field.classList.add(field.tagName === 'SELECT' ? 'form-select-disabled' : 'form-input-disabled');
