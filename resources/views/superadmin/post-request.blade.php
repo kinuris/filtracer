@@ -122,9 +122,11 @@ $post = $posts->where('id', request('view_post_modal'))->first();
                                 <img src="{{ asset('assets/approve.svg') }}" alt="Approve" class="w-5 h-5 inline">
                             </a>
                             @endif
+                            @if($post->status != 'Denied')
                             <a href="/post/changestat/{{ $post->id }}?status=Denied">
                                 <img src="{{ asset('assets/deny.svg') }}" alt="Deny" class="w-5 h-5 inline">
                             </a>
+                            @endif
                             <a href="?status={{ request('status') }}&view_post_modal={{ $post->id }}">
                                 <img src="{{ asset('assets/view.svg') }}" alt="View" class="w-6 h-6 inline">
                             </a>
