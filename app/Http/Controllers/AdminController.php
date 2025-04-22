@@ -12,6 +12,7 @@ use App\Models\Major;
 use App\Models\PersonalRecord;
 use App\Models\Post;
 use App\Models\ProfessionalRecord;
+use App\Models\ProfessionalRecordMethod;
 use App\Models\User;
 use App\Models\UserAlert;
 use Illuminate\Http\Request;
@@ -632,8 +633,8 @@ class AdminController extends Controller
                 ->orWhereRelation('personalBio', 'last_name', 'LIKE', '%' . $search . '%');
         }
 
-        if (!User::query()->find(Auth::user()->id)->admin()->is_super) {
-            $users = $users->where('department_id', '=', User::query()->find(Auth::user()->id)->admin()->office);
+        if (!Auth::user()->admin()->is_super) {
+            $users = $users->where('department_id', '=', Auth::user()->admin()->office);
         }
 
         $users = $users->paginate(7);
@@ -826,39 +827,175 @@ class AdminController extends Controller
 
     public function alumniListView(Request $request, Department $department)
     {
-        // $users = User::hasBio('educational');
-        $users = User::query()->where('role', '=', 'Alumni');
+        // --- Filter Parameters ---
+        $courseId = (int) $request->query('course', -1);
+        $search = $request->query('search');
+        $category = $request->query('category', 'All Alumni'); // Default to 'All Alumni'
+        $selectedBatch = $request->query('batch', '');
+        $withField = $request->query('with_field', '');
+        $withValue = $request->query('with_value', '');
 
-        $course = (int) $request->query('course');
-        if ($course && $course !== -1) {
-            $users = $users->whereHas('educationalBios', function ($query) use ($course) {
-                $query->where('course_id', '=', $course);
+        // --- Base Query ---
+        $usersQuery = User::query()
+            ->where('role', '=', 'Alumni')
+            ->where('department_id', '=', $department->id);
+
+        // --- Apply Course Filter ---
+        if ($courseId !== -1) {
+            $usersQuery = $usersQuery->whereHas('educationalBios', function ($query) use ($courseId) {
+                $query->where('course_id', '=', $courseId);
             });
         }
 
-        $search = $request->query('search');
-        if ($search) {
-            $users = $users
-                ->whereRelation('partialPersonal', 'first_name', 'LIKE', '%' . $search . '%')
-                ->orWhereRelation('partialPersonal', 'middle_name', 'LIKE', '%' . $search . '%')
-                ->orWhereRelation('partialPersonal', 'last_name', 'LIKE', '%' . $search . '%')
-                ->orWhereRelation('personalBio', 'first_name', 'LIKE', '%' . $search . '%')
-                ->orWhereRelation('personalBio', 'middle_name', 'LIKE', '%' . $search . '%')
-                ->orWhereRelation('personalBio', 'last_name', 'LIKE', '%' . $search . '%');
+        // --- Apply Batch Filter ---
+        if ($selectedBatch !== '') {
+            $usersQuery = $usersQuery->whereHas('educationalRecord', function ($subQuery) use ($selectedBatch) {
+                $subQuery->where('end', '=', $selectedBatch);
+            });
         }
 
-        $users = $users
-            ->where('department_id', '=', $department->id)
-            ->where('role', '=', 'Alumni')
-            ->paginate(7);
+        // --- Apply Category Filter (Employment Status) ---
+        $dbCategory = null;
+        switch ($category) {
+            case "Employed Alumni": $dbCategory = "Employed"; break;
+            case "Unemployed Alumni": $dbCategory = "Unemployed"; break;
+            case "Self-Employed Alumni": $dbCategory = "Self-employed"; break;
+            case "Student Alumni": $dbCategory = "Student"; break;
+            case "Retired Alumni": $dbCategory = "Retired"; break;
+            case "Working Student": $dbCategory = "Working Student"; break;
+                // Add other relevant alumni categories if needed
+        }
+        if ($dbCategory) {
+            $usersQuery = $usersQuery->whereHas('professionalRecords', function ($subQuery) use ($dbCategory) {
+                $subQuery->where('employment_status', '=', $dbCategory);
+            });
+        }
+        // Add filters for Verified/Unverified Alumni if needed
+        // case "Verified Alumni": ... whereHas('personalRecords', fn($pr) => $pr->where('status', 1)) ...
+        // case "Unverified Alumni": ... whereDoesntHave('personalRecords', fn($pr) => $pr->where('status', 1)) ...
 
 
+        // --- Apply 'With' Filter ---
+        if ($withField && $withValue && $withValue !== '') {
+            if ($withField === 'job_search_method') {
+                $usersQuery->whereHas('professionalRecords.methods', function ($subQuery) use ($withValue) {
+                    $subQuery->where('method', '=', $withValue);
+                });
+            } else {
+                // Ensure the field exists in ProfessionalRecord model to avoid errors
+                $professionalRecordFillable = (new ProfessionalRecord)->getFillable(); // Or define allowed fields explicitly
+                if (in_array($withField, $professionalRecordFillable) || $withField === 'job_title' || $withField === 'industry' || $withField === 'employment_type1' || $withField === 'employment_type2' || $withField === 'monthly_salary' || $withField === 'waiting_time') { // Add other valid fields
+                     $usersQuery->whereHas('professionalRecords', function ($subQuery) use ($withField, $withValue) {
+                        $subQuery->where($withField, '=', $withValue);
+                    });
+                }
+            }
+        }
+
+
+        // --- Apply Search Filter ---
+        if ($search) {
+            $usersQuery = $usersQuery->where(function ($query) use ($search) {
+                $searchTerm = '%' . $search . '%';
+                $query->whereHas('partialPersonal', function ($pp) use ($searchTerm) {
+                      $pp->where('first_name', 'like', $searchTerm)
+                         ->orWhere('middle_name', 'like', $searchTerm)
+                         ->orWhere('last_name', 'like', $searchTerm)
+                         ->orWhere('student_id', 'like', $searchTerm)
+                         ->orWhere('email_address', 'like', $searchTerm)
+                         ->orWhere('phone_number', 'like', $searchTerm);
+                  })
+                  ->orWhereHas('personalBio', function ($pb) use ($searchTerm) {
+                      $pb->where('first_name', 'like', $searchTerm)
+                         ->orWhere('middle_name', 'like', $searchTerm)
+                         ->orWhere('last_name', 'like', $searchTerm)
+                         ->orWhere('student_id', 'like', $searchTerm)
+                         ->orWhere('email_address', 'like', $searchTerm)
+                         ->orWhere('phone_number', 'like', $searchTerm);
+                  });
+            });
+        }
+
+        // --- Paginate Results ---
+        $users = $usersQuery
+            ->orderBy('created_at', 'DESC') // Or order by name, etc.
+            ->paginate(7); // Adjust pagination size if needed
+
+        // --- Data for Filters ---
         $courses = $department->getCourses();
+        $batches = EducationRecord::whereNotNull('end')
+            ->whereHas('user', function($q) use ($department) {
+                $q->where('department_id', $department->id);
+            })
+            ->distinct()
+            ->orderBy('end', 'asc')
+            ->pluck('end')
+            ->unique();
+
+        $withFieldsMap = [
+            'job_title' => 'Job',
+            'waiting_time' => 'Waiting Time',
+            'industry' => 'Industry',
+            'employment_type1' => 'Employment Type 1',
+            'employment_type2' => 'Employment Type 2',
+            'monthly_salary' => 'Monthly Salary',
+            'job_search_method' => 'Job Search Method',
+        ];
+
+        // Fetch distinct values for the selected 'With' field based on current filters
+        $withFieldValues = collect();
+        if ($withField && array_key_exists($withField, $withFieldsMap)) {
+            // Get IDs of users matching current filters (dept, course, batch, category) *before* applying 'with' filter
+            $relevantUserIdsQuery = User::query()
+                ->where('role', '=', 'Alumni')
+                ->where('department_id', '=', $department->id);
+            if ($courseId !== -1) {
+                 $relevantUserIdsQuery->whereHas('educationalBios', fn($q) => $q->where('course_id', $courseId));
+            }
+            if ($selectedBatch !== '') {
+                 $relevantUserIdsQuery->whereHas('educationalRecord', fn($q) => $q->where('end', $selectedBatch));
+            }
+             if ($dbCategory) {
+                 $relevantUserIdsQuery->whereHas('professionalRecords', fn($q) => $q->where('employment_status', $dbCategory));
+             }
+            $relevantUserIds = $relevantUserIdsQuery->pluck('id');
+
+            if ($withField === 'job_search_method') {
+                $withFieldValues = ProfessionalRecordMethod::whereIn(
+                        'professional_record_id',
+                        ProfessionalRecord::whereIn('user_id', $relevantUserIds)->pluck('id')
+                    )
+                    ->whereNotNull('method')
+                    ->where('method', '!=', '')
+                    ->distinct()
+                    ->orderBy('method')
+                    ->pluck('method');
+            } else {
+                 $professionalRecordFillableCheck = (new ProfessionalRecord)->getFillable();
+                 if (in_array($withField, $professionalRecordFillableCheck) || $withField === 'job_title' || $withField === 'industry' || $withField === 'employment_type1' || $withField === 'employment_type2' || $withField === 'monthly_salary' || $withField === 'waiting_time') {
+                    $withFieldValues = ProfessionalRecord::whereIn('user_id', $relevantUserIds)
+                        ->whereNotNull($withField)
+                        ->where($withField, '!=', '')
+                        ->distinct()
+                        ->orderBy($withField)
+                        ->pluck($withField);
+                 }
+            }
+        }
+
 
         return view('alumni.index')
             ->with('dept', $department)
             ->with('courses', $courses)
-            ->with('users', $users);
+            ->with('users', $users)
+            ->with('selectedCourse', $courseId) // Pass selected course ID
+            ->with('selectedBatch', $selectedBatch)
+            ->with('batches', $batches)
+            ->with('selectedCategory', $category)
+            ->with('withField', $withField)
+            ->with('withValue', $withValue)
+            ->with('withFieldsMap', $withFieldsMap)
+            ->with('withFieldValues', $withFieldValues);
     }
 
     public function editDepartmentView(Department $department)

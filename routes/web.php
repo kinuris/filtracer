@@ -152,7 +152,7 @@ Route::controller(AdminController::class)
     ->middleware('role:Superadmin')
     ->group(function () {
         Route::get('/department', 'departmentView');
-        Route::get('/department/{department}', 'alumniListView');
+        Route::get('/department/{department}', 'alumniListView')->name('admin.alumni.list');
 
         Route::get('/settings/department', 'departmentSettingsView');
         Route::get('/settings/department/edit/{department}', 'editDepartmentView');
