@@ -117,9 +117,11 @@ $post = $posts->where('id', request('view_post_modal'))->first();
                     <td class="py-2 px-4">{{ $post->created_at->format('Y-m-d') }}</td>
                     <td class="py-2 px-4">
                         <div class="flex justify-center items-center space-x-2.5">
+                            @if($post->status != 'Approved')
                             <a href="/post/changestat/{{ $post->id }}?status=Approved">
                                 <img src="{{ asset('assets/approve.svg') }}" alt="Approve" class="w-5 h-5 inline">
                             </a>
+                            @endif
                             <a href="/post/changestat/{{ $post->id }}?status=Denied">
                                 <img src="{{ asset('assets/deny.svg') }}" alt="Deny" class="w-5 h-5 inline">
                             </a>
