@@ -476,7 +476,7 @@ class AdminController extends Controller
 
             DB::commit();
 
-            return redirect()->route('admin.alumni.profile.view', [$dept->id, $user->id])->with([
+            return redirect('/user/view/' . $user->id)->with([
                 'message' => 'Profile updated successfully!',
                 'subtitle' => $user->name . '\'s profile has been updated.'
             ]);
