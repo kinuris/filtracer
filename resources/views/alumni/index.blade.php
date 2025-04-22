@@ -18,7 +18,7 @@
             <div class="p-4 md:p-6 space-y-4">
 
                 {{-- Filters Row 1 --}}
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 items-end">
                     {{-- Category Select --}}
                     <div>
                         <label for="category" class="block text-sm font-medium text-gray-700 mb-1">Category</label>
@@ -61,16 +61,16 @@
                             @endforeach
                         </select>
                     </div>
+                </div>
 
-                     {{-- Search Input --}}
-                    <div>
-                        <label for="search" class="block text-sm font-medium text-gray-700 mb-1">Search</label>
-                        <input value="{{ request('search') ?? '' }}" class="w-full bg-white border border-gray-300 rounded-md shadow-sm px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" placeholder="Name, ID, email..." type="text" name="search" id="search">
-                    </div>
+                {{-- Search Input Row --}}
+                <div class="pt-1">
+                    <label for="search" class="block text-sm font-medium text-gray-700 mb-1">Search</label>
+                    <input value="{{ request('search') ?? '' }}" class="w-full bg-white border border-gray-300 rounded-md shadow-sm px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" placeholder="Name, ID, email..." type="text" name="search" id="search">
                 </div>
 
                 {{-- 'With' Filter Row --}}
-                <div class="grid grid-cols-1 sm:grid-cols-[1fr_1fr_auto] gap-4 items-end pt-4">
+                <div class="grid grid-cols-1 sm:grid-cols-[1fr_1fr_auto] gap-4 items-end pt-1">
                     {{-- 'With' Field Select --}}
                     <div>
                         <label for="with_field" class="block text-sm font-medium text-gray-700 mb-1">With</label>

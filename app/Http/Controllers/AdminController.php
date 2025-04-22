@@ -9,7 +9,6 @@ use App\Models\Course;
 use App\Models\Department;
 use App\Models\EducationRecord;
 use App\Models\Major;
-use App\Models\PersonalRecord;
 use App\Models\Post;
 use App\Models\ProfessionalRecord;
 use App\Models\ProfessionalRecordMethod;
