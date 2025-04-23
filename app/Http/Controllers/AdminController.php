@@ -68,10 +68,6 @@ class AdminController extends Controller
     {
         $users = User::query();
 
-        if (request('mode') === 'generated') {
-            $users = User::has('adminGenerated');
-        }
-
         $role = request()->query('user_role', 'Alumni');
         if ($role === 'Alumni' && request('mode') !== 'generated') {
             $users = User::query()->where('role', '=', 'Alumni');
@@ -98,23 +94,10 @@ class AdminController extends Controller
 
         $currentUser = Auth::user();
         if (!User::query()->find($currentUser->id)->admin()->is_super) {
-            $users = $users->where('department_id', '=', $currentUser->department_id);
+            $users = $users->where('department_id', '=', $currentUser->admin()->office);
         }
 
-        $status = (int) request()->query('user_status', -1);
-        if ($status !== -1) {
-            if ($role === 'Alumni') {
-                $users = $users->whereHas('personalBio', function ($query) {
-                    $query->where('status', '=', request()->query('user_status'));
-                });
-            } else {
-                $users = $users->whereHas('adminRelation', function ($query) {
-                    $query->where('is_verified', '=', request()->query('user_status'));
-                });
-            }
-        }
-
-        $users = $users->whereRelation('educationalBios', 'course_id', '=', $course->id);
+        $users = $users->whereRelation('educationalRecord', 'course_id', '=', $course->id);
         $users = $users->paginate(6);
 
         return view('alumni.course')
