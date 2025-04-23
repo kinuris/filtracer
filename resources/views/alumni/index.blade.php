@@ -21,17 +21,15 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 items-end">
                     {{-- Category Select --}}
                     <div>
-                        <label for="category" class="block text-sm font-medium text-gray-700 mb-1">Category</label>
+                        <label for="category" class="block text-sm font-medium text-gray-700 mb-1">Employment Status</label>
                         <select onchange="handleChangeCategory()" class="w-full bg-white border border-gray-300 rounded-md shadow-sm px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" name="category" id="category">
-                            <option @if ($selectedCategory == 'All Alumni') selected @endif value="All Alumni">All Alumni</option>
-                            <optgroup label="Employment">
-                                <option @if ($selectedCategory == 'Employed Alumni') selected @endif value="Employed Alumni">Employed Alumni</option>
-                                <option @if ($selectedCategory == 'Working Student') selected @endif value="Working Student">Working Student</option>
-                                <option @if ($selectedCategory == 'Unemployed Alumni') selected @endif value="Unemployed Alumni">Unemployed Alumni</option>
-                                <option @if ($selectedCategory == 'Self-Employed Alumni') selected @endif value="Self-Employed Alumni">Self-Employed Alumni</option>
-                                <option @if ($selectedCategory == 'Student Alumni') selected @endif value="Student Alumni">Student Alumni</option>
-                                <option @if ($selectedCategory == 'Retired Alumni') selected @endif value="Retired Alumni">Retired Alumni</option>
-                            </optgroup>
+                            <option @if ($selectedCategory=='All Alumni' ) selected @endif value="All Alumni">All Employment Status</option>
+                            <option @if ($selectedCategory=='Employed Alumni' ) selected @endif value="Employed Alumni">Employed Alumni</option>
+                            <option @if ($selectedCategory=='Working Student' ) selected @endif value="Working Student">Working Student</option>
+                            <option @if ($selectedCategory=='Unemployed Alumni' ) selected @endif value="Unemployed Alumni">Unemployed Alumni</option>
+                            <option @if ($selectedCategory=='Self-Employed Alumni' ) selected @endif value="Self-Employed Alumni">Self-Employed Alumni</option>
+                            <option @if ($selectedCategory=='Student Alumni' ) selected @endif value="Student Alumni">Student Alumni</option>
+                            <option @if ($selectedCategory=='Retired Alumni' ) selected @endif value="Retired Alumni">Retired Alumni</option>
                             {{-- Add Verified/Unverified if needed --}}
                             {{-- <optgroup label="Status">
                                 <option @if ($selectedCategory == 'Verified Alumni') selected @endif value="Verified Alumni">Verified Alumni</option>
@@ -63,46 +61,58 @@
                     </div>
                 </div>
 
+                {{-- Additional Filter Row --}}
+                <div class="grid grid-cols-1 sm:grid-cols-[1fr_1fr_auto] gap-4 items-end pt-1">
+                    {{-- Filter Field Selection --}}
+                    <div>
+                        <label for="with_field" class="block text-sm font-medium text-gray-700 mb-1">Filter By Field</label>
+                        <select name="with_field" id="with_field" onchange="handleWithFieldChange()" class="w-full bg-white border border-gray-300 rounded-md shadow-sm px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                            <option value="">-- Select Field --</option>
+                            @foreach ($withFieldsMap as $fieldKey => $fieldName)
+                            <option value="{{ $fieldKey }}" {{ $withField == $fieldKey ? 'selected' : '' }}>{{ $fieldName }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    {{-- Filter Value Selection --}}
+                    <div>
+                        <label for="with_value" class="block text-sm font-medium text-gray-700 mb-1">Value</label>
+                        <select name="with_value" id="with_value" onchange="handleWithValueChange()" class="w-full bg-white border border-gray-300 rounded-md shadow-sm px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 disabled:bg-gray-100 disabled:cursor-not-allowed" {{ !$withField ? 'disabled' : '' }}>
+                            <option value="">-- Select Value --</option>
+                            {{-- Ensure $withFieldValues is available and not empty before looping --}}
+                            @if ($withField && isset($withFieldValues) && $withFieldValues->isNotEmpty())
+                            @foreach ($withFieldValues as $value)
+                            {{-- Explicitly cast to string for reliable comparison, especially with numeric-like strings --}}
+                            <option value="{{ $value }}" {{ (string) $withValue === (string) $value ? 'selected' : '' }}>{{ $value }}</option>
+                            @endforeach
+                            @endif
+                        </select>
+                    </div>
+
+                    {{-- Remove Filter Button --}}
+                    {{-- Aligned vertically with select inputs using flex and matching approximate height --}}
+                    <div class="flex items-center h-[38px]">
+                        <button type="button" onclick="removeWithFilter()" title="Remove this filter" class="text-sm text-red-600 hover:text-red-800 whitespace-nowrap py-2 px-1 transition-colors duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-red-500 rounded {{ !$withField ? 'invisible' : '' }}">
+                            Remove
+                        </button>
+                        {{-- Optional: Icon alternative --}}
+                        {{-- <button type="button" onclick="removeWithFilter()" title="Remove this filter" class="p-2 text-gray-500 hover:text-red-600 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 {{ !$withField ? 'invisible' : '' }}">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                        </button> --}}
+                    </div>
+                </div>
+
                 {{-- Search Input Row --}}
                 <div class="pt-1">
                     <label for="search" class="block text-sm font-medium text-gray-700 mb-1">Search</label>
                     <input value="{{ request('search') ?? '' }}" class="w-full bg-white border border-gray-300 rounded-md shadow-sm px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" placeholder="Name, ID, email..." type="text" name="search" id="search">
                 </div>
 
-                {{-- 'With' Filter Row --}}
-                <div class="grid grid-cols-1 sm:grid-cols-[1fr_1fr_auto] gap-4 items-end pt-1">
-                    {{-- 'With' Field Select --}}
-                    <div>
-                        <label for="with_field" class="block text-sm font-medium text-gray-700 mb-1">With</label>
-                        <select name="with_field" id="with_field" onchange="handleWithFieldChange()" class="w-full bg-white border border-gray-300 rounded-md shadow-sm px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
-                            <option value="">-- Select Field --</option>
-                            @foreach ($withFieldsMap as $fieldKey => $fieldName)
-                                <option value="{{ $fieldKey }}" {{ $withField == $fieldKey ? 'selected' : '' }}>{{ $fieldName }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-
-                    {{-- 'With' Value Select --}}
-                    <div>
-                        <select name="with_value" id="with_value" onchange="handleWithValueChange()" class="w-full bg-white border border-gray-300 rounded-md shadow-sm px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" {{ !$withField ? 'disabled' : '' }}>
-                            <option value="">-- Select Value --</option>
-                            @if ($withField && $withFieldValues->isNotEmpty())
-                                @foreach ($withFieldValues as $value)
-                                    <option value="{{ $value }}" {{ $withValue == $value ? 'selected' : '' }}>{{ $value }}</option>
-                                @endforeach
-                            @endif
-                        </select>
-                    </div>
-
-                    {{-- Remove Button --}}
-                    <div>
-                        <button type="button" onclick="removeWithFilter()" class="text-sm text-blue-600 hover:text-blue-800 whitespace-nowrap py-2">Remove</button>
-                    </div>
-                </div>
-
                 {{-- Action Buttons Row --}}
                 <div class="flex flex-col sm:flex-row gap-2 justify-end pt-4">
                     <button class="w-full sm:w-auto rounded-md px-4 py-2 text-sm bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" type="submit">Filter</button>
+                    {{-- Generate Report Button --}}
+                    <button type="button" onclick="generateReport()" class="w-full sm:w-auto rounded-md px-4 py-2 text-sm bg-green-600 text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">Generate Report</button>
                     {{-- Optional: Add a reset button --}}
                     <a href="{{ route('admin.alumni.list', ['department' => $dept->id]) }}" class="w-full sm:w-auto rounded-md px-4 py-2 text-sm bg-gray-200 text-gray-700 text-center hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-400">Reset Filters</a>
                 </div>
@@ -114,31 +124,31 @@
     {{-- Results Section --}}
     <div class="shadow rounded-lg">
         <div class="bg-white py-3 px-4 md:px-6 border-b rounded-t-lg">
-             <p class="font-semibold text-sm md:text-base text-gray-800">
+            <p class="font-semibold text-sm md:text-base text-gray-800">
                 @php
                 $titleParts = [$selectedCategory];
                 if ($selectedBatch != '') {
-                    $titleParts[] = 'from Batch ' . e($selectedBatch);
+                $titleParts[] = 'from Batch ' . e($selectedBatch);
                 } else {
-                    $titleParts[] = 'from All Batches';
+                $titleParts[] = 'from All Batches';
                 }
 
                 $courseNameForTitle = 'All Courses';
                 if ($selectedCourse != -1) {
-                    $foundCourse = $courses->firstWhere('id', $selectedCourse);
-                    if($foundCourse) $courseNameForTitle = $foundCourse->name;
+                $foundCourse = $courses->firstWhere('id', $selectedCourse);
+                if($foundCourse) $courseNameForTitle = $foundCourse->name;
                 }
                 $titleParts[] = 'in ' . e($courseNameForTitle);
 
                 if ($withField && $withValue && array_key_exists($withField, $withFieldsMap)) {
-                    $titleParts[] = 'with ' . e($withFieldsMap[$withField]) . ' = "' . e($withValue) . '"';
+                $titleParts[] = 'with ' . e($withFieldsMap[$withField]) . ' = "' . e($withValue) . '"';
                 }
 
                 $reportTitle = implode(' ', $titleParts);
                 @endphp
                 {{ $reportTitle }}
                 @if(request()->filled('search'))
-                    <span class="text-gray-500 font-normal"> (matching search "{{ e(request('search')) }}")</span>
+                <span class="text-gray-500 font-normal"> (matching search "{{ e(request('search')) }}")</span>
                 @endif
             </p>
         </div>
@@ -275,6 +285,34 @@
         }
         // Set hidden inputs if needed to clear server-side values, or just submit
         document.getElementById('filterForm').submit();
+    }
+
+    function generateReport() {
+        const form = document.getElementById('filterForm');
+        const category = form.elements['category'].value;
+        const batch = form.elements['batch'].value;
+        const course = form.elements['course'].value;
+        const search = form.elements['search'].value;
+        const withField = form.elements['with_field'].value;
+        const withValue = form.elements['with_value'].value;
+        const departmentId = '{{ $dept->id }}'; // Get department ID from PHP
+
+        // Construct the URL for the statistical report generation page
+        // Assuming the route name is 'admin.report.statistical.generate'
+        const reportUrl = new URL('/report/statistical/generate/', window.location.origin);
+
+        // Add parameters conditionally
+        reportUrl.searchParams.set('department', departmentId);
+        if (category) reportUrl.searchParams.set('category', category);
+        if (batch) reportUrl.searchParams.set('batch', batch);
+        // Use 'course' as the parameter name, matching the form input name
+        if (course && course !== '-1') reportUrl.searchParams.set('courses', course);
+        if (search) reportUrl.searchParams.set('search', search);
+        if (withField) reportUrl.searchParams.set('with_field', withField);
+        if (withValue) reportUrl.searchParams.set('with_value', withValue);
+
+        // Redirect to the report page
+        window.location.href = reportUrl.toString();
     }
 
     document.addEventListener('DOMContentLoaded', function() {
