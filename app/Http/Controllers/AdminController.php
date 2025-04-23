@@ -784,7 +784,7 @@ class AdminController extends Controller
 
         $currentUser = Auth::user();
         if (!User::query()->find($currentUser->id)->admin()->is_super) {
-            $users = $users->where('department_id', '=', $currentUser->department_id);
+            $users = $users->where('department_id', '=', $currentUser->admin()->office);
         }
 
         $status = (int) request()->query('user_status', -1);
