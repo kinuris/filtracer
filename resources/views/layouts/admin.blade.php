@@ -61,16 +61,18 @@
             {{-- Reports Dropdown --}}
             <div class="relative group">
                 {{-- Main Trigger Button --}}
-                <button type="button" class="w-full hover:bg-gray-100 font-medium tracking-wide hover:text-blue-500 rounded-lg p-3 flex place-items-center justify-between text-left text-gray-700">
-                    <div class="flex place-items-center">
-                        <img class="w-7 mr-4" src="{{ asset('assets/reports.svg') }}" alt="Reports Icon">
-                        <span>Reports</span>
-                    </div>
-                    {{-- Dropdown Arrow --}}
-                    <span class="material-symbols-outlined text-gray-400 text-lg transition-transform duration-200 ease-in-out group-hover:rotate-180">
-                        expand_more
-                    </span>
-                </button>
+                <a href="/report/graphical">
+                    <button type="button" class="w-full hover:bg-gray-100 font-medium tracking-wide hover:text-blue-500 rounded-lg p-3 flex place-items-center justify-between text-left text-gray-700">
+                        <div class="flex place-items-center">
+                            <img class="w-7 mr-4" src="{{ asset('assets/reports.svg') }}" alt="Reports Icon">
+                            <span>Reports</span>
+                        </div>
+                        {{-- Dropdown Arrow --}}
+                        <span class="material-symbols-outlined text-gray-400 text-lg transition-transform duration-200 ease-in-out group-hover:rotate-180">
+                            expand_more
+                        </span>
+                    </button>
+                </a>
                 {{-- Dropdown Menu --}}
                 <div class="absolute hidden group-hover:block bg-white shadow-lg rounded-md mt-1 left-0 w-full z-20 ring-1 ring-black ring-opacity-5 py-1 transition-all duration-150 ease-in-out origin-top top-10 scale-95 opacity-0 group-hover:scale-100 group-hover:opacity-100">
                     <a href="/report/graphical" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-blue-500 transition-colors duration-150 ease-in-out">
