@@ -325,7 +325,7 @@ class AdminController extends Controller
     {
         // Ensure the admin belongs to the same department unless superadmin
         $admin = Auth::user();
-        if (!$admin->admin()->is_super && $admin->department_id !== $user->department_id) {
+        if (!$admin->admin()->is_super && $admin->admin()->office !== $user->department_id) {
             abort(403, 'Unauthorized access to this user profile.');
         }
 
