@@ -338,7 +338,7 @@ class AdminController extends Controller
     {
         // Authorization check (redundant if route middleware is used, but good practice)
         $admin = Auth::user();
-        if (!$admin->admin()->is_super && $admin->department_id !== $user->department_id) {
+        if (!$admin->admin()->is_super && $admin->admin()->office !== $user->department_id) {
             abort(403, 'Unauthorized action.');
         }
 
